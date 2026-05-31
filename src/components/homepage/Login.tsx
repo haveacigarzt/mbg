@@ -11,6 +11,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { postLoginMutationOptions } from "@/queryOptions/auth";
+import { Link } from "@tanstack/react-router";
 
 const Login = () => {
   const mutation = useMutation(postLoginMutationOptions());
@@ -127,6 +128,12 @@ const Login = () => {
           )}
         />
       </form>
+      <Link
+        to="/"
+        className="mt-4 text-xs text-gray-400 hover:text-blue-500 transition-colors tracking-wide"
+      >
+        ← Kembali ke Beranda
+      </Link>
     </div>
   );
 };

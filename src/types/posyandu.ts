@@ -1,0 +1,29 @@
+import type { Metadata } from "./metadata";
+
+export interface Posyandu {
+  id: number;
+  nama: string;
+  alamat: string;
+  kecamatan: string;
+  kelurahan: string;
+  jumlah_balita: number;
+  jumlah_ibu_hamil: number;
+  sppg_id: number;
+  latitude: number;
+  longitude: number;
+  sosmed_url: string | null;
+  version: number;
+}
+
+export type FetchPosyanduResponse = {
+  metadata: Metadata;
+  posyandu: Posyandu[];
+};
+
+export type GetPosyanduParams = {
+  sppg_id?: number;
+  page?: number;
+  page_size?: number;
+  nama?: string;
+  sort?: string;
+};

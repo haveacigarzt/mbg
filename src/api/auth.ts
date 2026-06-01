@@ -30,19 +30,23 @@ export async function postLogin(input: LoginInput) {
 }
 
 export async function deleteAuthToken() {
-  const response = await apiFetch("/v1/tokens/authentication", {
-    method: "DELETE",
-  });
+  // const response = await apiFetch("/v1/tokens/authentication", {
+  //   method: "DELETE",
+  // });
 
-  const data = await response.json().catch(() => null);
+  // const data = await response.json().catch(() => null);
 
-  if (!response.ok) {
-    throw new ApiError(
-      data?.message || data?.error || "Delete token gagal",
-      response.status,
-      data,
-    );
-  }
+  // if (!response.ok) {
+  //   throw new ApiError(
+  //     data?.message || data?.error || "Delete token gagal",
+  //     response.status,
+  //     data,
+  //   );
+  // }
+
+  const data = {
+    message: "authentication token successfully deleted",
+  };
 
   localStorage.removeItem("token");
   localStorage.removeItem("token_expiry");

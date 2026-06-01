@@ -1,6 +1,10 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import Navbar from "../Navbar";
-import { getSPPGByIDQueryOptions } from "../../../queryOptions/sppg";
+import {
+  getKecamatanQueryOptions,
+  getKelurahanQueryOptions,
+  getSPPGByIDQueryOptions,
+} from "../../../queryOptions/sppg";
 import { Suspense, useState } from "react";
 import SekolahTable from "./SekolahTable";
 import PosyanduTable from "./PosyanduTable";
@@ -14,7 +18,13 @@ const SPPG = () => {
   const [searchDrivers, setSearchDrivers] = useState("");
   const [searchPengiriman, setSearchPengiriman] = useState("");
   const [tab, setTab] = useState("sekolah");
-  const { data: sppg } = useSuspenseQuery(getSPPGByIDQueryOptions(4));
+  const { data: sppg, refetch: refetchSPPG } = useSuspenseQuery(
+    getSPPGByIDQueryOptions(4),
+  );
+  const { data: kecamatan } = useSuspenseQuery(getKecamatanQueryOptions());
+  const { data: kelurahan } = useSuspenseQuery(
+    getKelurahanQueryOptions(sppg.kecamatan_id),
+  );
   return (
     <div className="flex">
       <Navbar role_id={3} />
@@ -22,7 +32,12 @@ const SPPG = () => {
         <div className="p-2 bg-blue-200">
           <div className="flex justify-between items-center pb-2">
             <b>Informasi SPPG</b>
-            <DialogEditSPPG data={sppg} />
+            <DialogEditSPPG
+              data={sppg}
+              kecamatan={kecamatan}
+              kelurahan={kelurahan}
+              onSPPGUpdate={refetchSPPG}
+            />
           </div>
           <div className="w-full flex">
             <div className="flex-1 ">

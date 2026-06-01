@@ -1,12 +1,12 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
-import SPPG from "../components/internal/SPPGPage/SPPG";
 import { requireAuth } from "@/api/auth";
+import Admin from "@/components/internal/AdminPage/Admin";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/sppg")({
+export const Route = createFileRoute("/admin")({
   beforeLoad: async () => {
     const { user } = await requireAuth();
-    if (user.role_id !== 3) {
+    if (user.role_id !== 1) {
       toast.error("Access denied", {
         style: {
           "--normal-bg":
@@ -22,10 +22,5 @@ export const Route = createFileRoute("/sppg")({
 });
 
 function RouteComponent() {
-  return (
-    <div>
-      Hello
-      <SPPG />
-    </div>
-  );
+  return <Admin />;
 }

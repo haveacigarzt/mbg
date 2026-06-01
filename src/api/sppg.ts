@@ -26,11 +26,7 @@ export async function getSPPG(params?: GetSPPGParams) {
 }
 
 export async function getSPPGByID(id: number) {
-  const response = await apiFetch(`/v1/sppg/${id}`, {
-    headers: {
-      Authorization: `Bearer WG5IBGQCPCGWISHG3DXHS7LVTA`,
-    },
-  });
+  const response = await apiFetch(`/v1/sppg/${id}`);
 
   if (!response.ok) {
     throw new Error("gagal mengambil sppg");

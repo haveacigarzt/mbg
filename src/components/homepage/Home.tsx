@@ -13,10 +13,6 @@ const home = () => {
         getSPPGQueryOptions(),
       ],
     });
-  // Untuk liat data
-  console.log("Sekolah", sekolah);
-  console.log("Posyandu", posyandu);
-  console.log("SPPG", sppg);
   return (
     <div className="flex">
       <main className="min-h-screen bg-gray-50 pt-32">

@@ -1,22 +1,76 @@
-import type { LoginInput, LoginResponse } from "@/types/auth";
-import { apiFetch } from "./client";
+import type { AuthResponse, LoginInput, LoginResponse } from "@/types/auth";
+import { ApiError, apiFetch } from "./client";
+import { redirect } from "@tanstack/react-router";
 
 export async function postLogin(input: LoginInput) {
+  console.log(input);
   const response = await apiFetch("/v1/tokens/authentication", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
   });
 
+  const data = await response.json();
+
   if (!response.ok) {
-    throw new Error("gagal post login");
+    throw new ApiError(
+      data?.message || data?.error || "Login gagal",
+      response.status,
+      data,
+    );
   }
+
+  const token = data.authentication_token.token;
+  const expiry = data.authentication_token.expiry;
+
+  localStorage.setItem("token", token);
+  localStorage.setItem("token_expiry", expiry);
+
+  return data as LoginResponse;
+}
+
+export async function deleteAuthToken() {
+  const response = await apiFetch("/v1/tokens/authentication", {
+    method: "DELETE",
+  });
 
   const data = await response.json().catch(() => null);
 
   if (!response.ok) {
-    throw new Error(data?.error || data?.message || "Login gagal");
+    throw new ApiError(
+      data?.message || data?.error || "Delete token gagal",
+      response.status,
+      data,
+    );
   }
 
-  return data as LoginResponse;
+  localStorage.removeItem("token");
+  localStorage.removeItem("token_expiry");
+
+  return data as { message: string };
+}
+
+export async function requireAuth() {
+  const res = await apiFetch("/v1/users/authme", {
+    credentials: "include",
+  });
+  if (!res.ok) {
+    throw redirect({
+      to: "/login",
+      search: {
+        reason: "login_required",
+      },
+    });
+  }
+  const data = await res.json().catch(() => null);
+  return data as AuthResponse;
+}
+
+export async function getMeOrNull() {
+  const res = await apiFetch("/v1/users/authme", {
+    credentials: "include",
+  });
+
+  if (!res.ok) return null;
+  return res.json();
 }

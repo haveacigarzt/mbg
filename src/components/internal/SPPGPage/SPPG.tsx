@@ -17,7 +17,7 @@ const SPPG = () => {
   const { data: sppg } = useSuspenseQuery(getSPPGByIDQueryOptions(4));
   return (
     <div className="flex">
-      <Navbar />
+      <Navbar role_id={3} />
       <div className="flex flex-col gap-3 p-3 w-[85%] bg-red-200">
         <div className="p-2 bg-blue-200">
           <div className="flex justify-between items-center pb-2">

@@ -27,11 +27,7 @@ export async function getPengiriman(params?: GetPengirimanParams) {
     }
   });
 
-  const response = await apiFetch(`/v1/pengiriman?${searchParams.toString()}`, {
-    headers: {
-      Authorization: `Bearer WG5IBGQCPCGWISHG3DXHS7LVTA`,
-    },
-  });
+  const response = await apiFetch(`/v1/pengiriman?${searchParams.toString()}`);
 
   if (!response.ok) {
     throw new Error("gagal mengambil pengiriman");

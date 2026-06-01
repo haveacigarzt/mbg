@@ -4,7 +4,11 @@ import { getPosyanduQueryOptions } from "../../queryOptions/posyandu";
 import Navbar from "./Navbar";
 import { getSPPGQueryOptions } from "../../queryOptions/sppg";
 
-const Dashboard = () => {
+interface Props {
+  role_id: number;
+}
+
+const Dashboard = ({ role_id }: Props) => {
   const [{ data: sekolah }, { data: posyandu }, { data: sppg }] =
     useSuspenseQueries({
       queries: [
@@ -15,7 +19,7 @@ const Dashboard = () => {
     });
   return (
     <div className="flex">
-      <Navbar />
+      <Navbar role_id={role_id} />
       <div className="flex flex-col gap-3 p-3 w-[85%] bg-red-200">
         <div className="w-full flex gap-3">
           <div className="flex-1 bg-blue-200">

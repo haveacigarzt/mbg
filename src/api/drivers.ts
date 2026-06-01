@@ -10,11 +10,7 @@ export async function getDrivers(params?: GetDriversParams) {
     }
   });
 
-  const response = await apiFetch(`/v1/drivers?${searchParams.toString()}`, {
-    headers: {
-      Authorization: `Bearer WG5IBGQCPCGWISHG3DXHS7LVTA`,
-    },
-  });
+  const response = await apiFetch(`/v1/drivers?${searchParams.toString()}`);
 
   if (!response.ok) {
     throw new Error("gagal mengambil drivers");

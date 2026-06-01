@@ -11,22 +11,58 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { postLoginMutationOptions } from "@/queryOptions/auth";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
+import type { ApiError } from "@/api/client";
+import { toast } from "sonner";
 
 const Login = () => {
-  const mutation = useMutation(postLoginMutationOptions());
+  const router = useRouter();
+  const errorMap: Record<number, string[]> = {
+    401: ["Email atau password salah", "Harap periksa dan coba lagi"],
+    403: ["Akses ditolak", ""],
+    500: ["Terjadi kesalahan server", "Harap menunggu beberapa saat"],
+  };
+  const mutation = useMutation({
+    ...postLoginMutationOptions(),
+    onSuccess: () => {
+      toast.success("Berhasil login. Selamat datang", {
+        style: {
+          "--normal-bg":
+            "color-mix(in oklab, light-dark(var(--color-green-600), var(--color-green-400)) 10%, var(--background))",
+          "--normal-text":
+            "light-dark(var(--color-green-600), var(--color-green-400))",
+          "--normal-border":
+            "light-dark(var(--color-green-600), var(--color-green-400))",
+        } as React.CSSProperties,
+      });
+      router.navigate({ to: "/dashboard" });
+    },
+    onError: (error: ApiError) => {
+      setErrorMsg(
+        errorMap[error.status][0] ||
+          error.message ||
+          "Kesalahan yang tidak dikenali",
+      );
+      setErrorMsgDesc(
+        errorMap[error.status][1] ||
+          error.message ||
+          "Harap menghubungi penyedia layanan",
+      );
+    },
+  });
+
   const form = useForm({
     defaultValues: {
       email: "",
       password: "",
     },
     onSubmit: async ({ value }) => {
-      // Do something with form data
       await mutation.mutateAsync(value);
     },
   });
   const [isShowed, setShowed] = React.useState(false);
-  const error = false;
+  const [errorMsg, setErrorMsg] = React.useState("");
+  const [errorMsgDesc, setErrorMsgDesc] = React.useState("");
   return (
     <div className="h-screen flex flex-col justify-center items-center">
       <div className="mb-8">
@@ -105,14 +141,14 @@ const Login = () => {
             />
           </FieldGroup>
         </FieldSet>
-        {error && (
+        {errorMsg && (
           <Alert
             variant="destructive"
             className="max-w-md mt-5 bg-red-100 border-red-300"
           >
             <AlertCircleIcon />
-            <AlertTitle>Email atau Password salah</AlertTitle>
-            <AlertDescription>Silakan coba lagi. {error}</AlertDescription>
+            <AlertTitle>{errorMsg}</AlertTitle>
+            <AlertDescription>{errorMsgDesc}</AlertDescription>
           </Alert>
         )}
         <form.Subscribe

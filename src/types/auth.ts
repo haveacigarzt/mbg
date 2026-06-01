@@ -9,3 +9,14 @@ export type LoginResponse = {
     expiry: string;
   };
 };
+
+export type AuthResponse = {
+  user: {
+    id: 34;
+    created_at: string;
+    name: string;
+    email: string;
+    activated: boolean;
+    role_id: number;
+  };
+};

@@ -11,8 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SppgRouteImport } from './routes/sppg'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as DriverRouteImport } from './routes/driver'
 import { Route as DataRouteImport } from './routes/data'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -26,6 +28,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DriverRoute = DriverRouteImport.update({
+  id: '/driver',
+  path: '/driver',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DataRoute = DataRouteImport.update({
   id: '/data',
   path: '/data',
@@ -34,6 +41,11 @@ const DataRoute = DataRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -50,16 +62,20 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/data': typeof DataRoute
+  '/driver': typeof DriverRoute
   '/login': typeof LoginRoute
   '/sppg': typeof SppgRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/data': typeof DataRoute
+  '/driver': typeof DriverRoute
   '/login': typeof LoginRoute
   '/sppg': typeof SppgRoute
 }
@@ -67,24 +83,53 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/data': typeof DataRoute
+  '/driver': typeof DriverRoute
   '/login': typeof LoginRoute
   '/sppg': typeof SppgRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/dashboard' | '/data' | '/login' | '/sppg'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/admin'
+    | '/dashboard'
+    | '/data'
+    | '/driver'
+    | '/login'
+    | '/sppg'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/dashboard' | '/data' | '/login' | '/sppg'
-  id: '__root__' | '/' | '/about' | '/dashboard' | '/data' | '/login' | '/sppg'
+  to:
+    | '/'
+    | '/about'
+    | '/admin'
+    | '/dashboard'
+    | '/data'
+    | '/driver'
+    | '/login'
+    | '/sppg'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/admin'
+    | '/dashboard'
+    | '/data'
+    | '/driver'
+    | '/login'
+    | '/sppg'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRoute
   DashboardRoute: typeof DashboardRoute
   DataRoute: typeof DataRoute
+  DriverRoute: typeof DriverRoute
   LoginRoute: typeof LoginRoute
   SppgRoute: typeof SppgRoute
 }
@@ -105,6 +150,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/driver': {
+      id: '/driver'
+      path: '/driver'
+      fullPath: '/driver'
+      preLoaderRoute: typeof DriverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/data': {
       id: '/data'
       path: '/data'
@@ -117,6 +169,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -139,8 +198,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AdminRoute: AdminRoute,
   DashboardRoute: DashboardRoute,
   DataRoute: DataRoute,
+  DriverRoute: DriverRoute,
   LoginRoute: LoginRoute,
   SppgRoute: SppgRoute,
 }

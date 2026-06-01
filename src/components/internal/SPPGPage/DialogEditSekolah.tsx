@@ -16,60 +16,51 @@ import {
   NativeSelect,
   NativeSelectOption,
 } from "@/components/ui/native-select";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  getKelurahanQueryOptions,
-  updateSPPGMutationOptions,
-} from "@/queryOptions/sppg";
-import { sppgSchema } from "@/schema/formValidation";
-import type { Distrik, PostSPPG, SPPG } from "@/types/sppg";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { updateSekolahMutationOptions } from "@/queryOptions/sekolah";
+import { sekolahSchema } from "@/schema/formValidation";
+import type { PostSekolah, Sekolah } from "@/types/sekolah";
+import type { Distrik } from "@/types/sppg";
+import { useMutation } from "@tanstack/react-query";
 import { Loader2, MapPin } from "lucide-react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-interface Props {
-  data: SPPG;
-  kecamatan: Distrik[];
+interface DialogEditSekolahProps {
+  sekolah: Sekolah; // Ganti dengan tipe yang sesuai
   kelurahan: Distrik[];
-  onSPPGUpdate?: () => void;
+  children: React.ReactNode;
+  onSekolahUpdate?: () => void;
+  kecamatan: string;
 }
 
-export function DialogEditSPPG({
-  data,
-  kecamatan,
+const DialogEditSekolah = ({
+  children,
+  sekolah,
   kelurahan,
-  onSPPGUpdate,
-}: Props) {
+  onSekolahUpdate,
+  kecamatan,
+}: DialogEditSekolahProps) => {
   const [open, setOpen] = useState(false);
   const initialForm = {
-    nama: data.nama || "",
-    alamat: data.alamat || "",
-    kepala_sppg: data.kepala_sppg || "",
-    nomor_telepon: data.nomor_telepon || "",
-    email: data.email || "",
-    kelurahan_id: data.kelurahan_id || 0,
-    kecamatan_id: data.kecamatan_id || 0,
-    kapasitas_porsi: data.kapasitas_porsi || 0,
-    status_aktif: data.status_aktif || false,
-    latitude: data.latitude || 0,
-    longitude: data.longitude || 0,
-    sosmed_url: data.sosmed_url || [],
+    nama: sekolah.nama || "",
+    alamat: sekolah.alamat || "",
+    latitude: sekolah.latitude || 0,
+    longitude: sekolah.longitude || 0,
+    jumlah_siswa: sekolah.jumlah_siswa || 0,
+    tingkat: sekolah.tingkat || "",
+    kelurahan_id: kelurahan.some((item) => item.id === sekolah.kelurahan_id)
+      ? sekolah.kelurahan_id
+      : 0,
   };
 
   const [form, setForm] = useState(initialForm);
 
-  function normalizeForm(form: typeof initialForm) {
-    return {
-      ...form,
-      sosmed_url: form.sosmed_url.map((url) => url.trim()).filter(Boolean),
-    };
-  }
+  useEffect(() => {
+    setForm(initialForm);
+  }, [sekolah]);
 
-  const isDirty =
-    JSON.stringify(normalizeForm(form)) !==
-    JSON.stringify(normalizeForm(initialForm));
+  const isDirty = JSON.stringify(form) !== JSON.stringify(initialForm);
 
   function updateField(field: string, value: any) {
     setForm((prev) => ({
@@ -79,9 +70,9 @@ export function DialogEditSPPG({
   }
 
   const mutation = useMutation({
-    ...updateSPPGMutationOptions(),
+    ...updateSekolahMutationOptions(),
     onSuccess: () => {
-      toast.success("Berhasil memperbarui data SPPG.", {
+      toast.success("Berhasil memperbarui data Sekolah.", {
         style: {
           "--normal-bg":
             "color-mix(in oklab, light-dark(var(--color-green-600), var(--color-green-400)) 10%, var(--background))",
@@ -91,11 +82,11 @@ export function DialogEditSPPG({
             "light-dark(var(--color-green-600), var(--color-green-400))",
         } as React.CSSProperties,
       });
-      onSPPGUpdate?.();
+      onSekolahUpdate?.();
       setOpen(false);
     },
     onError: (error: ApiError) => {
-      toast.error("Gagal memperbarui data SPPG.", {
+      toast.error("Gagal memperbarui data Sekolah.", {
         style: {
           "--normal-bg":
             "color-mix(in oklab, light-dark(var(--color-red-600), var(--color-red-400)) 10%, var(--background))",
@@ -111,7 +102,7 @@ export function DialogEditSPPG({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const result = sppgSchema.safeParse(form);
+    const result = sekolahSchema.safeParse(form);
 
     if (!result.success) {
       const firstError = Object.values(
@@ -132,20 +123,11 @@ export function DialogEditSPPG({
       }
       return;
     }
+    // console.log("VALIDATED DATA:", result.data);
     await mutation.mutateAsync({
-      sppg_id: data.id,
-      input: result.data as PostSPPG,
+      sekolah_id: sekolah.id,
+      input: result.data as PostSekolah,
     });
-  }
-
-  const { data: kelurahanNew } = useQuery({
-    ...getKelurahanQueryOptions(form.kecamatan_id),
-    enabled: form.kecamatan_id !== null,
-    initialData: kelurahan,
-  });
-
-  function updateKelurahan(id: number) {
-    updateField("kecamatan_id", id);
   }
 
   const [getLocLoading, setGetLocLoading] = useState(false);
@@ -180,55 +162,34 @@ export function DialogEditSPPG({
     setGetLocLoading(false);
   }
 
-  const MAX_URL = 3;
-
-  const addSosmed = () => {
-    if (form.sosmed_url.length >= MAX_URL) return;
-    updateField("sosmed_url", [...form.sosmed_url, ""]);
-  };
-
-  const updateSosmed = (index: number, value: string) => {
-    const urls = [...form.sosmed_url];
-    urls[index] = value;
-    updateField("sosmed_url", urls);
-  };
-
-  const removeSosmed = (index: number) => {
-    updateField(
-      "sosmed_url",
-      form.sosmed_url.filter((_, i) => i !== index),
-    );
-  };
   return (
     <Dialog open={open} onOpenChange={(val) => setOpen(val)}>
-      <DialogTrigger asChild>
-        <Button variant="outline">Edit</Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent
         className="sm:max-w-4xl
-  data-[state=open]:animate-in
-  data-[state=closed]:animate-out
-  data-[state=closed]:fade-out-0
-  data-[state=open]:fade-in-0
-  data-[state=closed]:zoom-out-95
-  data-[state=open]:zoom-in-95
-  duration-300
-"
+            data-[state=open]:animate-in
+            data-[state=closed]:animate-out
+            data-[state=closed]:fade-out-0
+            data-[state=open]:fade-in-0
+            data-[state=closed]:zoom-out-95
+            data-[state=open]:zoom-in-95
+            duration-300
+          "
       >
         <form onSubmit={handleSubmit}>
           <DialogHeader className="gap-0">
             <DialogTitle className="text-lg font-semibold">
-              Edit data SPPG
+              Edit data Sekolah
             </DialogTitle>
             <DialogDescription>
-              Ubah data SPPG anda. Klik simpan saat selesai.
+              Ubah data Sekolah di SPPG anda. Klik simpan saat selesai.
             </DialogDescription>
           </DialogHeader>
           <div className="flex gap-4 py-5">
             <div className="flex flex-1 flex-col gap-5">
               <div>
                 <Label htmlFor="sppg" className="mb-1">
-                  Nama SPPG
+                  Nama Sekolah
                 </Label>
                 <Input
                   id="sppg"
@@ -238,7 +199,6 @@ export function DialogEditSPPG({
                   required
                 />
               </div>
-
               <div>
                 <Label htmlFor="alamat" className="mb-1">
                   Alamat
@@ -251,33 +211,15 @@ export function DialogEditSPPG({
                   required
                 />
               </div>
+            </div>
+            <div className="flex flex-1 flex-col gap-5">
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <Label htmlFor="kecamatan" className="mb-1">
-                    Kecamatan
-                  </Label>
-                  <NativeSelect
-                    id="kecamatan"
-                    onChange={(e) => {
-                      updateField("kecamatan", e.target.value);
-                      updateKelurahan(Number(e.target.value));
-                    }}
-                    defaultValue={form.kecamatan_id}
-                    className="w-full"
-                  >
-                    {" "}
-                    <NativeSelectOption
-                      disabled
-                      value=""
-                      className="text-center"
-                    >
-                      --- Pilih Kecamatan ---
+                  <Label className="mb-1">Kecamatan</Label>
+                  <NativeSelect disabled defaultValue={0} className="w-full">
+                    <NativeSelectOption value="0">
+                      {kecamatan}
                     </NativeSelectOption>
-                    {kecamatan.map((el) => (
-                      <NativeSelectOption key={el.id} value={el.id}>
-                        {el.name}
-                      </NativeSelectOption>
-                    ))}
                   </NativeSelect>
                 </div>
                 <div>
@@ -286,18 +228,18 @@ export function DialogEditSPPG({
                   </Label>
                   <NativeSelect
                     id="kelurahan"
-                    onChange={(e) => updateField("kelurahan", e.target.value)}
-                    defaultValue={form.kelurahan_id || 0}
+                    onChange={(e) => {
+                      updateField("kelurahan_id", Number(e.target.value));
+                      console.log("Selected kelurahan_id:", e.target.value);
+                      console.log(form);
+                    }}
+                    defaultValue={form.kelurahan_id}
                     className="w-full"
                   >
-                    <NativeSelectOption
-                      disabled
-                      value=""
-                      className="text-center"
-                    >
+                    <NativeSelectOption value="0" className="text-center">
                       --- Pilih Kelurahan ---
                     </NativeSelectOption>
-                    {kelurahanNew.map((el) => (
+                    {kelurahan.map((el) => (
                       <NativeSelectOption key={el.id} value={el.id}>
                         {el.name}
                       </NativeSelectOption>
@@ -305,72 +247,37 @@ export function DialogEditSPPG({
                   </NativeSelect>
                 </div>
               </div>
-              <div className="grid grid-cols-5 gap-2">
-                <div className="col-span-3">
-                  <Label htmlFor="email" className="mb-1">
-                    Email
-                  </Label>
-                  <Input
-                    id="email"
-                    placeholder="Email"
-                    value={form.email}
-                    onChange={(e) => updateField("email", e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="col-span-2">
-                  <Label htmlFor="telepon" className="mb-1">
-                    No. Telepon
-                  </Label>
-                  <Input
-                    id="telepon"
-                    placeholder="No. Telepon"
-                    value={form.nomor_telepon}
-                    onChange={(e) =>
-                      updateField("nomor_telepon", e.target.value)
-                    }
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-1 flex-col gap-5">
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <Label htmlFor="kepala_sppg" className="mb-1">
-                    Kepala SPPG
+                  <Label htmlFor="tingkat" className="mb-1">
+                    Tingkat
                   </Label>
-                  <Input
-                    id="kepala_sppg"
-                    placeholder="Kepala SPPG"
-                    value={form.kepala_sppg}
-                    onChange={(e) => updateField("kepala_sppg", e.target.value)}
-                    required
-                  />
+                  <NativeSelect
+                    className="w-full"
+                    id="tingkat"
+                    value={form.tingkat}
+                    onChange={(e) => updateField("tingkat", e.target.value)}
+                  >
+                    <NativeSelectOption value="SD">SD</NativeSelectOption>
+                    <NativeSelectOption value="SMP">SMP</NativeSelectOption>
+                    <NativeSelectOption value="SMA">SMA</NativeSelectOption>
+                  </NativeSelect>
                 </div>
                 <div>
-                  <Label htmlFor="kapasitas" className="mb-1">
-                    Kapasitas Porsi
+                  <Label htmlFor="jumlah_siswa" className="mb-1">
+                    Jumlah Siswa
                   </Label>
                   <Input
-                    id="kapasitas"
+                    id="jumlah_siswa"
                     type="number"
-                    placeholder="Kapasitas Porsi"
-                    value={form.kapasitas_porsi}
+                    placeholder="Jumlah Siswa"
+                    value={form.jumlah_siswa}
                     onChange={(e) =>
-                      updateField("kapasitas_porsi", Number(e.target.value))
+                      updateField("jumlah_siswa", Number(e.target.value))
                     }
                     required
                   />
                 </div>
-              </div>
-              <div className="flex items-center justify-between border p-3 rounded">
-                <span>Status Aktif</span>
-                <Switch
-                  checked={form.status_aktif}
-                  onCheckedChange={(val) => updateField("status_aktif", val)}
-                  required
-                />
               </div>
               <div className="grid grid-cols-7 gap-2 items-end">
                 <div className="col-span-3">
@@ -403,7 +310,6 @@ export function DialogEditSPPG({
                     required
                   />
                 </div>
-
                 <Button
                   className="col-span-1"
                   type="button"
@@ -416,45 +322,19 @@ export function DialogEditSPPG({
                   )}
                 </Button>
               </div>
-              <div>
-                <Label>Sosial Media</Label>
-
-                <div className="space-y-2 mt-2">
-                  {form.sosmed_url.map((url, index) => (
-                    <div key={index} className="flex gap-2">
-                      <Input
-                        value={url}
-                        placeholder="https://..."
-                        onChange={(e) => updateSosmed(index, e.target.value)}
-                      />
-
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        onClick={() => removeSosmed(index)}
-                      >
-                        Hapus
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="mt-2"
-                  onClick={addSosmed}
-                >
-                  Tambah URL
-                </Button>
-              </div>
+              <div></div>
             </div>
           </div>
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline">Batal</Button>
             </DialogClose>
-            <Button type="submit" disabled={!isDirty || mutation.isPending}>
+            <Button
+              type="submit"
+              disabled={
+                !isDirty || mutation.isPending || form.kelurahan_id === 0
+              }
+            >
               {mutation.isPending ? (
                 <Loader2 className="animate-spin" />
               ) : (
@@ -466,4 +346,6 @@ export function DialogEditSPPG({
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default DialogEditSekolah;

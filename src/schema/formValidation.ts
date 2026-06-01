@@ -39,3 +39,13 @@ export const sppgSchema = z.object({
     z.array(socialUrlSchema).max(3, "Maksimal 3 URL"),
   ),
 });
+
+export const sekolahSchema = z.object({
+  nama: z.string().min(1, "Nama wajib diisi"),
+  alamat: z.string().min(1, "Alamat wajib diisi"),
+  tingkat: z.enum(["SD", "SMP", "SMA"], "Tingkat harus SD, SMP, atau SMA"),
+  kelurahan_id: z.number().positive(),
+  jumlah_siswa: z.number().nonnegative(),
+  latitude: z.number(),
+  longitude: z.number(),
+});

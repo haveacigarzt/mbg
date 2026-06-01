@@ -152,16 +152,21 @@ const SPPG = () => {
             </div>
             <Suspense fallback={<div>Loading...</div>}>
               {tab === "sekolah" && (
-                <SekolahTable search={searchSekolah} sppg_id={4} />
+                <SekolahTable
+                  search={searchSekolah}
+                  sppg_id={sppg.id}
+                  kelurahan={kelurahan}
+                  kecamatan={sppg.kecamatan}
+                />
               )}
               {tab === "posyandu" && (
-                <PosyanduTable search={searchPosyandu} sppg_id={4} />
+                <PosyanduTable search={searchPosyandu} sppg_id={sppg.id} />
               )}
               {tab === "pengiriman" && (
-                <PengirimanTable search={searchPengiriman} sppg_id={4} />
+                <PengirimanTable search={searchPengiriman} sppg_id={sppg.id} />
               )}
               {tab === "drivers" && (
-                <DriversTable search={searchDrivers} sppg_id={4} />
+                <DriversTable search={searchDrivers} sppg_id={sppg.id} />
               )}
             </Suspense>
           </div>

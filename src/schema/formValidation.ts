@@ -44,8 +44,9 @@ export const sekolahSchema = z.object({
   nama: z.string().min(1, "Nama wajib diisi"),
   alamat: z.string().min(1, "Alamat wajib diisi"),
   tingkat: z.enum(["SD", "SMP", "SMA"], "Tingkat harus SD, SMP, atau SMA"),
-  kelurahan_id: z.number().positive(),
-  jumlah_siswa: z.number().nonnegative(),
-  latitude: z.number(),
-  longitude: z.number(),
+  kelurahan_id: z.number().min(1, "Kelurahan wajib diisi"),
+  kecamatan_id: z.number().min(1, "Kecamatan wajib diisi"),
+  jumlah_siswa: z.number().min(1, "Jumlah siswa wajib diisi"),
+  latitude: z.number().min(0, "Latitude wajib diisi"),
+  longitude: z.number().min(0, "Latitude wajib diisi"),
 });

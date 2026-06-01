@@ -11,12 +11,9 @@ import PosyanduTable from "./PosyanduTable";
 import PengirimanTable from "./PengirimanTable";
 import DriversTable from "./DriversTable";
 import { DialogEditSPPG } from "./DialogEditSPPG";
+import DialogTambahSekolah from "./DialogTambahSekolah";
 
 const SPPG = () => {
-  const [searchSekolah, setSearchSekolah] = useState("");
-  const [searchPosyandu, setSearchPosyandu] = useState("");
-  const [searchDrivers, setSearchDrivers] = useState("");
-  const [searchPengiriman, setSearchPengiriman] = useState("");
   const [tab, setTab] = useState("sekolah");
   const { data: sppg, refetch: refetchSPPG } = useSuspenseQuery(
     getSPPGByIDQueryOptions(4),
@@ -113,61 +110,18 @@ const SPPG = () => {
             </div>
           </div>
           <div>
-            <div className="flex justify-between mb-1">
-              {tab === "sekolah" && (
-                <input
-                  className="border rounded-sm p-1"
-                  value={searchSekolah}
-                  onChange={(e) => setSearchSekolah(e.target.value)}
-                  placeholder={`Cari sekolah...`}
-                />
-              )}
-              {tab === "posyandu" && (
-                <input
-                  className="border rounded-sm p-1"
-                  value={searchPosyandu}
-                  onChange={(e) => setSearchPosyandu(e.target.value)}
-                  placeholder={`Cari posyandu...`}
-                />
-              )}
-              {tab === "pengiriman" && (
-                <input
-                  className="border rounded-sm p-1"
-                  value={searchPengiriman}
-                  onChange={(e) => setSearchPengiriman(e.target.value)}
-                  placeholder={`Cari pengiriman...`}
-                />
-              )}
-              {tab === "drivers" && (
-                <input
-                  className="border rounded-sm p-1"
-                  value={searchDrivers}
-                  onChange={(e) => setSearchDrivers(e.target.value)}
-                  placeholder={`Cari driver...`}
-                />
-              )}
-              <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded me-1">
-                Tambah
-              </button>
-            </div>
             <Suspense fallback={<div>Loading...</div>}>
               {tab === "sekolah" && (
                 <SekolahTable
-                  search={searchSekolah}
                   sppg_id={sppg.id}
                   kelurahan={kelurahan}
                   kecamatan={sppg.kecamatan}
+                  kecamatan_id={sppg.kecamatan_id}
                 />
               )}
-              {tab === "posyandu" && (
-                <PosyanduTable search={searchPosyandu} sppg_id={sppg.id} />
-              )}
-              {tab === "pengiriman" && (
-                <PengirimanTable search={searchPengiriman} sppg_id={sppg.id} />
-              )}
-              {tab === "drivers" && (
-                <DriversTable search={searchDrivers} sppg_id={sppg.id} />
-              )}
+              {tab === "posyandu" && <PosyanduTable sppg_id={sppg.id} />}
+              {tab === "pengiriman" && <PengirimanTable sppg_id={sppg.id} />}
+              {tab === "drivers" && <DriversTable sppg_id={sppg.id} />}
             </Suspense>
           </div>
         </div>

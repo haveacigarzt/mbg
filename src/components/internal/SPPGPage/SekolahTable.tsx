@@ -12,12 +12,13 @@ import { getSekolahQueryOptions } from "../../../queryOptions/sekolah";
 import DialogEditSekolah from "./DialogEditSekolah";
 import type { Distrik } from "@/types/sppg";
 import DialogHapusSekolah from "./DialogHapusSekolah";
+import DialogTambahSekolah from "./DialogTambahSekolah";
 
 interface Props {
   sppg_id: number;
-  search: string;
   kelurahan: Distrik[];
   kecamatan: string;
+  kecamatan_id: number;
 }
 
 const columnHelper = createColumnHelper<Sekolah>();
@@ -48,7 +49,13 @@ const columns = [
   }),
 ];
 
-const SekolahTable = ({ sppg_id, search, kelurahan, kecamatan }: Props) => {
+const SekolahTable = ({
+  sppg_id,
+  kelurahan,
+  kecamatan,
+  kecamatan_id,
+}: Props) => {
+  const [searchSekolah, setSearchSekolah] = useState("");
   const [page, setPage] = useState(1);
   const page_size = 10;
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -57,13 +64,19 @@ const SekolahTable = ({ sppg_id, search, kelurahan, kecamatan }: Props) => {
     : "";
 
   const { data, refetch } = useSuspenseQuery(
-    getSekolahQueryOptions({ sppg_id, page, page_size, nama: search, sort }),
+    getSekolahQueryOptions({
+      sppg_id,
+      page,
+      page_size,
+      nama: searchSekolah,
+      sort,
+    }),
   );
   const sekolah = data.sekolah;
   const metadata = data.metadata;
   useEffect(() => {
     setPage(1);
-  }, [search]);
+  }, [searchSekolah]);
   const table = useReactTable({
     data: sekolah,
     columns,
@@ -76,6 +89,24 @@ const SekolahTable = ({ sppg_id, search, kelurahan, kecamatan }: Props) => {
   });
   return (
     <div>
+      <div className="flex justify-between mb-1">
+        <input
+          className="border rounded-sm p-1"
+          value={searchSekolah}
+          onChange={(e) => setSearchSekolah(e.target.value)}
+          placeholder={`Cari sekolah...`}
+        />
+        <DialogTambahSekolah
+          onSekolahUpdate={refetch}
+          kecamatan={kecamatan}
+          kelurahan={kelurahan}
+          kecamatan_id={kecamatan_id}
+        >
+          <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded me-1">
+            Tambah
+          </button>
+        </DialogTambahSekolah>
+      </div>
       <table>
         <thead>
           {table.getHeaderGroups().map((hg) => (

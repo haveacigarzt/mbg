@@ -12,7 +12,6 @@ import { getDriversQueryOptions } from "../../../queryOptions/drivers";
 
 interface Props {
   sppg_id: number;
-  search: string;
 }
 const columnHelper = createColumnHelper<Drivers>();
 
@@ -51,7 +50,8 @@ const columns = [
     ),
   }),
 ];
-const DriversTable = ({ sppg_id, search }: Props) => {
+const DriversTable = ({ sppg_id }: Props) => {
+  const [searchDrivers, setSearchDrivers] = useState("");
   const [page, setPage] = useState(1);
   const page_size = 10;
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -60,13 +60,19 @@ const DriversTable = ({ sppg_id, search }: Props) => {
     : "";
 
   const { data } = useSuspenseQuery(
-    getDriversQueryOptions({ sppg_id, page, page_size, nama: search, sort }),
+    getDriversQueryOptions({
+      sppg_id,
+      page,
+      page_size,
+      nama: searchDrivers,
+      sort,
+    }),
   );
   const drivers = data.drivers;
   const metadata = data.metadata;
   useEffect(() => {
     setPage(1);
-  }, [search]);
+  }, [searchDrivers]);
   const table = useReactTable({
     data: drivers,
     columns,
@@ -79,6 +85,14 @@ const DriversTable = ({ sppg_id, search }: Props) => {
   });
   return (
     <div>
+      <div className="flex justify-between mb-1">
+        <input
+          className="border rounded-sm p-1"
+          value={searchDrivers}
+          onChange={(e) => setSearchDrivers(e.target.value)}
+          placeholder={`Cari driver...`}
+        />
+      </div>
       <table>
         <thead>
           {table.getHeaderGroups().map((hg) => (

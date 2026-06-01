@@ -11,7 +11,6 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { getPosyanduQueryOptions } from "../../../queryOptions/posyandu";
 interface Props {
   sppg_id: number;
-  search: string;
 }
 const columnHelper = createColumnHelper<Posyandu>();
 
@@ -52,7 +51,8 @@ const columns = [
     ),
   }),
 ];
-const PosyanduTable = ({ sppg_id, search }: Props) => {
+const PosyanduTable = ({ sppg_id }: Props) => {
+  const [searchPosyandu, setSearchPosyandu] = useState("");
   const [page, setPage] = useState(1);
   const page_size = 10;
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -61,13 +61,19 @@ const PosyanduTable = ({ sppg_id, search }: Props) => {
     : "";
 
   const { data } = useSuspenseQuery(
-    getPosyanduQueryOptions({ sppg_id, page, page_size, nama: search, sort }),
+    getPosyanduQueryOptions({
+      sppg_id,
+      page,
+      page_size,
+      nama: searchPosyandu,
+      sort,
+    }),
   );
   const posyandu = data.posyandu;
   const metadata = data.metadata;
   useEffect(() => {
     setPage(1);
-  }, [search]);
+  }, [searchPosyandu]);
   const table = useReactTable({
     data: posyandu,
     columns,
@@ -80,6 +86,14 @@ const PosyanduTable = ({ sppg_id, search }: Props) => {
   });
   return (
     <div>
+      <div className="flex justify-between mb-1">
+        <input
+          className="border rounded-sm p-1"
+          value={searchPosyandu}
+          onChange={(e) => setSearchPosyandu(e.target.value)}
+          placeholder={`Cari posyandu...`}
+        />
+      </div>
       <table>
         <thead>
           {table.getHeaderGroups().map((hg) => (

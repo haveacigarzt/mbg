@@ -1,5 +1,10 @@
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
-import { deleteSekolah, getSekolah, updateSekolah } from "../api/sekolah";
+import {
+  createSekolah,
+  deleteSekolah,
+  getSekolah,
+  updateSekolah,
+} from "../api/sekolah";
 import type { GetSekolahParams, PostSekolah } from "../types/sekolah";
 
 export function getSekolahQueryOptions(params?: GetSekolahParams) {
@@ -18,6 +23,12 @@ export function updateSekolahMutationOptions() {
       sekolah_id: number;
       input: PostSekolah;
     }) => updateSekolah(sekolah_id, input),
+  });
+}
+
+export function createSekolahMutationOptions() {
+  return mutationOptions({
+    mutationFn: ({ input }: { input: PostSekolah }) => createSekolah(input),
   });
 }
 

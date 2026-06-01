@@ -40,6 +40,21 @@ export async function updateSekolah(sekolah_id: number, input: PostSekolah) {
   return data.sekolah;
 }
 
+export async function createSekolah(input: PostSekolah) {
+  const response = await apiFetch(`/v1/sekolah`, {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+
+  if (!response.ok) {
+    throw new Error("gagal create sekolah");
+  }
+
+  const data: FetchSekolahResponse = await response.json();
+
+  return data.sekolah;
+}
+
 export async function deleteSekolah(sekolah_id: number) {
   const response = await apiFetch(`/v1/sekolah/${sekolah_id}`, {
     method: "DELETE",

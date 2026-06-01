@@ -12,7 +12,6 @@ import { getPengirimanQueryOptions } from "../../../queryOptions/pengiriman";
 
 interface Props {
   sppg_id: number;
-  search: string;
 }
 
 const columnHelper = createColumnHelper<Pengiriman>();
@@ -63,7 +62,8 @@ const columns = [
   }),
 ];
 
-const PengirimanTable = ({ sppg_id, search }: Props) => {
+const PengirimanTable = ({ sppg_id }: Props) => {
+  const [searchPengiriman, setSearchPengiriman] = useState("");
   const [page, setPage] = useState(1);
   const page_size = 10;
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -78,7 +78,7 @@ const PengirimanTable = ({ sppg_id, search }: Props) => {
   const metadata = data.metadata;
   useEffect(() => {
     setPage(1);
-  }, [search]);
+  }, [searchPengiriman]);
   const table = useReactTable({
     data: pengiriman,
     columns,
@@ -91,6 +91,14 @@ const PengirimanTable = ({ sppg_id, search }: Props) => {
   });
   return (
     <div>
+      <div className="flex justify-between mb-1">
+        <input
+          className="border rounded-sm p-1"
+          value={searchPengiriman}
+          onChange={(e) => setSearchPengiriman(e.target.value)}
+          placeholder={`Cari pengiriman...`}
+        />
+      </div>
       <table>
         <thead>
           {table.getHeaderGroups().map((hg) => (

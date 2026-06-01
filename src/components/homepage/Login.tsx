@@ -60,6 +60,10 @@ const Login = () => {
       await mutation.mutateAsync(value);
     },
   });
+  const loginCepat = async (email: string, password: string) => {
+    form.setFieldValue("email", email);
+    form.setFieldValue("password", password);
+  };
   const [isShowed, setShowed] = React.useState(false);
   const [errorMsg, setErrorMsg] = React.useState("");
   const [errorMsgDesc, setErrorMsgDesc] = React.useState("");
@@ -68,6 +72,34 @@ const Login = () => {
       <div className="mb-8">
         <h1 className="text-4xl font-extrabold">SIAP MBG</h1>
         <p className="text-center">BGN SANGGAU</p>
+      </div>
+      <div>
+        <Button
+          onClick={() => loginCepat("afriandy193@gmail.com", "pas55word")}
+        >
+          Admin
+        </Button>
+        <Button onClick={() => loginCepat("dinassgu@gmail.com", "password")}>
+          Stakeholder
+        </Button>
+        <Button onClick={() => loginCepat("admin_ponbar@sppg.id", "password")}>
+          SPPG A
+        </Button>
+        <Button
+          onClick={() => loginCepat("admin_pontim@sppg.id", "password123")}
+        >
+          SPPG B
+        </Button>
+        <Button
+          onClick={() => loginCepat("driver.sppg.bunut@mbg.id", "rahasia123")}
+        >
+          Driver A
+        </Button>
+        <Button
+          onClick={() => loginCepat("budi.driver@example.com", "password")}
+        >
+          Driver B
+        </Button>
       </div>
       <form
         onSubmit={(e) => {

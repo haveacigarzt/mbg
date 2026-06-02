@@ -10,8 +10,8 @@ import SekolahTable from "./SekolahTable";
 import PosyanduTable from "./PosyanduTable";
 import PengirimanTable from "./PengirimanTable";
 import DriversTable from "./DriversTable";
-import { DialogEditSPPG } from "./DialogEditSPPG";
-import DialogTambahSekolah from "./DialogTambahSekolah";
+import { DialogEditSPPG } from "./Dialog/DialogEditSPPG";
+import DialogTambahSekolah from "./Dialog/DialogTambahSekolah";
 
 const SPPG = () => {
   const [tab, setTab] = useState("sekolah");
@@ -117,9 +117,18 @@ const SPPG = () => {
                   kelurahan={kelurahan}
                   kecamatan={sppg.kecamatan}
                   kecamatan_id={sppg.kecamatan_id}
+                  kelurahan_id={sppg.kelurahan_id}
                 />
               )}
-              {tab === "posyandu" && <PosyanduTable sppg_id={sppg.id} />}
+              {tab === "posyandu" && (
+                <PosyanduTable
+                  sppg_id={sppg.id}
+                  kelurahan={kelurahan}
+                  kecamatan={sppg.kecamatan}
+                  kecamatan_id={sppg.kecamatan_id}
+                  kelurahan_id={sppg.kelurahan_id}
+                />
+              )}
               {tab === "pengiriman" && <PengirimanTable sppg_id={sppg.id} />}
               {tab === "drivers" && <DriversTable sppg_id={sppg.id} />}
             </Suspense>

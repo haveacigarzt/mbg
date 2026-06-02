@@ -45,8 +45,38 @@ export const sekolahSchema = z.object({
   alamat: z.string().min(1, "Alamat wajib diisi"),
   tingkat: z.enum(["SD", "SMP", "SMA"], "Tingkat harus SD, SMP, atau SMA"),
   kelurahan_id: z.number().min(1, "Kelurahan wajib diisi"),
-  kecamatan_id: z.number().min(1, "Kecamatan wajib diisi"),
+  kecamatan_id: z.number().min(1, "Kecamatan wajib diisi").optional(),
   jumlah_siswa: z.number().min(1, "Jumlah siswa wajib diisi"),
-  latitude: z.number().min(0, "Latitude wajib diisi"),
-  longitude: z.number().min(0, "Latitude wajib diisi"),
+  latitude: z.number(),
+  longitude: z.number(),
+});
+
+export const posyanduSchema = z.object({
+  nama: z.string().min(1, "Nama wajib diisi"),
+  alamat: z.string().min(1, "Alamat wajib diisi"),
+  kelurahan_id: z.number().min(1, "Kelurahan wajib diisi"),
+  kecamatan_id: z.number().min(1, "Kecamatan wajib diisi").optional(),
+  jumlah_balita: z.number().min(1, "Jumlah balita wajib diisi"),
+  jumlah_ibu_hamil: z.number().min(1, "Jumlah ibu hamil wajib diisi"),
+  latitude: z.number(),
+  longitude: z.number(),
+});
+
+export const driverSchema = z.object({
+  nama: z.string().min(1, "Nama wajib diisi"),
+  email: z
+    .string()
+    .min(1, { message: "Email wajib diisi" })
+    .email("Email yang dimasukan tidak valid"),
+  no_telepon: z.string().min(1, "No Telepon wajib diisi"),
+  password: z
+    .string()
+    .min(1, "Password wajib diisi")
+    .min(8, "Password minimal 8 karakter"),
+});
+
+export const driverPatchSchema = z.object({
+  nama: z.string().min(1, "Nama wajib diisi"),
+  status_aktif: z.boolean(),
+  nomor_telepon: z.string().min(1, "No Telepon wajib diisi"),
 });

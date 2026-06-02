@@ -6,6 +6,8 @@ export interface Posyandu {
   alamat: string;
   kecamatan: string;
   kelurahan: string;
+  kecamatan_id: number;
+  kelurahan_id: number;
   jumlah_balita: number;
   jumlah_ibu_hamil: number;
   sppg_id: number;
@@ -26,4 +28,15 @@ export type GetPosyanduParams = {
   page_size?: number;
   nama?: string;
   sort?: string;
+};
+
+export type PostPosyandu = {
+  nama: string;
+  alamat: string;
+  latitude: number;
+  longitude: number;
+  kecamatan_id: number;
+  kelurahan_id: number;
+  jumlah_balita: number;
+  jumlah_ibu_hamil: number;
 };

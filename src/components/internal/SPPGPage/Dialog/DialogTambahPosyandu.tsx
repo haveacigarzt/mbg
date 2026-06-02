@@ -17,39 +17,41 @@ import {
   NativeSelectOption,
 } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
-import { createSekolahMutationOptions } from "@/queryOptions/sekolah";
-import { sekolahSchema } from "@/schema/formValidation";
-import type { PostSekolah } from "@/types/sekolah";
+import { createPosyanduMutationOptions } from "@/queryOptions/posyandu";
+import { posyanduSchema } from "@/schema/formValidation";
+import type { PostPosyandu } from "@/types/posyandu";
 import type { Distrik } from "@/types/sppg";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2, MapPin } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "sonner";
 
-interface DialogEditSekolahProps {
+interface DialogTambahPosyanduProps {
   kelurahan: Distrik[];
   children: React.ReactNode;
-  onSekolahUpdate?: () => void;
+  onPosyanduUpdate: () => void;
   kecamatan: string;
   kecamatan_id: number;
+  kelurahan_id: number;
 }
 
-const DialogTambahSekolah = ({
+const DialogTambahPosyandu = ({
   children,
   kelurahan,
-  onSekolahUpdate,
+  onPosyanduUpdate,
   kecamatan,
   kecamatan_id,
-}: DialogEditSekolahProps) => {
+  kelurahan_id,
+}: DialogTambahPosyanduProps) => {
   const [open, setOpen] = useState(false);
   const initialForm = {
     nama: "",
     alamat: "",
     latitude: "",
     longitude: "",
-    jumlah_siswa: "",
-    tingkat: "SD" as "SD" | "SMP" | "SMA",
-    kelurahan_id: "",
+    jumlah_balita: "",
+    jumlah_ibu_hamil: "",
+    kelurahan_id,
     kecamatan_id,
   };
 
@@ -63,7 +65,7 @@ const DialogTambahSekolah = ({
   }
 
   const mutation = useMutation({
-    ...createSekolahMutationOptions(),
+    ...createPosyanduMutationOptions(),
     onSuccess: () => {
       toast.success("Berhasil memperbarui data Sekolah.", {
         style: {
@@ -75,7 +77,7 @@ const DialogTambahSekolah = ({
             "light-dark(var(--color-green-600), var(--color-green-400))",
         } as React.CSSProperties,
       });
-      onSekolahUpdate?.();
+      onPosyanduUpdate();
       setOpen(false);
     },
     onError: (error: ApiError) => {
@@ -99,10 +101,11 @@ const DialogTambahSekolah = ({
       ...form,
       latitude: Number(form.latitude),
       longitude: Number(form.longitude),
-      jumlah_siswa: Number(form.jumlah_siswa),
+      jumlah_balita: Number(form.jumlah_balita),
+      jumlah_ibu_hamil: Number(form.jumlah_ibu_hamil),
       kelurahan_id: Number(form.kelurahan_id),
     };
-    const result = sekolahSchema.safeParse(payload);
+    const result = posyanduSchema.safeParse(payload);
 
     if (!result.success) {
       const firstError = Object.values(
@@ -124,7 +127,7 @@ const DialogTambahSekolah = ({
       return;
     }
     await mutation.mutateAsync({
-      input: result.data as PostSekolah,
+      input: result.data as PostPosyandu,
     });
   }
 
@@ -177,20 +180,20 @@ const DialogTambahSekolah = ({
         <form onSubmit={handleSubmit}>
           <DialogHeader className="gap-0">
             <DialogTitle className="text-lg font-semibold">
-              Tambah data Sekolah
+              Tambah data Posyandu
             </DialogTitle>
             <DialogDescription>
-              Tambah data Sekolah di SPPG anda. Klik simpan saat selesai.
+              Tambah data Posyandu di SPPG anda. Klik simpan saat selesai.
             </DialogDescription>
           </DialogHeader>
           <div className="flex gap-4 py-5">
             <div className="flex flex-1 flex-col gap-5">
               <div>
-                <Label htmlFor="sppg" className="mb-1">
-                  Nama Sekolah
+                <Label htmlFor="nama" className="mb-1">
+                  Nama Posyandu
                 </Label>
                 <Input
-                  id="sppg"
+                  id="nama"
                   placeholder="Nama"
                   value={form.nama}
                   onChange={(e) => updateField("nama", e.target.value)}
@@ -232,9 +235,6 @@ const DialogTambahSekolah = ({
                     defaultValue={form.kelurahan_id}
                     className="w-full"
                   >
-                    <NativeSelectOption value="0" className="text-center">
-                      --- Pilih Kelurahan ---
-                    </NativeSelectOption>
                     {kelurahan.map((el) => (
                       <NativeSelectOption key={el.id} value={el.id}>
                         {el.name}
@@ -245,31 +245,31 @@ const DialogTambahSekolah = ({
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <Label htmlFor="tingkat" className="mb-1">
-                    Tingkat
-                  </Label>
-                  <NativeSelect
-                    className="w-full"
-                    id="tingkat"
-                    value={form.tingkat}
-                    onChange={(e) => updateField("tingkat", e.target.value)}
-                  >
-                    <NativeSelectOption value="SD">SD</NativeSelectOption>
-                    <NativeSelectOption value="SMP">SMP</NativeSelectOption>
-                    <NativeSelectOption value="SMA">SMA</NativeSelectOption>
-                  </NativeSelect>
-                </div>
-                <div>
-                  <Label htmlFor="jumlah_siswa" className="mb-1">
-                    Jumlah Siswa
+                  <Label htmlFor="jumlah_balita" className="mb-1">
+                    Jumlah Balita
                   </Label>
                   <Input
-                    id="jumlah_siswa"
+                    id="jumlah_balita"
                     type="number"
-                    placeholder="Jumlah Siswa"
-                    value={form.jumlah_siswa}
+                    placeholder="Jumlah Balita"
+                    value={form.jumlah_balita}
                     onChange={(e) =>
-                      updateField("jumlah_siswa", e.target.value)
+                      updateField("jumlah_balita", e.target.value)
+                    }
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="jumlah_ibu_hamil" className="mb-1">
+                    Jumlah Ibu Hamil
+                  </Label>
+                  <Input
+                    id="jumlah_ibu_hamil"
+                    type="number"
+                    placeholder="Jumlah Ibu Hamil"
+                    value={form.jumlah_ibu_hamil}
+                    onChange={(e) =>
+                      updateField("jumlah_ibu_hamil", e.target.value)
                     }
                     required
                   />
@@ -321,10 +321,7 @@ const DialogTambahSekolah = ({
             <DialogClose asChild>
               <Button variant="outline">Batal</Button>
             </DialogClose>
-            <Button
-              type="submit"
-              disabled={mutation.isPending || form.kelurahan_id === "0"}
-            >
+            <Button type="submit" disabled={mutation.isPending}>
               {mutation.isPending ? (
                 <Loader2 className="animate-spin" />
               ) : (
@@ -338,4 +335,4 @@ const DialogTambahSekolah = ({
   );
 };
 
-export default DialogTambahSekolah;
+export default DialogTambahPosyandu;

@@ -1,10 +1,39 @@
-import { queryOptions } from "@tanstack/react-query";
-import { getPosyandu } from "../api/posyandu";
-import type { GetPosyanduParams } from "../types/posyandu";
+import { mutationOptions, queryOptions } from "@tanstack/react-query";
+import {
+  createPosyandu,
+  deletePosyandu,
+  getPosyandu,
+  updatePosyandu,
+} from "../api/posyandu";
+import type { GetPosyanduParams, PostPosyandu } from "../types/posyandu";
 
 export function getPosyanduQueryOptions(params?: GetPosyanduParams) {
   return queryOptions({
     queryKey: ["posyandu", params],
     queryFn: () => getPosyandu(params),
+  });
+}
+
+export function createPosyanduMutationOptions() {
+  return mutationOptions({
+    mutationFn: ({ input }: { input: PostPosyandu }) => createPosyandu(input),
+  });
+}
+
+export function updatePosyanduMutationOptions() {
+  return mutationOptions({
+    mutationFn: ({
+      posyandu_id,
+      input,
+    }: {
+      posyandu_id: number;
+      input: PostPosyandu;
+    }) => updatePosyandu(posyandu_id, input),
+  });
+}
+
+export function deletePosyanduMutationOptions() {
+  return mutationOptions({
+    mutationFn: (posyandu_id: number) => deletePosyandu(posyandu_id),
   });
 }

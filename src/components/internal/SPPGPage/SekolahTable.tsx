@@ -9,16 +9,17 @@ import type { Sekolah } from "../../../types/sekolah";
 import { useEffect, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getSekolahQueryOptions } from "../../../queryOptions/sekolah";
-import DialogEditSekolah from "./DialogEditSekolah";
+import DialogEditSekolah from "./Dialog/DialogEditSekolah";
 import type { Distrik } from "@/types/sppg";
-import DialogHapusSekolah from "./DialogHapusSekolah";
-import DialogTambahSekolah from "./DialogTambahSekolah";
+import DialogHapusSekolah from "./Dialog/DialogHapusSekolah";
+import DialogTambahSekolah from "./Dialog/DialogTambahSekolah";
 
 interface Props {
   sppg_id: number;
   kelurahan: Distrik[];
   kecamatan: string;
   kecamatan_id: number;
+  kelurahan_id: number;
 }
 
 const columnHelper = createColumnHelper<Sekolah>();
@@ -30,11 +31,6 @@ const columns = [
 
   columnHelper.accessor("alamat", {
     header: "Alamat",
-    enableSorting: true,
-  }),
-
-  columnHelper.accessor("kecamatan", {
-    header: "Kecamatan",
     enableSorting: true,
   }),
 
@@ -54,6 +50,7 @@ const SekolahTable = ({
   kelurahan,
   kecamatan,
   kecamatan_id,
+  kelurahan_id,
 }: Props) => {
   const [searchSekolah, setSearchSekolah] = useState("");
   const [page, setPage] = useState(1);
@@ -101,6 +98,7 @@ const SekolahTable = ({
           kecamatan={kecamatan}
           kelurahan={kelurahan}
           kecamatan_id={kecamatan_id}
+          kelurahan_id={kelurahan_id}
         >
           <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded me-1">
             Tambah

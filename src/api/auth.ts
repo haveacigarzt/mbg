@@ -59,6 +59,8 @@ export async function requireAuth() {
     credentials: "include",
   });
   if (!res.ok) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("token_expiry");
     throw redirect({
       to: "/login",
       search: {

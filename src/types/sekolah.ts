@@ -38,5 +38,4 @@ export type PostSekolah = {
   kecamatan_id: number;
   kelurahan_id: number;
   jumlah_siswa: number;
-  status_aktif: boolean;
 };

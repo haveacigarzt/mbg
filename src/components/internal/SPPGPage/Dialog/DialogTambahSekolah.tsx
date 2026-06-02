@@ -17,50 +17,45 @@ import {
   NativeSelectOption,
 } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
-import { updateSekolahMutationOptions } from "@/queryOptions/sekolah";
+import { createSekolahMutationOptions } from "@/queryOptions/sekolah";
 import { sekolahSchema } from "@/schema/formValidation";
-import type { PostSekolah, Sekolah } from "@/types/sekolah";
+import type { PostSekolah } from "@/types/sekolah";
 import type { Distrik } from "@/types/sppg";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2, MapPin } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
 
-interface DialogEditSekolahProps {
-  sekolah: Sekolah; // Ganti dengan tipe yang sesuai
+interface DialogTambahSekolahProps {
+  onSekolahUpdate: () => void;
   kelurahan: Distrik[];
   children: React.ReactNode;
-  onSekolahUpdate?: () => void;
   kecamatan: string;
+  kecamatan_id: number;
+  kelurahan_id: number;
 }
 
-const DialogEditSekolah = ({
+const DialogTambahSekolah = ({
   children,
-  sekolah,
   kelurahan,
   onSekolahUpdate,
   kecamatan,
-}: DialogEditSekolahProps) => {
+  kecamatan_id,
+  kelurahan_id,
+}: DialogTambahSekolahProps) => {
   const [open, setOpen] = useState(false);
   const initialForm = {
-    nama: sekolah.nama || "",
-    alamat: sekolah.alamat || "",
-    latitude: sekolah.latitude || 0,
-    longitude: sekolah.longitude || 0,
-    jumlah_siswa: sekolah.jumlah_siswa || 0,
-    tingkat: sekolah.tingkat || "",
-    kelurahan_id: kelurahan.some((item) => item.id === sekolah.kelurahan_id)
-      ? sekolah.kelurahan_id
-      : 0,
+    nama: "",
+    alamat: "",
+    latitude: "",
+    longitude: "",
+    jumlah_siswa: "",
+    tingkat: "SD" as "SD" | "SMP" | "SMA",
+    kelurahan_id,
+    kecamatan_id,
   };
 
   const [form, setForm] = useState(initialForm);
-
-  useEffect(() => {
-    setForm(initialForm);
-  }, [sekolah]);
-
-  const isDirty = JSON.stringify(form) !== JSON.stringify(initialForm);
 
   function updateField(field: string, value: any) {
     setForm((prev) => ({
@@ -70,7 +65,7 @@ const DialogEditSekolah = ({
   }
 
   const mutation = useMutation({
-    ...updateSekolahMutationOptions(),
+    ...createSekolahMutationOptions(),
     onSuccess: () => {
       toast.success("Berhasil memperbarui data Sekolah.", {
         style: {
@@ -102,7 +97,14 @@ const DialogEditSekolah = ({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const result = sekolahSchema.safeParse(form);
+    const payload = {
+      ...form,
+      latitude: Number(form.latitude),
+      longitude: Number(form.longitude),
+      jumlah_siswa: Number(form.jumlah_siswa),
+      kelurahan_id: Number(form.kelurahan_id),
+    };
+    const result = sekolahSchema.safeParse(payload);
 
     if (!result.success) {
       const firstError = Object.values(
@@ -123,9 +125,7 @@ const DialogEditSekolah = ({
       }
       return;
     }
-    // console.log("VALIDATED DATA:", result.data);
     await mutation.mutateAsync({
-      sekolah_id: sekolah.id,
       input: result.data as PostSekolah,
     });
   }
@@ -179,10 +179,10 @@ const DialogEditSekolah = ({
         <form onSubmit={handleSubmit}>
           <DialogHeader className="gap-0">
             <DialogTitle className="text-lg font-semibold">
-              Edit data Sekolah
+              Tambah data Sekolah
             </DialogTitle>
             <DialogDescription>
-              Ubah data Sekolah di SPPG anda. Klik simpan saat selesai.
+              Tambah data Sekolah di SPPG anda. Klik simpan saat selesai.
             </DialogDescription>
           </DialogHeader>
           <div className="flex gap-4 py-5">
@@ -230,15 +230,10 @@ const DialogEditSekolah = ({
                     id="kelurahan"
                     onChange={(e) => {
                       updateField("kelurahan_id", Number(e.target.value));
-                      console.log("Selected kelurahan_id:", e.target.value);
-                      console.log(form);
                     }}
                     defaultValue={form.kelurahan_id}
                     className="w-full"
                   >
-                    <NativeSelectOption value="0" className="text-center">
-                      --- Pilih Kelurahan ---
-                    </NativeSelectOption>
                     {kelurahan.map((el) => (
                       <NativeSelectOption key={el.id} value={el.id}>
                         {el.name}
@@ -273,7 +268,7 @@ const DialogEditSekolah = ({
                     placeholder="Jumlah Siswa"
                     value={form.jumlah_siswa}
                     onChange={(e) =>
-                      updateField("jumlah_siswa", Number(e.target.value))
+                      updateField("jumlah_siswa", e.target.value)
                     }
                     required
                   />
@@ -289,9 +284,7 @@ const DialogEditSekolah = ({
                     type="number"
                     placeholder="Latitude"
                     value={form.latitude}
-                    onChange={(e) =>
-                      updateField("latitude", Number(e.target.value))
-                    }
+                    onChange={(e) => updateField("latitude", e.target.value)}
                     required
                   />
                 </div>
@@ -304,9 +297,7 @@ const DialogEditSekolah = ({
                     type="number"
                     placeholder="Longitude"
                     value={form.longitude}
-                    onChange={(e) =>
-                      updateField("longitude", Number(e.target.value))
-                    }
+                    onChange={(e) => updateField("longitude", e.target.value)}
                     required
                   />
                 </div>
@@ -329,12 +320,7 @@ const DialogEditSekolah = ({
             <DialogClose asChild>
               <Button variant="outline">Batal</Button>
             </DialogClose>
-            <Button
-              type="submit"
-              disabled={
-                !isDirty || mutation.isPending || form.kelurahan_id === 0
-              }
-            >
+            <Button type="submit" disabled={mutation.isPending}>
               {mutation.isPending ? (
                 <Loader2 className="animate-spin" />
               ) : (
@@ -348,4 +334,4 @@ const DialogEditSekolah = ({
   );
 };
 
-export default DialogEditSekolah;
+export default DialogTambahSekolah;

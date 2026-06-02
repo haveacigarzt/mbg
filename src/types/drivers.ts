@@ -22,3 +22,16 @@ export type GetDriversParams = {
   sort?: string;
   nama?: string;
 };
+
+export type PostDriver = {
+  nama: string;
+  no_telepon: string;
+  email: string;
+  password: string;
+};
+
+export type PatchDriver = {
+  nama: string;
+  nomor_telepon: string;
+  status_aktif: boolean;
+};

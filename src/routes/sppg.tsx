@@ -6,7 +6,8 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/sppg")({
   beforeLoad: async () => {
     const { user } = await requireAuth();
-    if (user.role_id !== 3) {
+    console.log(user);
+    if (user.role.role_id !== 3) {
       toast.error("Access denied", {
         style: {
           "--normal-bg":
@@ -17,15 +18,19 @@ export const Route = createFileRoute("/sppg")({
       });
       throw redirect({ to: "/dashboard" });
     }
+    return {
+      user,
+    };
   },
   component: RouteComponent,
 });
 
 function RouteComponent() {
+  const { user } = Route.useRouteContext();
   return (
     <div>
       Hello
-      <SPPG />
+      <SPPG user={{ user }} />
     </div>
   );
 }

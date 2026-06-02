@@ -13,12 +13,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import {
-  createDriverMutationOptions,
-  updateDriverMutationOptions,
-} from "@/queryOptions/drivers";
-import { driverPatchSchema, driverSchema } from "@/schema/formValidation";
-import type { Drivers, PatchDriver, PostDriver } from "@/types/drivers";
+import { updateDriverMutationOptions } from "@/queryOptions/drivers";
+import { driverPatchSchema } from "@/schema/formValidation";
+import type { Drivers, PatchDriver } from "@/types/drivers";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";

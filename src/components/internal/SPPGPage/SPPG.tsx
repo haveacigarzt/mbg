@@ -11,12 +11,16 @@ import PosyanduTable from "./PosyanduTable";
 import PengirimanTable from "./PengirimanTable";
 import DriversTable from "./DriversTable";
 import { DialogEditSPPG } from "./Dialog/DialogEditSPPG";
-import DialogTambahSekolah from "./Dialog/DialogTambahSekolah";
+import type { AuthResponse } from "@/types/auth";
 
-const SPPG = () => {
+interface Props {
+  user: AuthResponse;
+}
+
+const SPPG = ({ user }: Props) => {
   const [tab, setTab] = useState("sekolah");
   const { data: sppg, refetch: refetchSPPG } = useSuspenseQuery(
-    getSPPGByIDQueryOptions(4),
+    getSPPGByIDQueryOptions(user.user.role.id_in_role),
   );
   const { data: kecamatan } = useSuspenseQuery(getKecamatanQueryOptions());
   const { data: kelurahan } = useSuspenseQuery(

@@ -10,13 +10,18 @@ export type LoginResponse = {
   };
 };
 
-export type AuthResponse = {
+export type RoleId = 1 | 2 | 3 | 4;
+
+export interface AuthResponse {
   user: {
-    id: 34;
+    id: number;
     created_at: string;
     name: string;
     email: string;
     activated: boolean;
-    role_id: number;
+    role: {
+      role_id: RoleId;
+      id_in_role: number;
+    };
   };
-};
+}

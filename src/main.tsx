@@ -5,10 +5,16 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
 
+export async function requireAuth() {
+  const data = await queryClient.ensureQueryData(getAuthUserQueryOptions());
+  return data;
+}
+
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { getAuthUserQueryOptions } from "./queryOptions/auth";
 
 // Create a new router instance
 const router = createRouter({ routeTree });

@@ -17,7 +17,7 @@ export function getSPPGQueryOptions(params?: GetSPPGParams) {
 
 export function getSPPGByIDQueryOptions(id: number) {
   return queryOptions({
-    queryKey: [`sppg-${id}`],
+    queryKey: ["sppg", id],
     queryFn: () => getSPPGByID(id),
   });
 }
@@ -31,7 +31,7 @@ export function getKecamatanQueryOptions() {
 
 export function getKelurahanQueryOptions(kecamatan_id: number) {
   return queryOptions({
-    queryKey: [`kelurahan-${kecamatan_id}`],
+    queryKey: ["kelurahan", kecamatan_id],
     queryFn: () => getKelurahan(kecamatan_id),
   });
 }

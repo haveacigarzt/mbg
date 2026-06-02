@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import SPPG from "../components/internal/SPPGPage/SPPG";
-import { requireAuth } from "@/api/auth";
 import { toast } from "sonner";
+import { requireAuth } from "@/main";
 
 export const Route = createFileRoute("/sppg")({
   beforeLoad: async () => {

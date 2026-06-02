@@ -1,12 +1,12 @@
-import { requireAuth } from "@/api/auth";
 import Driver from "@/components/internal/DriverPage/Driver";
+import { requireAuth } from "@/main";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/driver")({
   beforeLoad: async () => {
     const { user } = await requireAuth();
-    if (user.role_id !== 4) {
+    if (user.role.role_id !== 4) {
       toast.error("Access denied", {
         style: {
           "--normal-bg":

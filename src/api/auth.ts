@@ -54,7 +54,8 @@ export async function deleteAuthToken() {
   return data as { message: string };
 }
 
-export async function requireAuth() {
+export async function getAuth() {
+  console.log("fetching get auth");
   const res = await apiFetch("/v1/users/authme", {
     credentials: "include",
   });

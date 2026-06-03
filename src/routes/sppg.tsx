@@ -6,7 +6,6 @@ import { requireAuth } from "@/main";
 export const Route = createFileRoute("/sppg")({
   beforeLoad: async () => {
     const { user } = await requireAuth();
-    console.log(user);
     if (user.role.role_id !== 3) {
       toast.error("Access denied", {
         style: {

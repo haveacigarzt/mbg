@@ -11,6 +11,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { getDriversQueryOptions } from "../../../queryOptions/drivers";
 import DialogTambahDriver from "./Dialog/DialogTambahDriver";
 import DialogEditDriver from "./Dialog/DialogEditDriver";
+import DialogHapusDriver from "./Dialog/DialogHapusDriver";
 
 interface Props {
   sppg_id: number;
@@ -126,7 +127,7 @@ const DriversTable = ({ sppg_id }: Props) => {
                     Edit
                   </button>
                 </DialogEditDriver>
-                {/* <DialogHapusDriver
+                <DialogHapusDriver
                   onSuccess={refetch}
                   id={row.original.id}
                   nama={row.original.nama}
@@ -134,7 +135,7 @@ const DriversTable = ({ sppg_id }: Props) => {
                   <button className="bg-red-600 hover:bg-red-700 text-white py-0.5 px-3 rounded">
                     Hapus
                   </button>
-                </DialogHapusDriver> */}
+                </DialogHapusDriver>
               </td>
             </tr>
           ))}

@@ -1,9 +1,9 @@
 import type { Metadata } from "./metadata";
 
-export type CreatePengirimanInput = {
-  tujuan_type: string;
-  tujuan_id: number;
-};
+// export type  = {
+//   tujuan_type: string;
+//   tujuan_id: number;
+// };
 
 export type Pengiriman = {
   id: number;
@@ -20,6 +20,10 @@ export type Pengiriman = {
   version: number;
 };
 
+export type CreatePengirimanInput = {
+  tujuan: { tujuan_type: string; tujuan_id: number }[];
+};
+
 export type FetchPengirimanResponse = {
   metadata: Metadata;
   pengiriman: Pengiriman[];
@@ -32,4 +36,5 @@ export type GetPengirimanParams = {
   page?: number;
   page_size?: number;
   sort?: string;
+  tanggal?: string;
 };

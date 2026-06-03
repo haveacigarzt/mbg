@@ -7,8 +7,20 @@ import {
 } from "@tanstack/react-table";
 import type { Pengiriman } from "../../../types/pengiriman";
 import { useEffect, useState } from "react";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQueries, useSuspenseQuery } from "@tanstack/react-query";
 import { getPengirimanQueryOptions } from "../../../queryOptions/pengiriman";
+import DialogTambahPengiriman from "./Dialog/DialogTambahPengiriman";
+import { getPosyanduQueryOptions } from "@/queryOptions/posyandu";
+import { getSekolahQueryOptions } from "@/queryOptions/sekolah";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Button } from "@/components/ui/button";
+import { ChevronDownIcon } from "lucide-react";
+import { formatTanggalIndonesia } from "@/lib/utils";
 
 interface Props {
   sppg_id: number;
@@ -44,22 +56,6 @@ const columns = [
       return getValue().toUpperCase();
     },
   }),
-
-  columnHelper.display({
-    id: "aksi",
-    header: "Aksi",
-    cell: () => (
-      <>
-        <button className="bg-gray-500 hover:bg-gray-600 text-white py-0.5 px-5 rounded me-1">
-          Edit
-        </button>
-
-        <button className="bg-red-600 hover:bg-red-700 text-white py-0.5 px-3 rounded">
-          Hapus
-        </button>
-      </>
-    ),
-  }),
 ];
 
 const PengirimanTable = ({ sppg_id }: Props) => {
@@ -70,10 +66,20 @@ const PengirimanTable = ({ sppg_id }: Props) => {
   const sort = sorting[0]
     ? `${sorting[0].desc ? "-" : ""}${sorting[0].id}`
     : "";
-
-  const { data } = useSuspenseQuery(
-    getPengirimanQueryOptions({ sppg_id, page, page_size, sort }),
+  const [tanggal, setTanggal] = useState(
+    new Date().toLocaleDateString("sv-SE"),
   );
+  const { data, refetch } = useSuspenseQuery(
+    getPengirimanQueryOptions({ sppg_id, page, tanggal, page_size, sort }),
+  );
+
+  const [{ data: sekolah }, { data: posyandu }] = useSuspenseQueries({
+    queries: [
+      getSekolahQueryOptions({ sppg_id }),
+      getPosyanduQueryOptions({ sppg_id }),
+    ],
+  });
+
   const pengiriman = data.pengiriman;
   const metadata = data.metadata;
   useEffect(() => {
@@ -89,15 +95,58 @@ const PengirimanTable = ({ sppg_id }: Props) => {
     manualSorting: true,
     getCoreRowModel: getCoreRowModel(),
   });
+  const [date, setDate] = useState<Date | undefined>(new Date());
+  function handleDateChange(selectedDate: Date | undefined) {
+    if (!selectedDate) return;
+
+    setDate(selectedDate);
+
+    console.log(selectedDate.toLocaleDateString("sv-SE"));
+    setTanggal(selectedDate.toLocaleDateString("sv-SE"));
+
+    // misalnya fetch data
+    // refetch();
+  }
   return (
     <div>
       <div className="flex justify-between mb-1">
-        <input
-          className="border rounded-sm p-1"
-          value={searchPengiriman}
-          onChange={(e) => setSearchPengiriman(e.target.value)}
-          placeholder={`Cari pengiriman...`}
-        />
+        <div>
+          <input
+            className="border rounded-sm p-1"
+            value={searchPengiriman}
+            onChange={(e) => setSearchPengiriman(e.target.value)}
+            placeholder={`Cari pengiriman...`}
+          />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                data-empty={!date}
+                className="w-53 justify-between text-left font-normal data-[empty=true]:text-muted-foreground"
+              >
+                {date ? formatTanggalIndonesia(date) : <span>Pick a date</span>}
+                <ChevronDownIcon />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-fit p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={handleDateChange}
+                defaultMonth={date}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+        <DialogTambahPengiriman
+          onPengirimanUpdate={refetch}
+          sekolah={sekolah.sekolah}
+          posyandu={posyandu.posyandu}
+        >
+          <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded me-1">
+            Tambah
+          </button>
+        </DialogTambahPengiriman>
       </div>
       <table>
         <thead>

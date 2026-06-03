@@ -46,7 +46,7 @@ export async function createDriver(input: PostDriver) {
 
   if (!response.ok) {
     throw new ApiError(
-      data?.message || data?.error || "Login gagal",
+      data?.message || data?.error || "Create driver gagal",
       response.status,
       data,
     );
@@ -59,6 +59,24 @@ export async function updateDriver(input: PatchDriver, id: number) {
   const response = await apiFetch(`/v1/drivers/${id}`, {
     method: "PATCH",
     body: JSON.stringify(input),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new ApiError(
+      data?.message || data?.error || "Gagal patch /drivers",
+      response.status,
+      data,
+    );
+  }
+
+  return data.drivers as FetchDriversResponse;
+}
+
+export async function deleteDriver(driver_id: number) {
+  const response = await apiFetch(`/v1/drivers/${driver_id}`, {
+    method: "DELETE",
   });
 
   const data = await response.json();

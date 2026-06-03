@@ -61,7 +61,17 @@ const DialogHapusPosyandu = ({ children, onSuccess, id, nama }: Props) => {
   return (
     <Dialog open={open} onOpenChange={(val) => setOpen(val)}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent>
+      <DialogContent
+        className="
+            data-[state=open]:animate-in
+            data-[state=closed]:animate-out
+            data-[state=closed]:fade-out-0
+            data-[state=open]:fade-in-0
+            data-[state=closed]:zoom-out-95
+            data-[state=open]:zoom-in-95
+            duration-300
+          "
+      >
         <DialogHeader>
           <DialogTitle className="text-lg me-7">
             Apakah Anda yakin ingin menghapus posyandu ini?

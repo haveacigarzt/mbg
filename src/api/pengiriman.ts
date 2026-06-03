@@ -3,7 +3,7 @@ import type {
   FetchPengirimanResponse,
   GetPengirimanParams,
 } from "../types/pengiriman";
-import { apiFetch } from "./client";
+import { ApiError, apiFetch } from "./client";
 
 export async function postPengiriman(input: CreatePengirimanInput) {
   const response = await apiFetch("/v1/pengiriman", {
@@ -11,11 +11,17 @@ export async function postPengiriman(input: CreatePengirimanInput) {
     body: JSON.stringify(input),
   });
 
+  const data = await response.json();
+
   if (!response.ok) {
-    throw new Error("gagal membuat pengiriman");
+    throw new ApiError(
+      data?.message || data?.error || "Create pengiriman gagal",
+      response.status,
+      data,
+    );
   }
 
-  return response.json();
+  return data;
 }
 
 export async function getPengiriman(params?: GetPengirimanParams) {
@@ -29,11 +35,15 @@ export async function getPengiriman(params?: GetPengirimanParams) {
 
   const response = await apiFetch(`/v1/pengiriman?${searchParams.toString()}`);
 
+  const data = await response.json();
+
   if (!response.ok) {
-    throw new Error("gagal mengambil pengiriman");
+    throw new ApiError(
+      data?.message || data?.error || "Get pengiriman gagal",
+      response.status,
+      data,
+    );
   }
 
-  const data: FetchPengirimanResponse = await response.json();
-
-  return data;
+  return data as FetchPengirimanResponse;
 }

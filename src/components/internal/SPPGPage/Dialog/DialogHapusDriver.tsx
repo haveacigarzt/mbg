@@ -10,11 +10,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { deleteSekolahMutationOptions } from "@/queryOptions/sekolah";
 import { Loader2 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
+import { deleteDriverMutationOptions } from "@/queryOptions/drivers";
 
 interface Props {
   children: React.ReactNode;
@@ -23,12 +23,12 @@ interface Props {
   nama: string;
 }
 
-const DialogHapusSekolah = ({ children, onSuccess, id, nama }: Props) => {
+const DialogHapusDriver = ({ children, onSuccess, id, nama }: Props) => {
   const [open, setOpen] = useState(false);
   const mutation = useMutation({
-    ...deleteSekolahMutationOptions(),
+    ...deleteDriverMutationOptions(),
     onSuccess: () => {
-      toast.success(`Berhasil menghapus sekolah ${nama}`, {
+      toast.success(`Berhasil menghapus driver ${nama}`, {
         style: {
           "--normal-bg":
             "color-mix(in oklab, light-dark(var(--color-green-600), var(--color-green-400)) 10%, var(--background))",
@@ -42,7 +42,7 @@ const DialogHapusSekolah = ({ children, onSuccess, id, nama }: Props) => {
       setOpen(false);
     },
     onError: (error: ApiError) => {
-      toast.error("Terjadi kesalahan server. Harap menunggu beberapa saat", {
+      toast.error(`Gagal menghapus driver ${nama}. ${error.message}`, {
         position: "top-center",
         style: {
           "--normal-bg":
@@ -51,7 +51,7 @@ const DialogHapusSekolah = ({ children, onSuccess, id, nama }: Props) => {
           "--normal-border": "var(--destructive)",
         } as React.CSSProperties,
       });
-      console.log(error);
+      setOpen(false);
     },
   });
 
@@ -74,10 +74,10 @@ const DialogHapusSekolah = ({ children, onSuccess, id, nama }: Props) => {
       >
         <DialogHeader>
           <DialogTitle className="text-lg me-7">
-            Apakah Anda yakin ingin menghapus sekolah ini?
+            Apakah Anda yakin ingin menghapus driver ini?
           </DialogTitle>
           <DialogDescription>
-            Tindakan ini akan secara permanen menghapus sekolah {nama} dari
+            Tindakan ini akan secara permanen menghapus driver {nama} dari
             server.
           </DialogDescription>
         </DialogHeader>
@@ -101,4 +101,4 @@ const DialogHapusSekolah = ({ children, onSuccess, id, nama }: Props) => {
   );
 };
 
-export default DialogHapusSekolah;
+export default DialogHapusDriver;

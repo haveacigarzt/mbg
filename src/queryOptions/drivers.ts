@@ -4,7 +4,12 @@ import type {
   PatchDriver,
   PostDriver,
 } from "../types/drivers";
-import { createDriver, getDrivers, updateDriver } from "../api/drivers";
+import {
+  createDriver,
+  deleteDriver,
+  getDrivers,
+  updateDriver,
+} from "../api/drivers";
 
 export function getDriversQueryOptions(params?: GetDriversParams) {
   return queryOptions({
@@ -23,5 +28,11 @@ export function updateDriverMutationOptions() {
   return mutationOptions({
     mutationFn: ({ input, id }: { input: PatchDriver; id: number }) =>
       updateDriver(input, id),
+  });
+}
+
+export function deleteDriverMutationOptions() {
+  return mutationOptions({
+    mutationFn: (driver_id: number) => deleteDriver(driver_id),
   });
 }

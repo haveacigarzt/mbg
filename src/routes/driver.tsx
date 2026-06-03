@@ -17,10 +17,14 @@ export const Route = createFileRoute("/driver")({
       });
       throw redirect({ to: "/dashboard" });
     }
+    return {
+      user,
+    };
   },
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  return <Driver />;
+  const { user } = Route.useRouteContext();
+  return <Driver user={{ user }} />;
 }

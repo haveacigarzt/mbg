@@ -1,5 +1,9 @@
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
-import { getPengiriman, postPengiriman } from "../api/pengiriman";
+import {
+  antarPengiriman,
+  getPengiriman,
+  postPengiriman,
+} from "../api/pengiriman";
 import type {
   CreatePengirimanInput,
   GetPengirimanParams,
@@ -16,5 +20,11 @@ export function createPengirimanMutationOptions() {
   return mutationOptions({
     mutationFn: ({ input }: { input: CreatePengirimanInput }) =>
       postPengiriman(input),
+  });
+}
+
+export function antarPengirimanMutationOptions() {
+  return mutationOptions({
+    mutationFn: ({ id }: { id: number }) => antarPengiriman(id),
   });
 }

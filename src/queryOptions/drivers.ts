@@ -7,6 +7,7 @@ import type {
 import {
   createDriver,
   deleteDriver,
+  getDriverCurrent,
   getDrivers,
   updateDriver,
 } from "../api/drivers";
@@ -15,6 +16,13 @@ export function getDriversQueryOptions(params?: GetDriversParams) {
   return queryOptions({
     queryKey: ["drivers", params],
     queryFn: () => getDrivers(params),
+  });
+}
+
+export function getDriverCurrentQueryOptions() {
+  return queryOptions({
+    queryKey: ["driver"],
+    queryFn: getDriverCurrent,
   });
 }
 

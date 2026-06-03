@@ -1,4 +1,5 @@
 import type {
+  FetchDriverResponse,
   FetchDriversResponse,
   GetDriversParams,
   PatchDriver,
@@ -17,13 +18,33 @@ export async function getDrivers(params?: GetDriversParams) {
 
   const response = await apiFetch(`/v1/drivers?${searchParams.toString()}`);
 
+  const data = await response.json();
+
   if (!response.ok) {
-    throw new Error("gagal mengambil drivers");
+    throw new ApiError(
+      data?.message || data?.error || "Create driver gagal",
+      response.status,
+      data,
+    );
   }
 
-  const data: FetchDriversResponse = await response.json();
+  return data as FetchDriversResponse;
+}
 
-  return data;
+export async function getDriverCurrent() {
+  const response = await apiFetch(`/v1/driver/current`);
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new ApiError(
+      data?.message || data?.error || "Create driver gagal",
+      response.status,
+      data,
+    );
+  }
+
+  return data as FetchDriverResponse;
 }
 
 export async function createDriver(input: PostDriver) {

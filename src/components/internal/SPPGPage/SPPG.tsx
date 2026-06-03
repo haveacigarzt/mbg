@@ -26,6 +26,10 @@ const SPPG = ({ user }: Props) => {
   const { data: kelurahan } = useSuspenseQuery(
     getKelurahanQueryOptions(sppg.kecamatan_id),
   );
+  const [tanggal, setTanggal] = useState(
+    new Date().toLocaleDateString("sv-SE"),
+  );
+  const [date, setDate] = useState<Date | undefined>(new Date());
   return (
     <div className="flex">
       <Navbar role_id={3} />
@@ -133,7 +137,15 @@ const SPPG = ({ user }: Props) => {
                   kelurahan_id={sppg.kelurahan_id}
                 />
               )}
-              {tab === "pengiriman" && <PengirimanTable sppg_id={sppg.id} />}
+              {tab === "pengiriman" && (
+                <PengirimanTable
+                  tanggal={tanggal}
+                  onTanggalChange={setTanggal}
+                  sppg_id={sppg.id}
+                  date={date}
+                  onDateChange={setDate}
+                />
+              )}
               {tab === "drivers" && <DriversTable sppg_id={sppg.id} />}
             </Suspense>
           </div>

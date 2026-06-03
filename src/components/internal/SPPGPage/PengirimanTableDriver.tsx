@@ -21,13 +21,10 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { ChevronDownIcon } from "lucide-react";
 import { formatTanggalIndonesia } from "@/lib/utils";
+import DialogAntarPengiriman from "./Dialog/DialogAntarPengiriman";
 
 interface Props {
   sppg_id: number;
-  tanggal: string;
-  onTanggalChange: React.Dispatch<React.SetStateAction<string>>;
-  date: Date | undefined;
-  onDateChange: React.Dispatch<React.SetStateAction<Date | undefined>>;
 }
 
 const columnHelper = createColumnHelper<Pengiriman>();
@@ -43,13 +40,8 @@ const columns = [
     enableSorting: true,
   }),
 
-  columnHelper.accessor("waktu_berangkat", {
-    header: "Waktu Berangkat",
-    enableSorting: true,
-  }),
-
-  columnHelper.accessor("waktu_selesai", {
-    header: "Waktu Selesai",
+  columnHelper.accessor("created_at", {
+    header: "Waktu Dibuat",
     enableSorting: true,
   }),
 
@@ -62,13 +54,7 @@ const columns = [
   }),
 ];
 
-const PengirimanTable = ({
-  sppg_id,
-  tanggal,
-  onTanggalChange,
-  date,
-  onDateChange,
-}: Props) => {
+const PengirimanTableDriver = ({ sppg_id }: Props) => {
   const [searchPengiriman, setSearchPengiriman] = useState("");
   const [page, setPage] = useState(1);
   const page_size = 10;
@@ -76,16 +62,12 @@ const PengirimanTable = ({
   const sort = sorting[0]
     ? `${sorting[0].desc ? "-" : ""}${sorting[0].id}`
     : "";
+  const [tanggal, setTanggal] = useState(
+    new Date().toLocaleDateString("sv-SE"),
+  );
   const { data, refetch } = useSuspenseQuery(
     getPengirimanQueryOptions({ sppg_id, page, tanggal, page_size, sort }),
   );
-
-  const [{ data: sekolah }, { data: posyandu }] = useSuspenseQueries({
-    queries: [
-      getSekolahQueryOptions({ sppg_id }),
-      getPosyanduQueryOptions({ sppg_id }),
-    ],
-  });
 
   const pengiriman = data.pengiriman;
   const metadata = data.metadata;
@@ -102,13 +84,14 @@ const PengirimanTable = ({
     manualSorting: true,
     getCoreRowModel: getCoreRowModel(),
   });
+  const [date, setDate] = useState<Date | undefined>(new Date());
   function handleDateChange(selectedDate: Date | undefined) {
     if (!selectedDate) return;
 
-    onDateChange(selectedDate);
+    setDate(selectedDate);
 
     console.log(selectedDate.toLocaleDateString("sv-SE"));
-    onTanggalChange(selectedDate.toLocaleDateString("sv-SE"));
+    setTanggal(selectedDate.toLocaleDateString("sv-SE"));
 
     // misalnya fetch data
     // refetch();
@@ -144,15 +127,6 @@ const PengirimanTable = ({
             </PopoverContent>
           </Popover>
         </div>
-        <DialogTambahPengiriman
-          onPengirimanUpdate={refetch}
-          sekolah={sekolah.sekolah}
-          posyandu={posyandu.posyandu}
-        >
-          <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded me-1">
-            Tambah
-          </button>
-        </DialogTambahPengiriman>
       </div>
       <table>
         <thead>
@@ -174,6 +148,7 @@ const PengirimanTable = ({
                   }[header.column.getIsSorted() as string] ?? null}
                 </th>
               ))}
+              <th>Aksi</th>
             </tr>
           ))}
         </thead>
@@ -186,6 +161,17 @@ const PengirimanTable = ({
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
+              <td>
+                <DialogAntarPengiriman
+                  onSuccess={refetch}
+                  id={row.original.id}
+                  nama={row.original.tujuan_nama}
+                >
+                  <Button disabled={row.original.status !== "menunggu"}>
+                    Ambil
+                  </Button>
+                </DialogAntarPengiriman>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -208,4 +194,4 @@ const PengirimanTable = ({
   );
 };
 
-export default PengirimanTable;
+export default PengirimanTableDriver;

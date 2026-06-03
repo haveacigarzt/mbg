@@ -5,6 +5,7 @@ import { requireAuth } from "@/main";
 export const Route = createFileRoute("/dashboard")({
   beforeLoad: async () => {
     const { user } = await requireAuth();
+    console.log(user);
     if (user.role.role_id === 4) {
       throw redirect({ to: "/driver" });
     }

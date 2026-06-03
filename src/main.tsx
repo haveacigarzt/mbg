@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 export async function requireAuth() {
   const data = await queryClient.ensureQueryData(getAuthUserQueryOptions());

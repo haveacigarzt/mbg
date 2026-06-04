@@ -2,6 +2,7 @@ import type {
   CreatePengirimanInput,
   FetchPengirimanResponse,
   GetPengirimanParams,
+  Pengiriman,
 } from "../types/pengiriman";
 import { ApiError, apiFetch } from "./client";
 
@@ -30,7 +31,7 @@ export async function antarPengiriman(id: number) {
     body: JSON.stringify({ status: "berangkat" }),
   });
 
-  const data = await response.json();
+  const data = await response.json().catch(() => null);
 
   if (!response.ok) {
     throw new ApiError(
@@ -65,4 +66,20 @@ export async function getPengiriman(params?: GetPengirimanParams) {
   }
 
   return data as FetchPengirimanResponse;
+}
+
+export async function getPengirimanAktifByDriverID() {
+  const response = await apiFetch("/v1/pengiriman-aktif/driver");
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new ApiError(
+      data?.message || data?.error || "Get pengiriman gagal",
+      response.status,
+      data,
+    );
+  }
+
+  return data.pengiriman as Pengiriman;
 }

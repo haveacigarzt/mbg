@@ -7,9 +7,13 @@ import {
 } from "@tanstack/react-table";
 import type { Pengiriman } from "../../../types/pengiriman";
 import { useEffect, useState } from "react";
-import { useSuspenseQueries, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useSuspenseQueries,
+  useSuspenseQuery,
+  type QueryObserverResult,
+  type RefetchOptions,
+} from "@tanstack/react-query";
 import { getPengirimanQueryOptions } from "../../../queryOptions/pengiriman";
-import DialogTambahPengiriman from "./Dialog/DialogTambahPengiriman";
 import { getPosyanduQueryOptions } from "@/queryOptions/posyandu";
 import { getSekolahQueryOptions } from "@/queryOptions/sekolah";
 import {
@@ -21,10 +25,13 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { ChevronDownIcon } from "lucide-react";
 import { formatTanggalIndonesia } from "@/lib/utils";
-import DialogAntarPengiriman from "./Dialog/DialogAntarPengiriman";
+import DialogAntarPengiriman from "@/components/internal/DriverPage/Dialog/DialogAntarPengiriman";
 
 interface Props {
   sppg_id: number;
+  onUpdate: (
+    options?: RefetchOptions | undefined,
+  ) => Promise<QueryObserverResult<Pengiriman, Error>>;
 }
 
 const columnHelper = createColumnHelper<Pengiriman>();
@@ -32,11 +39,6 @@ const columnHelper = createColumnHelper<Pengiriman>();
 const columns = [
   columnHelper.accessor("tujuan_nama", {
     header: "Tujuan",
-    enableSorting: true,
-  }),
-
-  columnHelper.accessor("driver_nama", {
-    header: "Driver",
     enableSorting: true,
   }),
 
@@ -52,9 +54,14 @@ const columns = [
       return getValue().toUpperCase();
     },
   }),
+
+  columnHelper.accessor("driver_nama", {
+    header: "Driver",
+    enableSorting: true,
+  }),
 ];
 
-const PengirimanTableDriver = ({ sppg_id }: Props) => {
+const PengirimanTableDriver = ({ sppg_id, onUpdate }: Props) => {
   const [searchPengiriman, setSearchPengiriman] = useState("");
   const [page, setPage] = useState(1);
   const page_size = 10;
@@ -163,7 +170,10 @@ const PengirimanTableDriver = ({ sppg_id }: Props) => {
               ))}
               <td>
                 <DialogAntarPengiriman
-                  onSuccess={refetch}
+                  onSuccess={() => {
+                    refetch();
+                    onUpdate;
+                  }}
                   id={row.original.id}
                   nama={row.original.tujuan_nama}
                 >

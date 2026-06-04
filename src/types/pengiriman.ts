@@ -29,6 +29,10 @@ export type FetchPengirimanResponse = {
   pengiriman: Pengiriman[];
 };
 
+export type FetchSinglePengirimanResponse = {
+  pengiriman: Pengiriman;
+};
+
 export type GetPengirimanParams = {
   status?: string;
   sppg_id?: number;

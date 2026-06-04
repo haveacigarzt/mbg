@@ -11,6 +11,8 @@ export type Pengiriman = {
   tujuan_type: "sekolah" | "posyandu";
   tujuan_id: number;
   tujuan_nama: string;
+  tujuan_latitude: number;
+  tujuan_longitude: number;
   driver_id: number | null;
   driver_nama: string | null;
   status: "menunggu" | "berangkat" | "sampai" | "dibatalkan";

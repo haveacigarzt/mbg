@@ -25,7 +25,6 @@ const Driver = ({ user }: Props) => {
   const { data: pengiriman, refetch } = useSuspenseQuery(
     getPengirimanAktifByDriverIDQueryOptions(),
   );
-  console.log(pengiriman);
   return (
     <div className="flex">
       <Navbar role_id={4} />

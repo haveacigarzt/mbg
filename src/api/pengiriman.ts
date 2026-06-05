@@ -44,6 +44,25 @@ export async function antarPengiriman(id: number) {
   return data;
 }
 
+export async function updatePengiriman(id: number, status: string) {
+  const response = await apiFetch(`/v1/pengiriman/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ status }),
+  });
+
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    throw new ApiError(
+      data?.message || data?.error || "Update pengiriman gagal",
+      response.status,
+      data,
+    );
+  }
+
+  return data;
+}
+
 export async function getPengiriman(params?: GetPengirimanParams) {
   const searchParams = new URLSearchParams();
 

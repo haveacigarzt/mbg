@@ -14,7 +14,10 @@ import { Loader2 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { antarPengirimanMutationOptions } from "@/queryOptions/pengiriman";
+import {
+  antarPengirimanMutationOptions,
+  updatePengirimanMutationOptions,
+} from "@/queryOptions/pengiriman";
 
 interface Props {
   children: React.ReactNode;
@@ -23,12 +26,12 @@ interface Props {
   nama: string;
 }
 
-const DialogAntarPengiriman = ({ children, refetchAll, id, nama }: Props) => {
+const DialogConfirmBatal = ({ children, refetchAll, id, nama }: Props) => {
   const [open, setOpen] = useState(false);
   const mutation = useMutation({
-    ...antarPengirimanMutationOptions(),
+    ...updatePengirimanMutationOptions(),
     onSuccess: () => {
-      toast.success(`Berhasil mengambil pengataran ke ${nama}`, {
+      toast.success(`Berhasil update status pengiriman ke ${nama}`, {
         style: {
           "--normal-bg":
             "color-mix(in oklab, light-dark(var(--color-green-600), var(--color-green-400)) 10%, var(--background))",
@@ -42,21 +45,24 @@ const DialogAntarPengiriman = ({ children, refetchAll, id, nama }: Props) => {
       setOpen(false);
     },
     onError: (error: ApiError) => {
-      toast.error(`Gagal mengambil pengataran ke ${nama}. ${error.message}`, {
-        position: "top-center",
-        style: {
-          "--normal-bg":
-            "color-mix(in oklab, var(--destructive) 10%, var(--background))",
-          "--normal-text": "var(--destructive)",
-          "--normal-border": "var(--destructive)",
-        } as React.CSSProperties,
-      });
+      toast.error(
+        `Gagal update status pengiriman ke ${nama}. ${error.message}`,
+        {
+          position: "top-center",
+          style: {
+            "--normal-bg":
+              "color-mix(in oklab, var(--destructive) 10%, var(--background))",
+            "--normal-text": "var(--destructive)",
+            "--normal-border": "var(--destructive)",
+          } as React.CSSProperties,
+        },
+      );
       setOpen(false);
     },
   });
 
   const handleAntar = async (id: number) => {
-    await mutation.mutateAsync({ id });
+    await mutation.mutateAsync({ id, status: "dibatalkan" });
   };
   return (
     <Dialog open={open} onOpenChange={(val) => setOpen(val)}>
@@ -74,21 +80,19 @@ const DialogAntarPengiriman = ({ children, refetchAll, id, nama }: Props) => {
       >
         <DialogHeader>
           <DialogTitle className="text-lg me-7">
-            Antar pengiriman ini sekarang?
+            Pembatalan pengantaran
           </DialogTitle>
-          <DialogDescription>
-            Anda akan bertanggung jawab atas pengantaran ke {nama}.
-          </DialogDescription>
+          <DialogDescription>Batalkan pengantaran ke {nama}?</DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Batal</Button>
+            <Button variant="outline">Kembali</Button>
           </DialogClose>
           <Button onClick={() => handleAntar(id)} disabled={mutation.isPending}>
             {mutation.isPending ? (
               <Loader2 className="animate-spin" />
             ) : (
-              "Lanjutkan"
+              "Lanjut"
             )}
           </Button>
         </DialogFooter>
@@ -97,4 +101,4 @@ const DialogAntarPengiriman = ({ children, refetchAll, id, nama }: Props) => {
   );
 };
 
-export default DialogAntarPengiriman;
+export default DialogConfirmBatal;

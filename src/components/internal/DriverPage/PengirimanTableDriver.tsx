@@ -5,17 +5,15 @@ import {
   useReactTable,
   type SortingState,
 } from "@tanstack/react-table";
-import type { Pengiriman } from "../../../types/pengiriman";
+import type {
+  FetchPengirimanResponse,
+  Pengiriman,
+} from "../../../types/pengiriman";
 import { useEffect, useState } from "react";
 import {
-  useSuspenseQueries,
-  useSuspenseQuery,
   type QueryObserverResult,
   type RefetchOptions,
 } from "@tanstack/react-query";
-import { getPengirimanQueryOptions } from "../../../queryOptions/pengiriman";
-import { getPosyanduQueryOptions } from "@/queryOptions/posyandu";
-import { getSekolahQueryOptions } from "@/queryOptions/sekolah";
 import {
   Popover,
   PopoverContent,
@@ -26,12 +24,19 @@ import { Button } from "@/components/ui/button";
 import { ChevronDownIcon } from "lucide-react";
 import { formatTanggalIndonesia } from "@/lib/utils";
 import DialogAntarPengiriman from "@/components/internal/DriverPage/Dialog/DialogAntarPengiriman";
+import type { Metadata } from "@/types/metadata";
 
 interface Props {
-  sppg_id: number;
-  onUpdate: (
-    options?: RefetchOptions | undefined,
-  ) => Promise<QueryObserverResult<Pengiriman, Error>>;
+  pengiriman: Pengiriman[];
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+  searchPengiriman: string;
+  sorting: SortingState;
+  setSorting: React.Dispatch<React.SetStateAction<SortingState>>;
+  setTanggal: React.Dispatch<React.SetStateAction<string>>;
+  setSearchPengiriman: React.Dispatch<React.SetStateAction<string>>;
+  refetchAll: () => void;
+  metadata: Metadata;
+  page: number;
 }
 
 const columnHelper = createColumnHelper<Pengiriman>();
@@ -61,23 +66,18 @@ const columns = [
   }),
 ];
 
-const PengirimanTableDriver = ({ sppg_id, onUpdate }: Props) => {
-  const [searchPengiriman, setSearchPengiriman] = useState("");
-  const [page, setPage] = useState(1);
-  const page_size = 10;
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const sort = sorting[0]
-    ? `${sorting[0].desc ? "-" : ""}${sorting[0].id}`
-    : "";
-  const [tanggal, setTanggal] = useState(
-    new Date().toLocaleDateString("sv-SE"),
-  );
-  const { data, refetch } = useSuspenseQuery(
-    getPengirimanQueryOptions({ sppg_id, page, tanggal, page_size, sort }),
-  );
-
-  const pengiriman = data.pengiriman;
-  const metadata = data.metadata;
+const PengirimanTableDriver = ({
+  pengiriman,
+  setPage,
+  searchPengiriman,
+  sorting,
+  setSorting,
+  setTanggal,
+  setSearchPengiriman,
+  refetchAll,
+  metadata,
+  page,
+}: Props) => {
   useEffect(() => {
     setPage(1);
   }, [searchPengiriman]);
@@ -170,10 +170,7 @@ const PengirimanTableDriver = ({ sppg_id, onUpdate }: Props) => {
               ))}
               <td>
                 <DialogAntarPengiriman
-                  onSuccess={() => {
-                    refetch();
-                    onUpdate;
-                  }}
+                  refetchAll={refetchAll}
                   id={row.original.id}
                   nama={row.original.tujuan_nama}
                 >

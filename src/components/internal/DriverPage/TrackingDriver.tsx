@@ -2,9 +2,15 @@ import { Button } from "@/components/ui/button";
 import type { Pengiriman } from "@/types/pengiriman";
 import { useEffect, useState } from "react";
 import DriverMap from "./DriverMap";
+import { useMutation } from "@tanstack/react-query";
+import { createTrackingMutationOptions } from "@/queryOptions/tracking";
+import type { ApiError } from "@/api/client";
+import DialogConfirmBatal from "./Dialog/DialogConfirmBatal";
+import DialogConfirmSampai from "./Dialog/DialogConfirmSampai";
 
 interface Props {
   pengiriman: Pengiriman;
+  refetchAll: () => void;
 }
 
 const dummyTracking = [
@@ -94,7 +100,7 @@ const dummyTracking = [
   },
 ];
 
-const TrackingDriver = ({ pengiriman }: Props) => {
+const TrackingDriver = ({ pengiriman, refetchAll }: Props) => {
   // useEffect(() => {
   //   if (!pengiriman) return;
 
@@ -124,16 +130,41 @@ const TrackingDriver = ({ pengiriman }: Props) => {
 
   //   return () => clearInterval(interval);
   // }, [pengiriman]);
-
+  const mutation = useMutation({
+    ...createTrackingMutationOptions(),
+    onSuccess: () => {
+      console.log(`Berhasil mengirim tracking posisi`);
+    },
+    onError: (error: ApiError) => {
+      console.log(`Gagal mengirim tracking posisi. ${error.message}`);
+    },
+  });
   const [idx, setIdx] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIdx((prev) => (prev + 1) % dummyTracking.length);
+    if (!pengiriman) return;
+
+    const interval = setInterval(async () => {
+      const point = dummyTracking[idx];
+
+      const payload = {
+        ...point,
+        pengiriman_id: pengiriman.id,
+        speed: 20,
+        accuracy: 5,
+      };
+
+      try {
+        // await mutation.mutateAsync({ input: payload });
+
+        setIdx((prev) => (prev + 1) % dummyTracking.length);
+      } catch (err) {
+        console.error(err);
+      }
     }, 10000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [pengiriman, idx]);
 
   const currentPosition = dummyTracking[idx];
 
@@ -150,7 +181,7 @@ const TrackingDriver = ({ pengiriman }: Props) => {
       lng: position.lng,
     };
 
-    const duration = 30000; // sama dengan interval GPS
+    const duration = 10000; // sama dengan interval GPS
     const startTime = performance.now();
 
     const animate = (now: number) => {
@@ -203,12 +234,24 @@ const TrackingDriver = ({ pengiriman }: Props) => {
             />
           </div>
           <div className="flex justify-center gap-5">
-            <Button className="bg-red-600 hover:bg-red-700 text-white py-0.5 px-5">
-              Batal
-            </Button>
-            <Button className="bg-green-600 hover:bg-green-700 text-white py-0.5 px-5">
-              Sampai
-            </Button>
+            <DialogConfirmBatal
+              nama={pengiriman.tujuan_nama}
+              id={pengiriman.id}
+              refetchAll={refetchAll}
+            >
+              <Button className="bg-red-600 hover:bg-red-700 text-white py-0.5 px-5">
+                Batal
+              </Button>
+            </DialogConfirmBatal>
+            <DialogConfirmSampai
+              nama={pengiriman.tujuan_nama}
+              id={pengiriman.id}
+              refetchAll={refetchAll}
+            >
+              <Button className="bg-green-600 hover:bg-green-700 text-white py-0.5 px-5">
+                Sampai
+              </Button>
+            </DialogConfirmSampai>
           </div>
         </div>
       ) : (

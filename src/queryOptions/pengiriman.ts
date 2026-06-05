@@ -4,6 +4,7 @@ import {
   getPengiriman,
   getPengirimanAktifByDriverID,
   postPengiriman,
+  updatePengiriman,
 } from "../api/pengiriman";
 import type {
   CreatePengirimanInput,
@@ -34,5 +35,12 @@ export function createPengirimanMutationOptions() {
 export function antarPengirimanMutationOptions() {
   return mutationOptions({
     mutationFn: ({ id }: { id: number }) => antarPengiriman(id),
+  });
+}
+
+export function updatePengirimanMutationOptions() {
+  return mutationOptions({
+    mutationFn: ({ id, status }: { id: number; status: string }) =>
+      updatePengiriman(id, status),
   });
 }

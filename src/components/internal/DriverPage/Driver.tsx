@@ -8,6 +8,8 @@ import {
 } from "@/queryOptions/pengiriman";
 import PengirimanTableDriver from "@/components/internal/DriverPage/PengirimanTableDriver";
 import TrackingDriver from "@/components/internal/DriverPage/TrackingDriver";
+import { useState } from "react";
+import type { SortingState } from "@tanstack/react-table";
 
 interface Props {
   user: AuthResponse;
@@ -16,15 +18,41 @@ interface Props {
 const Driver = ({ user }: Props) => {
   // console.log(user);
   const { data: driver } = useSuspenseQuery(getDriverCurrentQueryOptions());
-  // const { data: pengiriman } = useSuspenseQuery(
-  //   getPengirimanQueryOptions({
-  //     tanggal: new Date().toLocaleDateString("sv-SE"),
-  //   }),
-  // );
-  // console.log(pengiriman);
-  const { data: pengiriman, refetch } = useSuspenseQuery(
+
+  const [searchPengiriman, setSearchPengiriman] = useState("");
+  const [page, setPage] = useState(1);
+  const page_size = 10;
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const sort = sorting[0]
+    ? `${sorting[0].desc ? "-" : ""}${sorting[0].id}`
+    : "";
+  const [tanggal, setTanggal] = useState(
+    new Date().toLocaleDateString("sv-SE"),
+  );
+
+  const { data, refetch } = useSuspenseQuery(
+    getPengirimanQueryOptions({
+      sppg_id: driver.driver.sppg.id,
+      page,
+      tanggal,
+      page_size,
+      sort,
+    }),
+  );
+
+  const pengiriman = data.pengiriman;
+  const metadata = data.metadata;
+
+  const { data: pengirimanAktif, refetch: refetchAktif } = useSuspenseQuery(
     getPengirimanAktifByDriverIDQueryOptions(),
   );
+
+  const refetchAll = () => {
+    console.log("refetch all");
+    refetch();
+    refetchAktif();
+  };
+
   return (
     <div className="flex">
       <Navbar role_id={4} />
@@ -36,14 +64,25 @@ const Driver = ({ user }: Props) => {
             <p>{driver.driver.sppg.alamat}</p>
           </div>
           <div className="flex-1 bg-blue-200">
-            <TrackingDriver pengiriman={pengiriman} />
+            <TrackingDriver
+              pengiriman={pengirimanAktif}
+              refetchAll={refetchAll}
+            />
           </div>
         </div>
         <div className=" bg-blue-200">
           <b>Pengiriman Hari Ini</b>
           <PengirimanTableDriver
-            sppg_id={driver.driver.sppg.id}
-            onUpdate={refetch}
+            pengiriman={pengiriman}
+            refetchAll={refetchAll}
+            setPage={setPage}
+            searchPengiriman={searchPengiriman}
+            sorting={sorting}
+            setSorting={setSorting}
+            setTanggal={setTanggal}
+            setSearchPengiriman={setSearchPengiriman}
+            metadata={metadata}
+            page={page}
           />
         </div>
       </div>

@@ -21,6 +21,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { ChevronDownIcon } from "lucide-react";
 import { formatTanggalIndonesia } from "@/lib/utils";
+import { queryClient } from "@/main";
+import { useWebSocket } from "@/contexts/websocket-context";
 
 interface Props {
   sppg_id: number;
@@ -79,6 +81,7 @@ const PengirimanTable = ({
   const { data, refetch } = useSuspenseQuery(
     getPengirimanQueryOptions({ sppg_id, page, tanggal, page_size, sort }),
   );
+  console.log(data);
 
   const [{ data: sekolah }, { data: posyandu }] = useSuspenseQueries({
     queries: [
@@ -102,6 +105,7 @@ const PengirimanTable = ({
     manualSorting: true,
     getCoreRowModel: getCoreRowModel(),
   });
+
   function handleDateChange(selectedDate: Date | undefined) {
     if (!selectedDate) return;
 
@@ -113,6 +117,47 @@ const PengirimanTable = ({
     // misalnya fetch data
     // refetch();
   }
+
+  const { connected, lastMessage } = useWebSocket();
+
+  console.log(connected);
+
+  useEffect(() => {
+    if (!lastMessage) return;
+
+    console.log(lastMessage.data);
+    // queryClient.invalidateQueries({
+    //   queryKey: ["pengiriman"],
+    // });
+    console.log(lastMessage.type === "pengiriman:update");
+    console.log(lastMessage.data.sppg_id === sppg_id);
+    if (
+      lastMessage.type === "pengiriman:update" &&
+      lastMessage.data.sppg_id === sppg_id
+    ) {
+      queryClient.setQueriesData(
+        {
+          queryKey: ["pengiriman"],
+        },
+        (old: any) => {
+          if (!old) return old;
+
+          return {
+            ...old,
+            pengiriman: old.pengiriman.map((el: any) =>
+              el.id === lastMessage.data.pengiriman_id
+                ? {
+                    ...el,
+                    status: lastMessage.data.status,
+                  }
+                : el,
+            ),
+          };
+        },
+      );
+    }
+  }, [lastMessage]);
+
   return (
     <div>
       <div className="flex justify-between mb-1">

@@ -8,12 +8,14 @@ import {
 } from "@/queryOptions/pengiriman";
 import PengirimanTableDriver from "@/components/internal/DriverPage/PengirimanTableDriver";
 import TrackingDriver from "@/components/internal/DriverPage/TrackingDriver";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { SortingState } from "@tanstack/react-table";
 
 interface Props {
   user: AuthResponse;
 }
+
+const ws = new WebSocket("ws://localhost:4040/ws");
 
 const Driver = ({ user }: Props) => {
   // console.log(user);
@@ -52,6 +54,23 @@ const Driver = ({ user }: Props) => {
     refetch();
     refetchAktif();
   };
+
+  useEffect(() => {
+    ws.onopen = () => {
+      console.log("CONNECTED");
+    };
+    ws.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (
+        message.type === `pengiriman:update sppd_id:${driver.driver.sppg.id}`
+      ) {
+        console.log("TRACKING UPDATE", message.data);
+      }
+    };
+    ws.onclose = () => {
+      console.log("DISCONNECTED");
+    };
+  }, []);
 
   return (
     <div className="flex">

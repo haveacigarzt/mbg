@@ -16,6 +16,7 @@ import { routeTree } from "./routeTree.gen";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { getAuthUserQueryOptions } from "./queryOptions/auth";
+import { WebSocketProvider } from "./provider/websocket-provider";
 
 // Create a new router instance
 const router = createRouter({ routeTree });
@@ -28,10 +29,12 @@ declare module "@tanstack/react-router" {
 }
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
+  <QueryClientProvider client={queryClient}>
+    <WebSocketProvider>
       <RouterProvider router={router} />
       <ReactQueryDevtools />
-    </QueryClientProvider>
-  </StrictMode>,
+    </WebSocketProvider>
+  </QueryClientProvider>,
+  // <StrictMode>
+  // </StrictMode>,
 );

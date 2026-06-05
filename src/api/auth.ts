@@ -4,7 +4,6 @@ import { redirect } from "@tanstack/react-router";
 import { queryClient } from "@/main";
 
 export async function postLogin(input: LoginInput) {
-  console.log(input);
   const response = await apiFetch("/v1/tokens/authentication", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

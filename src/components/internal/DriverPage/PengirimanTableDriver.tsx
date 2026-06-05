@@ -5,15 +5,8 @@ import {
   useReactTable,
   type SortingState,
 } from "@tanstack/react-table";
-import type {
-  FetchPengirimanResponse,
-  Pengiriman,
-} from "../../../types/pengiriman";
+import type { Pengiriman } from "../../../types/pengiriman";
 import { useEffect, useState } from "react";
-import {
-  type QueryObserverResult,
-  type RefetchOptions,
-} from "@tanstack/react-query";
 import {
   Popover,
   PopoverContent,
@@ -25,6 +18,8 @@ import { ChevronDownIcon } from "lucide-react";
 import { formatTanggalIndonesia } from "@/lib/utils";
 import DialogAntarPengiriman from "@/components/internal/DriverPage/Dialog/DialogAntarPengiriman";
 import type { Metadata } from "@/types/metadata";
+import { useWebSocket } from "@/contexts/websocket-context";
+import { queryClient } from "@/main";
 
 interface Props {
   pengiriman: Pengiriman[];
@@ -103,6 +98,21 @@ const PengirimanTableDriver = ({
     // misalnya fetch data
     // refetch();
   }
+
+  const { connected, lastMessage } = useWebSocket();
+
+  console.log(connected);
+
+  useEffect(() => {
+    if (!lastMessage) return;
+
+    if (lastMessage.type === "pengiriman:create") {
+      queryClient.invalidateQueries({
+        queryKey: ["pengiriman"],
+      });
+    }
+  }, [lastMessage]);
+
   return (
     <div>
       <div className="flex justify-between mb-1">

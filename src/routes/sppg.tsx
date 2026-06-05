@@ -26,10 +26,5 @@ export const Route = createFileRoute("/sppg")({
 
 function RouteComponent() {
   const { user } = Route.useRouteContext();
-  return (
-    <div>
-      Hello
-      <SPPG user={{ user }} />
-    </div>
-  );
+  return <SPPG user={{ user }} />;
 }

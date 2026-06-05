@@ -10,12 +10,13 @@ import PengirimanTableDriver from "@/components/internal/DriverPage/PengirimanTa
 import TrackingDriver from "@/components/internal/DriverPage/TrackingDriver";
 import { useEffect, useState } from "react";
 import type { SortingState } from "@tanstack/react-table";
+import { WebSocketProvider } from "@/provider/websocket-provider";
+import { queryClient } from "@/main";
+import { useWebSocket } from "@/contexts/websocket-context";
 
 interface Props {
   user: AuthResponse;
 }
-
-const ws = new WebSocket("ws://localhost:4040/ws");
 
 const Driver = ({ user }: Props) => {
   // console.log(user);
@@ -55,57 +56,42 @@ const Driver = ({ user }: Props) => {
     refetchAktif();
   };
 
-  useEffect(() => {
-    ws.onopen = () => {
-      console.log("CONNECTED");
-    };
-    ws.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      if (
-        message.type === `pengiriman:update sppd_id:${driver.driver.sppg.id}`
-      ) {
-        console.log("TRACKING UPDATE", message.data);
-      }
-    };
-    ws.onclose = () => {
-      console.log("DISCONNECTED");
-    };
-  }, []);
-
   return (
-    <div className="flex">
-      <Navbar role_id={4} />
-      <div className="flex flex-col gap-3 p-3 w-[85%] bg-red-200">
-        <div className="flex gap-3">
-          <div className="flex-1 bg-blue-200">
-            <b>Data SPPG</b>
-            <p>{driver.driver.sppg.nama}</p>
-            <p>{driver.driver.sppg.alamat}</p>
+    <WebSocketProvider sppg_id={driver.driver.sppg.id}>
+      <div className="flex">
+        <Navbar role_id={4} />
+        <div className="flex flex-col gap-3 p-3 w-[85%] bg-red-200">
+          <div className="flex gap-3">
+            <div className="flex-1 bg-blue-200">
+              <b>Data SPPG</b>
+              <p>{driver.driver.sppg.nama}</p>
+              <p>{driver.driver.sppg.alamat}</p>
+            </div>
+            <div className="flex-1 bg-blue-200">
+              <TrackingDriver
+                pengiriman={pengirimanAktif}
+                refetchAll={refetchAll}
+              />
+            </div>
           </div>
-          <div className="flex-1 bg-blue-200">
-            <TrackingDriver
-              pengiriman={pengirimanAktif}
+          <div className=" bg-blue-200">
+            <b>Pengiriman Hari Ini</b>
+            <PengirimanTableDriver
+              pengiriman={pengiriman}
               refetchAll={refetchAll}
+              setPage={setPage}
+              searchPengiriman={searchPengiriman}
+              sorting={sorting}
+              setSorting={setSorting}
+              setTanggal={setTanggal}
+              setSearchPengiriman={setSearchPengiriman}
+              metadata={metadata}
+              page={page}
             />
           </div>
         </div>
-        <div className=" bg-blue-200">
-          <b>Pengiriman Hari Ini</b>
-          <PengirimanTableDriver
-            pengiriman={pengiriman}
-            refetchAll={refetchAll}
-            setPage={setPage}
-            searchPengiriman={searchPengiriman}
-            sorting={sorting}
-            setSorting={setSorting}
-            setTanggal={setTanggal}
-            setSearchPengiriman={setSearchPengiriman}
-            metadata={metadata}
-            page={page}
-          />
-        </div>
       </div>
-    </div>
+    </WebSocketProvider>
   );
 };
 

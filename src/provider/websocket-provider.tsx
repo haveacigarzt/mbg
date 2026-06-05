@@ -1,12 +1,18 @@
 import { useEffect, useState } from "react";
 import { WebSocketContext } from "@/contexts/websocket-context";
 
-export function WebSocketProvider({ children }: { children: React.ReactNode }) {
+export function WebSocketProvider({
+  children,
+  sppg_id,
+}: {
+  children: React.ReactNode;
+  sppg_id: number;
+}) {
   const [connected, setConnected] = useState(false);
   const [lastMessage, setLastMessage] = useState(null);
 
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:4040/ws");
+    const ws = new WebSocket(`ws://192.168.1.10:4040/ws/${sppg_id}`);
 
     ws.onopen = () => setConnected(true);
 

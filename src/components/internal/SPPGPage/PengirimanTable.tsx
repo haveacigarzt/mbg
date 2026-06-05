@@ -81,7 +81,7 @@ const PengirimanTable = ({
   const { data, refetch } = useSuspenseQuery(
     getPengirimanQueryOptions({ sppg_id, page, tanggal, page_size, sort }),
   );
-  console.log(data);
+  // console.log(data);
 
   const [{ data: sekolah }, { data: posyandu }] = useSuspenseQueries({
     queries: [
@@ -120,27 +120,23 @@ const PengirimanTable = ({
 
   const { connected, lastMessage } = useWebSocket();
 
-  console.log(connected);
+  // console.log(connected);
 
   useEffect(() => {
     if (!lastMessage) return;
 
     console.log(lastMessage.data);
-    // queryClient.invalidateQueries({
-    //   queryKey: ["pengiriman"],
-    // });
-    console.log(lastMessage.type === "pengiriman:update");
-    console.log(lastMessage.data.sppg_id === sppg_id);
-    if (
-      lastMessage.type === "pengiriman:update" &&
-      lastMessage.data.sppg_id === sppg_id
-    ) {
+    if (lastMessage.type === "pengiriman:update") {
+      // queryClient.invalidateQueries({
+      //   queryKey: ["pengiriman"],
+      // });
       queryClient.setQueriesData(
         {
           queryKey: ["pengiriman"],
         },
         (old: any) => {
           if (!old) return old;
+          // console.log(lastMessage.data);
 
           return {
             ...old,
@@ -149,6 +145,9 @@ const PengirimanTable = ({
                 ? {
                     ...el,
                     status: lastMessage.data.status,
+                    driver_nama: lastMessage.data.driver_nama,
+                    waktu_berangkat: lastMessage.data.waktu_berangkat,
+                    waktu_selesai: lastMessage.data.waktu_selesai,
                   }
                 : el,
             ),

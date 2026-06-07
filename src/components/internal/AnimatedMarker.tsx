@@ -51,12 +51,13 @@ export default function AnimatedMarker({ tracking, color }: Props) {
     <>
       <CircleMarker
         center={[position.lat, position.lng]}
-        radius={13}
+        radius={14}
         pathOptions={{
           color: "transparent",
           fillColor: color,
           fillOpacity: 0.4,
         }}
+        className="pulse"
       />
 
       <CircleMarker
@@ -68,7 +69,10 @@ export default function AnimatedMarker({ tracking, color }: Props) {
           fillOpacity: 1,
         }}
       >
-        <Tooltip permanent>{tracking.pengiriman_id}</Tooltip>
+        <Tooltip permanent direction="top" offset={[1, -13]}>
+          {tracking.id}
+          <div>{tracking.sppg_nama}</div>({tracking.driver_nama})
+        </Tooltip>
       </CircleMarker>
     </>
   );

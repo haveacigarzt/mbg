@@ -15,6 +15,7 @@ export type Pengiriman = {
   tujuan_longitude: number;
   driver_id: number | null;
   driver_nama: string | null;
+  sppg_nama: string | null;
   status: "menunggu" | "berangkat" | "sampai" | "dibatalkan";
   waktu_berangkat: string | null;
   waktu_selesai: string | null;

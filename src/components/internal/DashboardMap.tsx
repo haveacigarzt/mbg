@@ -43,7 +43,6 @@ const DashboardMap = ({ tracking }: Props) => {
             <Fragment key={el.pengiriman_id}>
               <AnimatedMarker
                 color={colors[el.pengiriman_id % colors.length]}
-                key={el.pengiriman_id}
                 tracking={el}
               />
 

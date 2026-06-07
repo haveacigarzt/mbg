@@ -29,6 +29,8 @@ export type Tracking = {
   tujuan_lat: number;
   tujuan_lng: number;
   tujuan_nama: string;
+  sppg_nama: string;
+  driver_nama: string;
 };
 
 export type FetchTrackingResponse = {

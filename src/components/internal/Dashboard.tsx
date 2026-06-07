@@ -40,8 +40,6 @@ const Dashboard = ({ role_id }: Props) => {
 
   const { data: tracking } = useQuery(getTrackingQueryOptions(pengirimanIds));
 
-  // console.log(tracking);
-
   const { connected, lastMessage } = useWebSocket();
 
   // console.log("connected: ", connected);
@@ -129,7 +127,7 @@ const Dashboard = ({ role_id }: Props) => {
             <ul>
               {pengiriman.pengiriman.map((el) => (
                 <li className="mb-2" key={el.id}>
-                  SPPG: {el.sppg_id} (Driver: {el.driver_nama}) menuju ke{" "}
+                  {el.sppg_nama} (Driver: {el.driver_nama}) menuju ke{" "}
                   {el.tujuan_nama}
                 </li>
               ))}

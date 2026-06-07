@@ -7,6 +7,9 @@ import { createTrackingMutationOptions } from "@/queryOptions/tracking";
 import type { ApiError } from "@/api/client";
 import DialogConfirmBatal from "./Dialog/DialogConfirmBatal";
 import DialogConfirmSampai from "./Dialog/DialogConfirmSampai";
+import type { CreateTrackingInput } from "@/types/tracking";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface Props {
   pengiriman: Pengiriman;
@@ -209,35 +212,7 @@ const dummyTrackingB = [
 ];
 
 const TrackingDriver = ({ pengiriman, refetchAll, sppg_id }: Props) => {
-  // useEffect(() => {
-  //   if (!pengiriman) return;
-
-  //   const sendLocation = () => {
-  //     navigator.geolocation.getCurrentPosition(
-  //       async (position) => {
-  //         const payload = {
-  //           pengirimanId: pengiriman.id,
-  //           latitude: position.coords.latitude,
-  //           longitude: position.coords.longitude,
-  //           speed: position.coords.speed ?? 0,
-  //           accuracy: position.coords.accuracy,
-  //         };
-  //         console.log(payload);
-  //         // await trackingMutation.mutateAsync();
-  //       },
-  //       console.error,
-  //       {
-  //         enableHighAccuracy: true,
-  //       },
-  //     );
-  //   };
-
-  //   sendLocation();
-
-  //   const interval = setInterval(sendLocation, 30000);
-
-  //   return () => clearInterval(interval);
-  // }, [pengiriman]);
+  const [usingDummy, setUsingDummy] = useState(false);
 
   const dummyTracking = sppg_id === 4 ? dummyTrackingB : dummyTrackingA;
 
@@ -252,18 +227,40 @@ const TrackingDriver = ({ pengiriman, refetchAll, sppg_id }: Props) => {
   });
   const [idx, setIdx] = useState(0);
 
+  function getCurrentLocation() {
+    return new Promise<GeolocationPosition>((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: true,
+      });
+    });
+  }
+
   useEffect(() => {
     if (!pengiriman) return;
 
     const interval = setInterval(async () => {
-      const point = dummyTracking[idx];
+      let payload = {} as CreateTrackingInput;
 
-      const payload = {
-        ...point,
-        pengiriman_id: pengiriman.id,
-        speed: 20,
-        accuracy: 5,
-      };
+      if (usingDummy) {
+        const point = dummyTracking[idx];
+
+        payload = {
+          ...point,
+          pengiriman_id: pengiriman.id,
+          speed: 20,
+          accuracy: 5,
+        };
+      } else {
+        const position = await getCurrentLocation();
+
+        payload = {
+          pengiriman_id: pengiriman.id,
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          speed: position.coords.speed ?? 0,
+          accuracy: position.coords.accuracy,
+        };
+      }
 
       try {
         await mutation.mutateAsync({ input: payload });
@@ -275,7 +272,7 @@ const TrackingDriver = ({ pengiriman, refetchAll, sppg_id }: Props) => {
     }, 10000);
 
     return () => clearInterval(interval);
-  }, [pengiriman, idx]);
+  }, [pengiriman, idx, usingDummy]);
 
   const currentPosition = dummyTracking[idx];
 
@@ -332,6 +329,14 @@ const TrackingDriver = ({ pengiriman, refetchAll, sppg_id }: Props) => {
             <span className="font-bold">Pos:</span>
             {currentPosition.latitude}, {currentPosition.longitude}
           </p>
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="airplane-mode"
+              checked={usingDummy}
+              onCheckedChange={setUsingDummy}
+            />
+            <Label htmlFor="airplane-mode">Pakai Data Dummy</Label>
+          </div>
           <div className="bg-amber-200 h-100">
             <DriverMap
               latitude={position.lat}

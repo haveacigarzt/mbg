@@ -231,7 +231,6 @@ const DialogEditSekolah = ({
                     id="kelurahan"
                     onChange={(e) => {
                       updateField("kelurahan_id", Number(e.target.value));
-                      console.log("Selected kelurahan_id:", e.target.value);
                     }}
                     defaultValue={form.kelurahan_id}
                     className="w-full"

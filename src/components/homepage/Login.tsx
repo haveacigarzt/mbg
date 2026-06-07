@@ -82,12 +82,12 @@ const Login = () => {
         <Button onClick={() => loginCepat("dinassgu@gmail.com", "password")}>
           Stakeholder
         </Button>
-        <Button onClick={() => loginCepat("admin_ponbar@sppg.id", "password")}>
-          SPPG A
-        </Button>
         <Button
           onClick={() => loginCepat("admin_pontim@sppg.id", "password123")}
         >
+          SPPG A
+        </Button>
+        <Button onClick={() => loginCepat("admin_ponbar@sppg.id", "password")}>
           SPPG B
         </Button>
         <Button
@@ -96,7 +96,7 @@ const Login = () => {
           Driver A
         </Button>
         <Button
-          onClick={() => loginCepat("budi.driver@example.com", "password")}
+          onClick={() => loginCepat("budi.driver@example.com", "password123")}
         >
           Driver B
         </Button>

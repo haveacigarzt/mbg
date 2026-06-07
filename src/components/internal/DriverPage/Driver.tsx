@@ -57,7 +57,7 @@ const Driver = ({ user }: Props) => {
   };
 
   return (
-    <WebSocketProvider sppg_id={driver.driver.sppg.id}>
+    <WebSocketProvider room_id={`sppg/${String(driver.driver.sppg.id)}`}>
       <div className="flex">
         <Navbar role_id={4} />
         <div className="flex flex-col gap-3 p-3 w-[85%] bg-red-200">
@@ -71,6 +71,7 @@ const Driver = ({ user }: Props) => {
               <TrackingDriver
                 pengiriman={pengirimanAktif}
                 refetchAll={refetchAll}
+                sppg_id={driver.driver.sppg.id}
               />
             </div>
           </div>

@@ -32,7 +32,7 @@ const SPPG = ({ user }: Props) => {
   );
   const [date, setDate] = useState<Date | undefined>(new Date());
   return (
-    <WebSocketProvider sppg_id={sppg.id}>
+    <WebSocketProvider room_id={`sppg/${String(sppg.id)}`}>
       <div className="flex">
         <Navbar role_id={3} />
         <div className="flex flex-col gap-3 p-3 w-[85%] bg-red-200">

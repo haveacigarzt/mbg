@@ -11,9 +11,10 @@ import DialogConfirmSampai from "./Dialog/DialogConfirmSampai";
 interface Props {
   pengiriman: Pengiriman;
   refetchAll: () => void;
+  sppg_id: number;
 }
 
-const dummyTracking = [
+const dummyTrackingA = [
   {
     latitude: 0.12338290023859251,
     longitude: 110.60558480347815,
@@ -100,7 +101,114 @@ const dummyTracking = [
   },
 ];
 
-const TrackingDriver = ({ pengiriman, refetchAll }: Props) => {
+const dummyTrackingB = [
+  {
+    latitude: 0.12024148387039542,
+    longitude: 110.58510601939116,
+  },
+  {
+    latitude: 0.12088521259630856,
+    longitude: 110.58347523626813,
+  },
+  {
+    latitude: 0.12114270408239662,
+    longitude: 110.58270276005197,
+  },
+  {
+    latitude: 0.1214431108130936,
+    longitude: 110.58235943728923,
+  },
+  {
+    latitude: 0.1220010090183523,
+    longitude: 110.58167279176374,
+  },
+  {
+    latitude: 0.12212975475639014,
+    longitude: 110.58150113038238,
+  },
+  {
+    latitude: 0.1223443309850707,
+    longitude: 110.58064282347551,
+  },
+  {
+    latitude: 0.12225850049380457,
+    longitude: 110.57995617795002,
+  },
+  {
+    latitude: 0.12225850049380457,
+    longitude: 110.57905495569783,
+  },
+  {
+    latitude: 0.12212975475639014,
+    longitude: 110.57841122551767,
+  },
+  {
+    latitude: 0.12208683951044537,
+    longitude: 110.57841122551767,
+  },
+  {
+    latitude: 0.12225850049380457,
+    longitude: 110.57789624137357,
+  },
+  {
+    latitude: 0.122043924264437,
+    longitude: 110.57725251119344,
+  },
+  {
+    latitude: 0.12165768704724472,
+    longitude: 110.57648003497727,
+  },
+  {
+    latitude: 0.12221558524806338,
+    longitude: 110.57566464341575,
+  },
+  {
+    latitude: 0.12238724623060836,
+    longitude: 110.57549298203438,
+  },
+  {
+    latitude: 0.12315802391352076,
+    longitude: 110.57469462658389,
+  },
+  {
+    latitude: 0.12303664127232755,
+    longitude: 110.57396632902287,
+  },
+  {
+    latitude: 0.12324906089407536,
+    longitude: 110.57363252597408,
+  },
+  {
+    latitude: 0.1237042457921284,
+    longitude: 110.57275249975451,
+  },
+  {
+    latitude: 0.12394701106788657,
+    longitude: 110.57211523938864,
+  },
+  {
+    latitude: 0.12412908502325803,
+    longitude: 110.5720242021935,
+  },
+  {
+    latitude: 0.12443254161274916,
+    longitude: 110.57138694182763,
+  },
+  {
+    latitude: 0.12516083741326883,
+    longitude: 110.57087106438857,
+  },
+  {
+    latitude: 0.12531256570250568,
+    longitude: 110.57002138390072,
+  },
+  {
+    latitude: 0.1268353398297325,
+    longitude: 110.5690282709128,
+  },
+];
+
+const TrackingDriver = ({ pengiriman, refetchAll, sppg_id }: Props) => {
   // useEffect(() => {
   //   if (!pengiriman) return;
 
@@ -130,6 +238,9 @@ const TrackingDriver = ({ pengiriman, refetchAll }: Props) => {
 
   //   return () => clearInterval(interval);
   // }, [pengiriman]);
+
+  const dummyTracking = sppg_id === 4 ? dummyTrackingB : dummyTrackingA;
+
   const mutation = useMutation({
     ...createTrackingMutationOptions(),
     onSuccess: () => {
@@ -155,7 +266,7 @@ const TrackingDriver = ({ pengiriman, refetchAll }: Props) => {
       };
 
       try {
-        // await mutation.mutateAsync({ input: payload });
+        await mutation.mutateAsync({ input: payload });
 
         setIdx((prev) => (prev + 1) % dummyTracking.length);
       } catch (err) {

@@ -100,10 +100,10 @@ const PengirimanTableDriver = ({
   }
 
   const { connected, lastMessage } = useWebSocket();
-
-  console.log(connected);
+  // console.log("connected: ", connected);
 
   useEffect(() => {
+    // console.log("lastMessage: ", lastMessage);
     if (!lastMessage) return;
 
     if (lastMessage.type === "pengiriman:create") {

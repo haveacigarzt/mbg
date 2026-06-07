@@ -120,12 +120,12 @@ const PengirimanTable = ({
 
   const { connected, lastMessage } = useWebSocket();
 
-  // console.log(connected);
+  // console.log("connected: ", connected);
 
   useEffect(() => {
+    // console.log("lastMessage: ", lastMessage);
     if (!lastMessage) return;
 
-    console.log(lastMessage.data);
     if (lastMessage.type === "pengiriman:update") {
       // queryClient.invalidateQueries({
       //   queryKey: ["pengiriman"],

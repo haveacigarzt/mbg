@@ -1,54 +1,73 @@
-"use client";
-
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import { ChartContainer } from "@/components/ui/chart";
+interface SekolahItem {
+  tingkat: string;
+  jumlah_siswa: number;
+}
 
-const dataMap: Record<string, { label: string; items: { name: string; value: number; color: string }[] }> = {
-  "3B": {
-    label: "3B (BUMIL, BUSUI, BALITA)",
-    items: [
-      { name: "Ibu Hamil (Bumil)", value: 504, color: "#ec4899" },
-      { name: "Ibu Menyusui (Busui)", value: 592, color: "#a855f7" },
-      { name: "Balita", value: 1246, color: "#3b82f6" },
-    ],
-  },
-  "Ps.D": {
-    label: "PESERTA DIDIK (Ps.D)",
-    items: [
-      { name: "SD/MI", value: 8200, color: "#3b82f6" },
-      { name: "SMP/MTs", value: 5100, color: "#6366f1" },
-    ],
-  },
-  Guru: {
-    label: "GURU & TENAGA PENDIDIK",
-    items: [
-      { name: "Guru PNS", value: 45, color: "#f97316" },
-      { name: "Guru Honorer", value: 44, color: "#fb923c" },
-    ],
-  },
-  ATS: {
-    label: "ANAK TIDAK SEKOLAH (ATS)",
-    items: [
-      { name: "Usia 7-12 Tahun", value: 30, color: "#ef4444" },
-      { name: "Usia 13-18 Tahun", value: 37, color: "#f87171" },
-    ],
-  },
-  APS: {
-    label: "ANAK PUTUS SEKOLAH (APS)",
-    items: [
-      { name: "Putus SD", value: 35, color: "#6b7280" },
-      { name: "Putus SMP", value: 25, color: "#9ca3af" },
-    ],
-  },
-};
+interface PosyanduItem {
+  jumlah_balita: number;
+  jumlah_ibu_hamil: number;
+}
+
+interface Props {
+  selected: string;
+  sekolah: SekolahItem[];
+  posyandu: PosyanduItem[];
+}
 
 const chartConfig = { data: { label: "Data" } };
 
-export default function DonutPenerima({ selected }: { selected: string }) {
+export default function DonutPenerima({ selected, sekolah, posyandu }: Props) {
+  // Hitung data 3B dari posyandu
+  const totalBumil = posyandu.reduce((sum, el) => sum + el.jumlah_ibu_hamil, 0);
+  const totalBalita = posyandu.reduce((sum, el) => sum + el.jumlah_balita, 0);
+
+  // Hitung data Ps.D — group per tingkat
+  const groupByTingkat = sekolah.reduce(
+    (acc, el) => {
+      acc[el.tingkat] = (acc[el.tingkat] || 0) + el.jumlah_siswa;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
+
+  const dataMap: Record<string, { label: string; items: { name: string; value: number; color: string }[] }> = {
+    "3B": {
+      label: "3B (BUMIL, BUSUI, BALITA)",
+      items: [
+        { name: "Ibu Hamil (Bumil)", value: totalBumil, color: "#ec4899" },
+        { name: "Ibu Menyusui (Busui)", value: 0, color: "#a855f7" },
+        { name: "Balita", value: totalBalita, color: "#3b82f6" },
+      ],
+    },
+    "Ps.D": {
+      label: "PESERTA DIDIK (Ps.D)",
+      items: Object.entries(groupByTingkat).map(([tingkat, jumlah], i) => ({
+        name: tingkat,
+        value: jumlah,
+        color: ["#3b82f6", "#6366f1", "#8b5cf6", "#a855f7"][i] ?? "#94a3b8",
+      })),
+    },
+    Guru: {
+      label: "GURU & TENAGA PENDIDIK",
+      items: [{ name: "Data belum tersedia", value: 1, color: "#e5e7eb" }],
+    },
+    ATS: {
+      label: "ANAK TIDAK SEKOLAH (ATS)",
+      items: [{ name: "Data belum tersedia", value: 1, color: "#e5e7eb" }],
+    },
+    APS: {
+      label: "ANAK PUTUS SEKOLAH (APS)",
+      items: [{ name: "Data belum tersedia", value: 1, color: "#e5e7eb" }],
+    },
+  };
+
   const data = dataMap[selected];
   if (!data) return null;
 
   const total = data.items.reduce((sum, i) => sum + i.value, 0);
+  const isDataTersedia = data.items[0]?.name !== "Data belum tersedia";
 
   return (
     <div className="bg-white rounded-2xl p-6 border border-gray-100">
@@ -71,7 +90,7 @@ export default function DonutPenerima({ selected }: { selected: string }) {
 
           {/* Total di tengah donut */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <p className="text-2xl font-black text-gray-800">{total.toLocaleString()}</p>
+            <p className="text-2xl font-black text-gray-800">{total.toLocaleString("id-ID")}</p>
             <p className="text-xs text-gray-400">Jiwa</p>
           </div>
         </div>
@@ -89,7 +108,7 @@ export default function DonutPenerima({ selected }: { selected: string }) {
                 </div>
                 <div className="flex items-center gap-3">
                   <p className="text-xs font-bold text-gray-800">
-                    {item.value.toLocaleString()} <span className="text-gray-400 font-normal">jiwa</span>
+                    {item.value.toLocaleString("id-ID")} <span className="text-gray-400 font-normal">jiwa</span>
                   </p>
                   <p className="text-xs text-gray-400">{pct}%</p>
                 </div>

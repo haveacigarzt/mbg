@@ -1,16 +1,24 @@
 "use client";
 
-import { useState } from "react";
 import { Bar, BarChart, XAxis, YAxis, CartesianGrid, Cell } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
-const data = [
-  { kategori: "3B", jumlah: 2342 },
-  { kategori: "Ps.D", jumlah: 14200 },
-  { kategori: "Guru", jumlah: 89 },
-  { kategori: "ATS", jumlah: 67 },
-  { kategori: "APS", jumlah: 60 },
-];
+interface SekolahItem {
+  tingkat: string;
+  jumlah_siswa: number;
+}
+
+interface PosyanduItem {
+  jumlah_balita: number;
+  jumlah_ibu_hamil: number;
+}
+
+interface Props {
+  onSelect: (kategori: string) => void;
+  selected: string;
+  sekolah: SekolahItem[];
+  posyandu: PosyanduItem[];
+}
 
 const chartConfig = {
   jumlah: {
@@ -19,13 +27,17 @@ const chartConfig = {
   },
 };
 
-interface Props {
-  onSelect: (kategori: string) => void;
-  selected: string;
-}
+export default function GrafikSebaran({ onSelect, selected, sekolah, posyandu }: Props) {
+  const totalBalita = posyandu.reduce((sum, el) => sum + el.jumlah_balita + el.jumlah_ibu_hamil, 0);
+  const totalPesertaDidik = sekolah.reduce((sum, el) => sum + el.jumlah_siswa, 0);
 
-export default function GrafikSebaran({ onSelect, selected }: Props) {
-  const [active, setActive] = useState("3B");
+  const data = [
+    { kategori: "3B", jumlah: totalBalita },
+    { kategori: "Ps.D", jumlah: totalPesertaDidik },
+    { kategori: "Guru", jumlah: 0 },
+    { kategori: "ATS", jumlah: 0 },
+    { kategori: "APS", jumlah: 0 },
+  ];
 
   return (
     <div className="bg-white rounded-2xl p-6 border border-gray-100">

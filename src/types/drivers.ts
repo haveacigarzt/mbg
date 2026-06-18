@@ -14,6 +14,22 @@ export type FetchDriversResponse = {
   drivers: Drivers[];
 };
 
+export type FetchDriverResponse = {
+  driver: {
+    id: number;
+    nama: string;
+    nomor_telepon: string;
+    status_aktif: boolean;
+    sppg: {
+      id: number;
+      created_at: string;
+      alamat: string;
+      nama: string;
+    };
+    version: number;
+  };
+};
+
 export type GetDriversParams = {
   status_aktif?: boolean;
   sppg_id?: number;

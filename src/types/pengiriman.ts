@@ -1,9 +1,9 @@
 import type { Metadata } from "./metadata";
 
-export type CreatePengirimanInput = {
-  tujuan_type: string;
-  tujuan_id: number;
-};
+// export type  = {
+//   tujuan_type: string;
+//   tujuan_id: number;
+// };
 
 export type Pengiriman = {
   id: number;
@@ -11,8 +11,11 @@ export type Pengiriman = {
   tujuan_type: "sekolah" | "posyandu";
   tujuan_id: number;
   tujuan_nama: string;
+  tujuan_latitude: number;
+  tujuan_longitude: number;
   driver_id: number | null;
   driver_nama: string | null;
+  sppg_nama: string | null;
   status: "menunggu" | "berangkat" | "sampai" | "dibatalkan";
   waktu_berangkat: string | null;
   waktu_selesai: string | null;
@@ -20,9 +23,17 @@ export type Pengiriman = {
   version: number;
 };
 
+export type CreatePengirimanInput = {
+  tujuan: { tujuan_type: string; tujuan_id: number }[];
+};
+
 export type FetchPengirimanResponse = {
   metadata: Metadata;
   pengiriman: Pengiriman[];
+};
+
+export type FetchSinglePengirimanResponse = {
+  pengiriman: Pengiriman;
 };
 
 export type GetPengirimanParams = {
@@ -32,4 +43,5 @@ export type GetPengirimanParams = {
   page?: number;
   page_size?: number;
   sort?: string;
+  tanggal?: string;
 };

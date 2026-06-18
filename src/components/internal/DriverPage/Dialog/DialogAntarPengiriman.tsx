@@ -10,25 +10,25 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { deleteSekolahMutationOptions } from "@/queryOptions/sekolah";
 import { Loader2 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
+import { antarPengirimanMutationOptions } from "@/queryOptions/pengiriman";
 
 interface Props {
   children: React.ReactNode;
-  onSuccess: () => void;
+  refetchAll: () => void;
   id: number;
   nama: string;
 }
 
-const DialogHapusSekolah = ({ children, onSuccess, id, nama }: Props) => {
+const DialogAntarPengiriman = ({ children, refetchAll, id, nama }: Props) => {
   const [open, setOpen] = useState(false);
   const mutation = useMutation({
-    ...deleteSekolahMutationOptions(),
+    ...antarPengirimanMutationOptions(),
     onSuccess: () => {
-      toast.success(`Berhasil menghapus sekolah ${nama}`, {
+      toast.success(`Berhasil mengambil pengataran ke ${nama}`, {
         style: {
           "--normal-bg":
             "color-mix(in oklab, light-dark(var(--color-green-600), var(--color-green-400)) 10%, var(--background))",
@@ -38,11 +38,11 @@ const DialogHapusSekolah = ({ children, onSuccess, id, nama }: Props) => {
             "light-dark(var(--color-green-600), var(--color-green-400))",
         } as React.CSSProperties,
       });
-      onSuccess();
+      refetchAll();
       setOpen(false);
     },
     onError: (error: ApiError) => {
-      toast.error("Terjadi kesalahan server. Harap menunggu beberapa saat", {
+      toast.error(`Gagal mengambil pengataran ke ${nama}. ${error.message}`, {
         position: "top-center",
         style: {
           "--normal-bg":
@@ -51,12 +51,12 @@ const DialogHapusSekolah = ({ children, onSuccess, id, nama }: Props) => {
           "--normal-border": "var(--destructive)",
         } as React.CSSProperties,
       });
-      console.log(error);
+      setOpen(false);
     },
   });
 
-  const handleDelete = async (id: number) => {
-    await mutation.mutateAsync(id);
+  const handleAntar = async (id: number) => {
+    await mutation.mutateAsync({ id });
   };
   return (
     <Dialog open={open} onOpenChange={(val) => setOpen(val)}>
@@ -74,21 +74,17 @@ const DialogHapusSekolah = ({ children, onSuccess, id, nama }: Props) => {
       >
         <DialogHeader>
           <DialogTitle className="text-lg me-7">
-            Apakah Anda yakin ingin menghapus sekolah ini?
+            Antar pengiriman ini sekarang?
           </DialogTitle>
           <DialogDescription>
-            Tindakan ini akan secara permanen menghapus sekolah {nama} dari
-            server.
+            Anda akan bertanggung jawab atas pengantaran ke {nama}.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Batal</Button>
           </DialogClose>
-          <Button
-            onClick={() => handleDelete(id)}
-            disabled={mutation.isPending}
-          >
+          <Button onClick={() => handleAntar(id)} disabled={mutation.isPending}>
             {mutation.isPending ? (
               <Loader2 className="animate-spin" />
             ) : (
@@ -101,4 +97,4 @@ const DialogHapusSekolah = ({ children, onSuccess, id, nama }: Props) => {
   );
 };
 
-export default DialogHapusSekolah;
+export default DialogAntarPengiriman;

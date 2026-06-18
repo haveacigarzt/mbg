@@ -102,6 +102,7 @@ const DialogEditPosyandu = ({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    console.log("validating");
     const result = posyanduSchema.safeParse(form);
 
     if (!result.success) {
@@ -294,7 +295,9 @@ const DialogEditPosyandu = ({
                     type="number"
                     placeholder="Latitude"
                     value={form.latitude}
-                    onChange={(e) => updateField("latitude", e.target.value)}
+                    onChange={(e) =>
+                      updateField("latitude", Number(e.target.value))
+                    }
                     required
                   />
                 </div>
@@ -307,7 +310,9 @@ const DialogEditPosyandu = ({
                     type="number"
                     placeholder="Longitude"
                     value={form.longitude}
-                    onChange={(e) => updateField("longitude", e.target.value)}
+                    onChange={(e) =>
+                      updateField("longitude", Number(e.target.value))
+                    }
                     required
                   />
                 </div>

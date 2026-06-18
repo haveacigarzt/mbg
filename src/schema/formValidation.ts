@@ -80,3 +80,12 @@ export const driverPatchSchema = z.object({
   status_aktif: z.boolean(),
   nomor_telepon: z.string().min(1, "No Telepon wajib diisi"),
 });
+
+export const tujuanSchema = z.object({
+  tujuan_id: z.number().int().positive(),
+  tujuan_type: z.enum(["sekolah", "posyandu"]),
+});
+
+export const pengirimanSchema = z.object({
+  tujuan: z.array(tujuanSchema).min(1, "Minimal pilih satu tujuan"),
+});

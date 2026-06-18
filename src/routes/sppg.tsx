@@ -6,7 +6,6 @@ import { requireAuth } from "@/main";
 export const Route = createFileRoute("/sppg")({
   beforeLoad: async () => {
     const { user } = await requireAuth();
-    console.log(user);
     if (user.role.role_id !== 3) {
       toast.error("Access denied", {
         style: {
@@ -27,10 +26,5 @@ export const Route = createFileRoute("/sppg")({
 
 function RouteComponent() {
   const { user } = Route.useRouteContext();
-  return (
-    <div>
-      Hello
-      <SPPG user={{ user }} />
-    </div>
-  );
+  return <SPPG user={{ user }} />;
 }

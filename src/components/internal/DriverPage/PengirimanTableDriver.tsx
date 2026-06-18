@@ -7,11 +7,6 @@ import {
 } from "@tanstack/react-table";
 import type { Pengiriman } from "../../../types/pengiriman";
 import { useEffect, useState } from "react";
-import { useSuspenseQueries, useSuspenseQuery } from "@tanstack/react-query";
-import { getPengirimanQueryOptions } from "../../../queryOptions/pengiriman";
-import DialogTambahPengiriman from "./Dialog/DialogTambahPengiriman";
-import { getPosyanduQueryOptions } from "@/queryOptions/posyandu";
-import { getSekolahQueryOptions } from "@/queryOptions/sekolah";
 import {
   Popover,
   PopoverContent,
@@ -21,15 +16,22 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { ChevronDownIcon } from "lucide-react";
 import { formatTanggalIndonesia } from "@/lib/utils";
-import { queryClient } from "@/main";
+import DialogAntarPengiriman from "@/components/internal/DriverPage/Dialog/DialogAntarPengiriman";
+import type { Metadata } from "@/types/metadata";
 import { useWebSocket } from "@/contexts/websocket-context";
+import { queryClient } from "@/main";
 
 interface Props {
-  sppg_id: number;
-  tanggal: string;
-  onTanggalChange: React.Dispatch<React.SetStateAction<string>>;
-  date: Date | undefined;
-  onDateChange: React.Dispatch<React.SetStateAction<Date | undefined>>;
+  pengiriman: Pengiriman[];
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+  searchPengiriman: string;
+  sorting: SortingState;
+  setSorting: React.Dispatch<React.SetStateAction<SortingState>>;
+  setTanggal: React.Dispatch<React.SetStateAction<string>>;
+  setSearchPengiriman: React.Dispatch<React.SetStateAction<string>>;
+  refetchAll: () => void;
+  metadata: Metadata;
+  page: number;
 }
 
 const columnHelper = createColumnHelper<Pengiriman>();
@@ -40,18 +42,8 @@ const columns = [
     enableSorting: true,
   }),
 
-  columnHelper.accessor("driver_nama", {
-    header: "Driver",
-    enableSorting: true,
-  }),
-
-  columnHelper.accessor("waktu_berangkat", {
-    header: "Waktu Berangkat",
-    enableSorting: true,
-  }),
-
-  columnHelper.accessor("waktu_selesai", {
-    header: "Waktu Selesai",
+  columnHelper.accessor("created_at", {
+    header: "Waktu Dibuat",
     enableSorting: true,
   }),
 
@@ -62,36 +54,25 @@ const columns = [
       return getValue().toUpperCase();
     },
   }),
+
+  columnHelper.accessor("driver_nama", {
+    header: "Driver",
+    enableSorting: true,
+  }),
 ];
 
-const PengirimanTable = ({
-  sppg_id,
-  tanggal,
-  onTanggalChange,
-  date,
-  onDateChange,
+const PengirimanTableDriver = ({
+  pengiriman,
+  setPage,
+  searchPengiriman,
+  sorting,
+  setSorting,
+  setTanggal,
+  setSearchPengiriman,
+  refetchAll,
+  metadata,
+  page,
 }: Props) => {
-  const [searchPengiriman, setSearchPengiriman] = useState("");
-  const [page, setPage] = useState(1);
-  const page_size = 10;
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const sort = sorting[0]
-    ? `${sorting[0].desc ? "-" : ""}${sorting[0].id}`
-    : "";
-  const { data, refetch } = useSuspenseQuery(
-    getPengirimanQueryOptions({ sppg_id, page, tanggal, page_size, sort }),
-  );
-  // console.log(data);
-
-  const [{ data: sekolah }, { data: posyandu }] = useSuspenseQueries({
-    queries: [
-      getSekolahQueryOptions({ sppg_id }),
-      getPosyanduQueryOptions({ sppg_id }),
-    ],
-  });
-
-  const pengiriman = data.pengiriman;
-  const metadata = data.metadata;
   useEffect(() => {
     setPage(1);
   }, [searchPengiriman]);
@@ -105,55 +86,30 @@ const PengirimanTable = ({
     manualSorting: true,
     getCoreRowModel: getCoreRowModel(),
   });
-
+  const [date, setDate] = useState<Date | undefined>(new Date());
   function handleDateChange(selectedDate: Date | undefined) {
     if (!selectedDate) return;
 
-    onDateChange(selectedDate);
+    setDate(selectedDate);
 
     console.log(selectedDate.toLocaleDateString("sv-SE"));
-    onTanggalChange(selectedDate.toLocaleDateString("sv-SE"));
+    setTanggal(selectedDate.toLocaleDateString("sv-SE"));
 
     // misalnya fetch data
     // refetch();
   }
 
   const { connected, lastMessage } = useWebSocket();
-
   // console.log("connected: ", connected);
 
   useEffect(() => {
     // console.log("lastMessage: ", lastMessage);
     if (!lastMessage) return;
 
-    if (lastMessage.type === "pengiriman:update") {
-      // queryClient.invalidateQueries({
-      //   queryKey: ["pengiriman"],
-      // });
-      queryClient.setQueriesData(
-        {
-          queryKey: ["pengiriman"],
-        },
-        (old: any) => {
-          if (!old) return old;
-          // console.log(lastMessage.data);
-
-          return {
-            ...old,
-            pengiriman: old.pengiriman.map((el: any) =>
-              el.id === lastMessage.data.pengiriman_id
-                ? {
-                    ...el,
-                    status: lastMessage.data.status,
-                    driver_nama: lastMessage.data.driver_nama,
-                    waktu_berangkat: lastMessage.data.waktu_berangkat,
-                    waktu_selesai: lastMessage.data.waktu_selesai,
-                  }
-                : el,
-            ),
-          };
-        },
-      );
+    if (lastMessage.type === "pengiriman:create") {
+      queryClient.invalidateQueries({
+        queryKey: ["pengiriman"],
+      });
     }
   }, [lastMessage]);
 
@@ -188,15 +144,6 @@ const PengirimanTable = ({
             </PopoverContent>
           </Popover>
         </div>
-        <DialogTambahPengiriman
-          onPengirimanUpdate={refetch}
-          sekolah={sekolah.sekolah}
-          posyandu={posyandu.posyandu}
-        >
-          <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded me-1">
-            Tambah
-          </button>
-        </DialogTambahPengiriman>
       </div>
       <table>
         <thead>
@@ -218,6 +165,7 @@ const PengirimanTable = ({
                   }[header.column.getIsSorted() as string] ?? null}
                 </th>
               ))}
+              <th>Aksi</th>
             </tr>
           ))}
         </thead>
@@ -230,6 +178,17 @@ const PengirimanTable = ({
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
+              <td>
+                <DialogAntarPengiriman
+                  refetchAll={refetchAll}
+                  id={row.original.id}
+                  nama={row.original.tujuan_nama}
+                >
+                  <Button disabled={row.original.status !== "menunggu"}>
+                    Ambil
+                  </Button>
+                </DialogAntarPengiriman>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -252,4 +211,4 @@ const PengirimanTable = ({
   );
 };
 
-export default PengirimanTable;
+export default PengirimanTableDriver;

@@ -1,9 +1,9 @@
 import type { AuthResponse, LoginInput, LoginResponse } from "@/types/auth";
 import { ApiError, apiFetch } from "./client";
 import { redirect } from "@tanstack/react-router";
+import { queryClient } from "@/main";
 
 export async function postLogin(input: LoginInput) {
-  console.log(input);
   const response = await apiFetch("/v1/tokens/authentication", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -50,6 +50,10 @@ export async function deleteAuthToken() {
 
   localStorage.removeItem("token");
   localStorage.removeItem("token_expiry");
+
+  queryClient.removeQueries({
+    queryKey: ["auth-user"],
+  });
 
   return data as { message: string };
 }

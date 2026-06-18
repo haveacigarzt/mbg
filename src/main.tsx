@@ -2,8 +2,9 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import "leaflet/dist/leaflet.css";
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 export async function requireAuth() {
   const data = await queryClient.ensureQueryData(getAuthUserQueryOptions());
@@ -27,10 +28,10 @@ declare module "@tanstack/react-router" {
 }
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-      <ReactQueryDevtools />
-    </QueryClientProvider>
-  </StrictMode>,
+  <QueryClientProvider client={queryClient}>
+    <RouterProvider router={router} />
+    <ReactQueryDevtools />
+  </QueryClientProvider>,
+  // <StrictMode>
+  // </StrictMode>,
 );

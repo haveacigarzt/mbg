@@ -3,11 +3,12 @@ import Navbar from '../Navbar';
 import { getKecamatanQueryOptions, getKelurahanQueryOptions, getSPPGByIDQueryOptions } from '../../../queryOptions/sppg';
 import { Suspense, useState } from 'react';
 import type { AuthResponse } from '@/types/auth';
-import { Building2, MapPin, Phone, Mail, Users, ChefHat, CheckCircle, XCircle, ClockCheck, HandCoins, ShoppingCart, Wallet, Plus, History, CalendarClock } from 'lucide-react';
+import { Building2, MapPin, Phone, Mail, Users, ChefHat, CheckCircle, XCircle, ClockCheck, HandCoins, ShoppingCart, Wallet, Plus, History, CalendarClock, SquarePen } from 'lucide-react';
 import { WebSocketProvider } from '@/provider/websocket-provider';
 import { formatRupiah } from '@/lib/utils';
 import PengeluaranTable from './PengeluaranTable';
 import DialogTambahPengeluaran from './Dialog/DialogTambahPengeluaran';
+import { Button } from '@/components/ui/button';
 
 interface Props {
   user: AuthResponse;
@@ -94,7 +95,7 @@ const Keuangan = ({ user }: Props) => {
             </div>
 
             <div className="grid grid-cols-3 gap-0 divide-x divide-gray-100">
-              <div className="p-6 flex flex-col gap-4">
+              <div className="p-6 flex justify-between">
                 <div className="flex items-start gap-3">
                   <HandCoins className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
                   <div>
@@ -102,6 +103,12 @@ const Keuangan = ({ user }: Props) => {
                     <p className="text-sm text-gray-700 mt-0.5">{formatRupiah(alokasiHarian.jumlah)}</p>
                   </div>
                 </div>
+                <Button
+                  className="bg-blue-600 hover:bg-blue-700
+                             text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
+                >
+                  <SquarePen />
+                </Button>
               </div>
               <div className="p-6 flex flex-col gap-4">
                 <div className="flex items-start gap-3">

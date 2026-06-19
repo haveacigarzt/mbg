@@ -1,0 +1,31 @@
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { requireAuth } from "@/main";
+import Keuangan from "@/components/internal/SPPGPage/Keuangan";
+
+export const Route = createFileRoute("/sppg/keuangan")({
+  beforeLoad: async () => {
+    const { user } = await requireAuth();
+    if (user.role.role_id !== 3) {
+      toast.error("Access denied", {
+        style: {
+          "--normal-bg":
+            "color-mix(in oklab, var(--destructive) 10%, var(--background))",
+          "--normal-text": "var(--destructive)",
+          "--normal-border": "var(--destructive)",
+        } as React.CSSProperties,
+      });
+      throw redirect({ to: "/dashboard" });
+    }
+    return {
+      user,
+    };
+  },
+  component: RouteComponent,
+});
+
+function RouteComponent() {
+  const { user } = Route.useRouteContext();
+  // return <p>Hello</p>;
+  return <Keuangan user={{ user }}></Keuangan>;
+}

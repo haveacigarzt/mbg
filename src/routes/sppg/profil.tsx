@@ -1,9 +1,9 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import SPPG from "../components/internal/SPPGPage/SPPG";
+import SPPG from "@/components/internal/SPPGPage/SPPG";
 import { toast } from "sonner";
 import { requireAuth } from "@/main";
 
-export const Route = createFileRoute("/sppg")({
+export const Route = createFileRoute("/sppg/profil")({
   beforeLoad: async () => {
     const { user } = await requireAuth();
     if (user.role.role_id !== 3) {

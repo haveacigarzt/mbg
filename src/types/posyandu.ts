@@ -1,4 +1,4 @@
-import type { Metadata } from "./metadata";
+import type { Metadata } from './metadata';
 
 export interface Posyandu {
   id: number;
@@ -13,7 +13,6 @@ export interface Posyandu {
   sppg_id: number;
   latitude: number;
   longitude: number;
-  sosmed_url: string | null;
   version: number;
 }
 

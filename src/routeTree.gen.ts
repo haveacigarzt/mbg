@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SppgRouteImport } from './routes/sppg'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DriverRouteImport } from './routes/driver'
 import { Route as DataRouteImport } from './routes/data'
@@ -17,12 +16,12 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SppgIndexRouteImport } from './routes/sppg/index'
+import { Route as SppgProfilRouteImport } from './routes/sppg/profil'
+import { Route as SppgProduksiRouteImport } from './routes/sppg/produksi'
+import { Route as SppgPengirimanRouteImport } from './routes/sppg/pengiriman'
+import { Route as SppgKeuanganRouteImport } from './routes/sppg/keuangan'
 
-const SppgRoute = SppgRouteImport.update({
-  id: '/sppg',
-  path: '/sppg',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -58,6 +57,31 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SppgIndexRoute = SppgIndexRouteImport.update({
+  id: '/sppg/',
+  path: '/sppg/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SppgProfilRoute = SppgProfilRouteImport.update({
+  id: '/sppg/profil',
+  path: '/sppg/profil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SppgProduksiRoute = SppgProduksiRouteImport.update({
+  id: '/sppg/produksi',
+  path: '/sppg/produksi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SppgPengirimanRoute = SppgPengirimanRouteImport.update({
+  id: '/sppg/pengiriman',
+  path: '/sppg/pengiriman',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SppgKeuanganRoute = SppgKeuanganRouteImport.update({
+  id: '/sppg/keuangan',
+  path: '/sppg/keuangan',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -67,7 +91,11 @@ export interface FileRoutesByFullPath {
   '/data': typeof DataRoute
   '/driver': typeof DriverRoute
   '/login': typeof LoginRoute
-  '/sppg': typeof SppgRoute
+  '/sppg/keuangan': typeof SppgKeuanganRoute
+  '/sppg/pengiriman': typeof SppgPengirimanRoute
+  '/sppg/produksi': typeof SppgProduksiRoute
+  '/sppg/profil': typeof SppgProfilRoute
+  '/sppg/': typeof SppgIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -77,7 +105,11 @@ export interface FileRoutesByTo {
   '/data': typeof DataRoute
   '/driver': typeof DriverRoute
   '/login': typeof LoginRoute
-  '/sppg': typeof SppgRoute
+  '/sppg/keuangan': typeof SppgKeuanganRoute
+  '/sppg/pengiriman': typeof SppgPengirimanRoute
+  '/sppg/produksi': typeof SppgProduksiRoute
+  '/sppg/profil': typeof SppgProfilRoute
+  '/sppg': typeof SppgIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -88,7 +120,11 @@ export interface FileRoutesById {
   '/data': typeof DataRoute
   '/driver': typeof DriverRoute
   '/login': typeof LoginRoute
-  '/sppg': typeof SppgRoute
+  '/sppg/keuangan': typeof SppgKeuanganRoute
+  '/sppg/pengiriman': typeof SppgPengirimanRoute
+  '/sppg/produksi': typeof SppgProduksiRoute
+  '/sppg/profil': typeof SppgProfilRoute
+  '/sppg/': typeof SppgIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -100,7 +136,11 @@ export interface FileRouteTypes {
     | '/data'
     | '/driver'
     | '/login'
-    | '/sppg'
+    | '/sppg/keuangan'
+    | '/sppg/pengiriman'
+    | '/sppg/produksi'
+    | '/sppg/profil'
+    | '/sppg/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -110,6 +150,10 @@ export interface FileRouteTypes {
     | '/data'
     | '/driver'
     | '/login'
+    | '/sppg/keuangan'
+    | '/sppg/pengiriman'
+    | '/sppg/produksi'
+    | '/sppg/profil'
     | '/sppg'
   id:
     | '__root__'
@@ -120,7 +164,11 @@ export interface FileRouteTypes {
     | '/data'
     | '/driver'
     | '/login'
-    | '/sppg'
+    | '/sppg/keuangan'
+    | '/sppg/pengiriman'
+    | '/sppg/produksi'
+    | '/sppg/profil'
+    | '/sppg/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -131,18 +179,15 @@ export interface RootRouteChildren {
   DataRoute: typeof DataRoute
   DriverRoute: typeof DriverRoute
   LoginRoute: typeof LoginRoute
-  SppgRoute: typeof SppgRoute
+  SppgKeuanganRoute: typeof SppgKeuanganRoute
+  SppgPengirimanRoute: typeof SppgPengirimanRoute
+  SppgProduksiRoute: typeof SppgProduksiRoute
+  SppgProfilRoute: typeof SppgProfilRoute
+  SppgIndexRoute: typeof SppgIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sppg': {
-      id: '/sppg'
-      path: '/sppg'
-      fullPath: '/sppg'
-      preLoaderRoute: typeof SppgRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -192,6 +237,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sppg/': {
+      id: '/sppg/'
+      path: '/sppg'
+      fullPath: '/sppg/'
+      preLoaderRoute: typeof SppgIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sppg/profil': {
+      id: '/sppg/profil'
+      path: '/sppg/profil'
+      fullPath: '/sppg/profil'
+      preLoaderRoute: typeof SppgProfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sppg/produksi': {
+      id: '/sppg/produksi'
+      path: '/sppg/produksi'
+      fullPath: '/sppg/produksi'
+      preLoaderRoute: typeof SppgProduksiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sppg/pengiriman': {
+      id: '/sppg/pengiriman'
+      path: '/sppg/pengiriman'
+      fullPath: '/sppg/pengiriman'
+      preLoaderRoute: typeof SppgPengirimanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sppg/keuangan': {
+      id: '/sppg/keuangan'
+      path: '/sppg/keuangan'
+      fullPath: '/sppg/keuangan'
+      preLoaderRoute: typeof SppgKeuanganRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -203,7 +283,11 @@ const rootRouteChildren: RootRouteChildren = {
   DataRoute: DataRoute,
   DriverRoute: DriverRoute,
   LoginRoute: LoginRoute,
-  SppgRoute: SppgRoute,
+  SppgKeuanganRoute: SppgKeuanganRoute,
+  SppgPengirimanRoute: SppgPengirimanRoute,
+  SppgProduksiRoute: SppgProduksiRoute,
+  SppgProfilRoute: SppgProfilRoute,
+  SppgIndexRoute: SppgIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

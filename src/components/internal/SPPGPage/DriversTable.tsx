@@ -6,7 +6,7 @@ import { getDriversQueryOptions } from '../../../queryOptions/drivers';
 import DialogTambahDriver from './Dialog/DialogTambahDriver';
 import DialogEditDriver from './Dialog/DialogEditDriver';
 import DialogHapusDriver from './Dialog/DialogHapusDriver';
-import { Plus } from 'lucide-react';
+import { Plus, ChevronRight, ChevronLeft, Search } from 'lucide-react';
 
 interface Props {
   sppg_id: number;
@@ -65,8 +65,18 @@ const DriversTable = ({ sppg_id }: Props) => {
   });
   return (
     <div>
-      <div className="flex justify-between mb-1">
-        <input className="border rounded-sm p-1" value={searchDrivers} onChange={(e) => setSearchDrivers(e.target.value)} placeholder={`Cari driver...`} />
+      {/* Header search add */}
+      <div className="flex justify-between mb-5">
+        <div className="relative max-w-sm flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-xl
+                       focus:outline-none focus:border-blue-400 transition-colors"
+            value={searchDrivers}
+            onChange={(e) => setSearchDrivers(e.target.value)}
+            placeholder={`Cari driver...`}
+          />
+        </div>
         <DialogTambahDriver onDriverUpdate={refetch}>
           <button
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700
@@ -77,48 +87,102 @@ const DriversTable = ({ sppg_id }: Props) => {
           </button>
         </DialogTambahDriver>
       </div>
-      <table>
-        <thead>
-          {table.getHeaderGroups().map((hg) => (
-            <tr key={hg.id}>
-              {hg.headers.map((header) => (
-                <th key={header.id} onClick={header.column.getToggleSortingHandler()} className="cursor-pointer">
-                  {flexRender(header.column.columnDef.header, header.getContext())}
-                  {{
-                    asc: ' ↑',
-                    desc: ' ↓'
-                  }[header.column.getIsSorted() as string] ?? null}
-                </th>
-              ))}
-              <th>Aksi</th>
-            </tr>
-          ))}
-        </thead>
 
-        <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
-              ))}
-              <td className="flex gap-2">
-                <DialogEditDriver onDriverUpdate={refetch} driver={row.original}>
-                  <button className="bg-gray-500 hover:bg-gray-600 text-white py-0.5 px-5 rounded me-1">Edit</button>
-                </DialogEditDriver>
-                <DialogHapusDriver onSuccess={refetch} id={row.original.id} nama={row.original.nama}>
-                  <button className="bg-red-600 hover:bg-red-700 text-white py-0.5 px-3 rounded">Hapus</button>
-                </DialogHapusDriver>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="flex gap-3 justify-center py-2">
-        {Array.from({ length: metadata.last_page }, (_, i) => i + 1).map((p) => (
-          <button className={`border px-2 ${p === page ? 'opacity-60' : 'cursor-pointer'}`} key={p} onClick={() => setPage(p)} disabled={p === page}>
-            {p}
+      {/* Tabel */}
+      <div className="rounded-xl border-gray-500 overflow-hidden">
+        <table className="w-full">
+          <thead>
+            {table.getHeaderGroups().map((hg) => (
+              <tr key={hg.id} className="bg-gray-50 border-b border-gray-100">
+                {hg.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    onClick={header.column.getToggleSortingHandler()}
+                    className="px-4 py-3 text-left text-xs text-gray-400 tracking-widest font-semibold cursor-pointer hover:text-gray-600 transition-colors"
+                  >
+                    {flexRender(header.column.columnDef.header, header.getContext())}
+                    {{
+                      asc: ' ↑',
+                      desc: ' ↓'
+                    }[header.column.getIsSorted() as string] ?? null}
+                  </th>
+                ))}
+                <th className="px-4 py-3 text-left text-xs text-gray-400 tracking-widest font-semibold">Aksi</th>
+              </tr>
+            ))}
+          </thead>
+
+          <tbody>
+            {table.getRowModel().rows.map((row, i) => (
+              <tr
+                key={row.id}
+                className={`border-b border-gray-50 hover:bg-gray-50 transition-colors
+                  ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'}`}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} className="px-4 py-3 text-sm text-gray-700">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+                <td className="flex gap-2">
+                  <DialogEditDriver onDriverUpdate={refetch} driver={row.original}>
+                    <button
+                      className="text-xs font-semibold text-gray-600 bg-gray-100
+                                         hover:bg-blue-300 px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      Edit
+                    </button>
+                  </DialogEditDriver>
+                  <DialogHapusDriver onSuccess={refetch} id={row.original.id} nama={row.original.nama}>
+                    <button
+                      className="text-xs font-semibold text-red-500 bg-red-50
+                                         hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      Hapus
+                    </button>
+                  </DialogHapusDriver>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {/* Paginasi */}
+      <div className="flex items-center justify-between mt-5">
+        <p className="text-xs text-gray-400">
+          Halaman {page} dari {metadata.last_page} — <span className="font-bold text-gray-600">TOTAL {metadata.total_records} DATA</span>
+        </p>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className="p-1.5 rounded-lg border border-gray-200 text-gray-500
+                       hover:border-blue-300 hover:text-blue-500
+                       disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          >
+            <ChevronLeft className="w-4 h-4" />
           </button>
-        ))}
+          {Array.from({ length: metadata.last_page }, (_, i) => i + 1).map((p) => (
+            <button
+              key={p}
+              onClick={() => setPage(p)}
+              disabled={p === page}
+              className={`w-8 h-8 rounded-lg text-xs font-semibold transition-all
+                ${p === page ? 'bg-blue-600 text-white' : 'border border-gray-200 text-gray-500 hover:border-blue-300 hover:text-blue-500'}`}
+            >
+              {p}
+            </button>
+          ))}
+          <button
+            onClick={() => setPage((p) => Math.min(metadata.last_page, p + 1))}
+            disabled={page === metadata.last_page}
+            className="p-1.5 rounded-lg border border-gray-200 text-gray-500
+                       hover:border-blue-300 hover:text-blue-500
+                       disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </div>
   );

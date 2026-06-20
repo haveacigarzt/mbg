@@ -68,9 +68,17 @@ const DialogEditDriver = ({ children, waktu_mulai, estimasi_waktu_selesai }: Pro
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Batal</Button>
+              <Button variant="outline" className="text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
+                Batal
+              </Button>
             </DialogClose>
-            <Button type="submit">Simpan</Button>
+            <Button
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700
+                             text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
+            >
+              Simpan
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

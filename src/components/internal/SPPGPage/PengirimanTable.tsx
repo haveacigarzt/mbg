@@ -9,7 +9,7 @@ import { getSekolahQueryOptions } from '@/queryOptions/sekolah';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
-import { ChevronDownIcon, Plus } from 'lucide-react';
+import { ChevronDownIcon, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { formatTanggalIndonesia } from '@/lib/utils';
 import { queryClient } from '@/main';
 import { useWebSocket } from '@/contexts/websocket-context';
@@ -136,6 +136,7 @@ const PengirimanTable = ({ sppg_id, tanggal, onTanggalChange, date, onDateChange
 
   return (
     <div>
+      {/* Header Search & Tambah */}
       <div className="flex justify-between mb-1">
         <div>
           <input className="border rounded-sm p-1" value={searchPengiriman} onChange={(e) => setSearchPengiriman(e.target.value)} placeholder={`Cari pengiriman...`} />
@@ -161,39 +162,82 @@ const PengirimanTable = ({ sppg_id, tanggal, onTanggalChange, date, onDateChange
           </button>
         </DialogTambahPengiriman>
       </div>
-      <table>
-        <thead>
-          {table.getHeaderGroups().map((hg) => (
-            <tr key={hg.id}>
-              {hg.headers.map((header) => (
-                <th key={header.id} onClick={header.column.getToggleSortingHandler()} className="cursor-pointer">
-                  {flexRender(header.column.columnDef.header, header.getContext())}
-                  {{
-                    asc: ' ↑',
-                    desc: ' ↓'
-                  }[header.column.getIsSorted() as string] ?? null}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
+      {/* Tabel */}
+      <div className="overflow-hidden rounded-xl border-gray-500 mt-5">
+        <table className="w-full">
+          <thead>
+            {table.getHeaderGroups().map((hg) => (
+              <tr key={hg.id} className="bg-gray-50 border-b border-gray-100">
+                {hg.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    onClick={header.column.getToggleSortingHandler()}
+                    className="px-4 py-3 text-left text-xs text-gray-400 tracking-widest font-semibold cursor-pointer hover:text-gray-600 transition-colors"
+                  >
+                    {flexRender(header.column.columnDef.header, header.getContext())}
+                    {{
+                      asc: ' ↑',
+                      desc: ' ↓'
+                    }[header.column.getIsSorted() as string] ?? null}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
 
-        <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="flex gap-3 justify-center py-2">
-        {Array.from({ length: metadata.last_page }, (_, i) => i + 1).map((p) => (
-          <button className={`border px-2 ${p === page ? 'opacity-60' : 'cursor-pointer'}`} key={p} onClick={() => setPage(p)} disabled={p === page}>
-            {p}
+          <tbody>
+            {table.getRowModel().rows.map((row, i) => (
+              <tr
+                key={row.id}
+                className={`border-b border-gray-50 hover:bg-gray-50 transition-colors
+                  ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'}`}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} className="px-4 py-3 text-sm text-gray-700">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {/* Paginasi */}
+      <div className="flex items-center justify-between mt-5">
+        <p className="text-xs text-gray-400">
+          Halaman {page} dari {metadata.last_page} — <span className="font-bold text-gray-600">TOTAL {metadata.total_records} DATA</span>
+        </p>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className="p-1.5 rounded-lg border border-gray-200 text-gray-500
+                       hover:border-blue-300 hover:text-blue-500
+                       disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          >
+            <ChevronLeft className="w-4 h-4" />
           </button>
-        ))}
+          {Array.from({ length: metadata.last_page }, (_, i) => i + 1).map((p) => (
+            <button
+              key={p}
+              onClick={() => setPage(p)}
+              disabled={p === page}
+              className={`w-8 h-8 rounded-lg text-xs font-semibold transition-all
+                ${p === page ? 'bg-blue-600 text-white' : 'border border-gray-200 text-gray-500 hover:border-blue-300 hover:text-blue-500'}`}
+            >
+              {p}
+            </button>
+          ))}
+          <button
+            onClick={() => setPage((p) => Math.min(metadata.last_page, p + 1))}
+            disabled={page === metadata.last_page}
+            className="p-1.5 rounded-lg border border-gray-200 text-gray-500
+                       hover:border-blue-300 hover:text-blue-500
+                       disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </div>
   );

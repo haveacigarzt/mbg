@@ -3,7 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { errorToast, successToast } from '@/lib/constants';
 import { createDriverMutationOptions } from '@/queryOptions/drivers';
+import { createPengeluaranMutationOptions } from '@/queryOptions/sppg';
 import { driverSchema, pengeluaranSchema } from '@/schema/formValidation';
 import type { PostDriver } from '@/types/drivers';
 import { useMutation } from '@tanstack/react-query';
@@ -14,9 +16,11 @@ import { toast } from 'sonner';
 interface DialogTambahPengeluaranProps {
   onPengeluaranUpdate: () => void;
   children: React.ReactNode;
+  sppg_id: number;
+  alokasi_harian_id: number;
 }
 
-const DialogTambahPengeluaran = ({ onPengeluaranUpdate, children }: DialogTambahPengeluaranProps) => {
+const DialogTambahPengeluaran = ({ onPengeluaranUpdate, children, sppg_id, alokasi_harian_id }: DialogTambahPengeluaranProps) => {
   const [open, setOpen] = useState(false);
   const initialForm = { produk: '', jumlah: 0, satuan: '', harga_satuan: 0 };
   const [form, setForm] = useState(initialForm);
@@ -25,29 +29,22 @@ const DialogTambahPengeluaran = ({ onPengeluaranUpdate, children }: DialogTambah
     setForm((prev) => ({ ...prev, [field]: value }));
   }
   const mutation = useMutation({
-    ...createDriverMutationOptions(),
+    ...createPengeluaranMutationOptions(),
     onSuccess: () => {
-      toast.success('Berhasil menambahkan data Driver.', {
-        style: {
-          '--normal-bg': 'color-mix(in oklab, light-dark(var(--color-green-600), var(--color-green-400)) 10%, var(--background))',
-          '--normal-text': 'light-dark(var(--color-green-600), var(--color-green-400))',
-          '--normal-border': 'light-dark(var(--color-green-600), var(--color-green-400))'
-        } as React.CSSProperties
+      toast.success('Berhasil mengirim pengeluaran harian.', {
+        style: successToast as React.CSSProperties
       });
       onPengeluaranUpdate();
       setOpen(false);
     },
     onError: (error: ApiError) => {
-      toast.error('Gagal menambahkan data Driver.', {
-        style: {
-          '--normal-bg': 'color-mix(in oklab, light-dark(var(--color-red-600), var(--color-red-400)) 10%, var(--background))',
-          '--normal-text': 'light-dark(var(--color-red-600), var(--color-red-400))',
-          '--normal-border': 'light-dark(var(--color-red-400), var(--color-red-400))'
-        } as React.CSSProperties
+      toast.error('Gagal mengirim pengeluaran harian.', {
+        style: errorToast as React.CSSProperties
       });
       console.log('ERROR:', error);
     }
   });
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const payload = {
@@ -72,9 +69,7 @@ const DialogTambahPengeluaran = ({ onPengeluaranUpdate, children }: DialogTambah
       }
       return;
     }
-    // await mutation.mutateAsync({
-    //   input: result.data as PostDriver
-    // });
+    await mutation.mutateAsync({ sppg_id: sppg_id, input: { ...payload, alokasi_harian_id } });
     console.log({
       // input: result.data as PostDriver
       input: result.data

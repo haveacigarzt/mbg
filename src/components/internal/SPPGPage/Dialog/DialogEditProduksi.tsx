@@ -1,20 +1,30 @@
+import type { ApiError } from '@/api/client';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { errorToast, successToast } from '@/lib/constants';
+import { timeToDateTime } from '@/lib/utils';
+import { createProduksiHarianMutationOptions } from '@/queryOptions/sppg';
+import { produksiSchema } from '@/schema/formValidation';
+import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface Props {
   children: React.ReactNode;
   waktu_mulai: string;
   estimasi_waktu_selesai: string;
+  tanggal: string;
+  sppg_id: number;
+  onUpdate: () => void;
 }
 
-const DialogEditDriver = ({ children, waktu_mulai, estimasi_waktu_selesai }: Props) => {
+const DialogEditDriver = ({ onUpdate, sppg_id, children, waktu_mulai, estimasi_waktu_selesai, tanggal }: Props) => {
   const [open, setOpen] = useState(false);
   const initialForm = {
-    waktu_mulai: toTimeInput(waktu_mulai),
-    estimasi_waktu_selesai: toTimeInput(estimasi_waktu_selesai)
+    waktu_mulai: waktu_mulai,
+    estimasi_waktu_selesai: estimasi_waktu_selesai
   };
   const [form, setForm] = useState(initialForm);
 
@@ -24,15 +34,42 @@ const DialogEditDriver = ({ children, waktu_mulai, estimasi_waktu_selesai }: Pro
       [field]: value
     }));
   }
-
+  const mutation = useMutation({
+    ...createProduksiHarianMutationOptions(),
+    onSuccess: () => {
+      toast.success('Berhasil mengubah produksi harian.', {
+        style: successToast as React.CSSProperties
+      });
+      onUpdate();
+    },
+    onError: (error: ApiError) => {
+      toast.error('Gagal mengubah produksi harian.', {
+        style: errorToast as React.CSSProperties
+      });
+      console.log('ERROR:', error);
+    }
+  });
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const payload = { tanggal, waktu_mulai: timeToDateTime(tanggal, form.waktu_mulai), estimasi_waktu_selesai: timeToDateTime(tanggal, form.estimasi_waktu_selesai) };
+    console.log('payload', payload);
 
-    console.log('form', form);
+    const result = produksiSchema.safeParse(payload);
+    if (!result.success) {
+      const firstError = Object.values(result.error.flatten().fieldErrors).flat()[0];
+
+      if (firstError) {
+        toast.error(firstError, {
+          style: errorToast as React.CSSProperties
+        });
+      }
+      return;
+    }
+    await mutation.mutateAsync({ sppg_id: sppg_id, input: payload });
+    // setIsLoading(false);
+    setOpen(false);
   }
-  function toTimeInput(datetime: string): string {
-    return datetime.slice(11, 16);
-  }
+
   return (
     <Dialog open={open} onOpenChange={(val) => setOpen(val)}>
       <DialogTrigger asChild>{children}</DialogTrigger>

@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import Navbar from '../Navbar';
-import { getKecamatanQueryOptions, getKelurahanQueryOptions, getSPPGByIDQueryOptions } from '../../../queryOptions/sppg';
+import { getKecamatanQueryOptions, getKelurahanQueryOptions, getProduksiHarianQueryOptions, getSPPGByIDQueryOptions } from '../../../queryOptions/sppg';
 import { Suspense, useEffect, useState } from 'react';
 import SekolahTable from './SekolahTable';
 import PosyanduTable from './PosyanduTable';
@@ -8,7 +8,7 @@ import { DialogEditSPPG } from './Dialog/DialogEditSPPG';
 import type { AuthResponse } from '@/types/auth';
 import { Building2, MapPin, Phone, Mail, Users, ChefHat, CheckCircle, XCircle, HandHeart, CookingPot, Clock, ClockCheck, BookmarkCheck, SquarePen } from 'lucide-react';
 import { WebSocketProvider } from '@/provider/websocket-provider';
-import { formatTanggalIndonesia, formatTime, getProgressRealtime } from '@/lib/utils';
+import { calculateProgress, formatTanggalIndonesia, formatTime, getTodaysDate } from '@/lib/utils';
 import DialogEditProduksi from './Dialog/DialogEditProduksi';
 
 interface Props {
@@ -28,17 +28,23 @@ const Produksi = ({ user }: Props) => {
     { id: 'posyandu', label: 'Posyandu' }
   ];
 
-  const produksiHariIni = {
-    id: 0,
-    waktu_mulai: '2026-06-19 10:30:45',
-    estimasi_waktu_selesai: '2026-06-19 17:50:45'
-  };
+  // const produksiHariIni = {
+  //   id: 0,
+  //   sppg_id: 5,
+  //   waktu_mulai: '2026-06-19 10:30:45',
+  //   estimasi_waktu_selesai: '2026-06-19 17:50:45'
+  // };
+
+  // 20/06/2026
+  const today = getTodaysDate();
+  const { data: produksiHarian, refetch: refetchProduksi } = useSuspenseQuery(getProduksiHarianQueryOptions(sppg.id, today));
 
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
+    if (!produksiHarian) return;
     const updateProgress = () => {
-      setProgress(getProgressRealtime(produksiHariIni.waktu_mulai, produksiHariIni.estimasi_waktu_selesai));
+      setProgress(calculateProgress(produksiHarian.waktu_mulai, produksiHarian.estimasi_waktu_selesai));
     };
 
     updateProgress();
@@ -47,6 +53,10 @@ const Produksi = ({ user }: Props) => {
 
     return () => clearInterval(interval);
   }, []);
+
+  function toTimeInput(datetime: string): string {
+    return datetime.slice(11, 16);
+  }
 
   return (
     <WebSocketProvider room_id={`sppg/${String(sppg.id)}`}>
@@ -71,7 +81,13 @@ const Produksi = ({ user }: Props) => {
                   <p className="font-bold text-gray-800">Status Produksi Hari Ini (Real Time)</p>
                 </div>
               </div>
-              <DialogEditProduksi waktu_mulai={produksiHariIni.waktu_mulai} estimasi_waktu_selesai={produksiHariIni.estimasi_waktu_selesai}>
+              <DialogEditProduksi
+                onUpdate={() => refetchProduksi()}
+                sppg_id={sppg.id}
+                tanggal={tanggal}
+                waktu_mulai={produksiHarian ? toTimeInput(produksiHarian.waktu_mulai) : '00:00'}
+                estimasi_waktu_selesai={produksiHarian ? toTimeInput(produksiHarian.estimasi_waktu_selesai) : '00:00'}
+              >
                 <button
                   className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700
                              text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
@@ -88,7 +104,7 @@ const Produksi = ({ user }: Props) => {
                   <Clock className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
                   <div>
                     <p className="text-xs text-gray-400 tracking-widest">WAKTU MULAI</p>
-                    <p className="text-sm text-gray-700 mt-0.5">{formatTime(produksiHariIni.waktu_mulai)}</p>
+                    <p className="text-sm text-gray-700 mt-0.5">{produksiHarian ? formatTime(produksiHarian.waktu_mulai) : 'Belum diatur'}</p>
                   </div>
                 </div>
               </div>
@@ -97,7 +113,7 @@ const Produksi = ({ user }: Props) => {
                   <ClockCheck className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
                   <div>
                     <p className="text-xs text-gray-400 tracking-widest">ESTIMASI WAKTU SELESAI</p>
-                    <p className="text-sm text-gray-700 mt-0.5">{formatTime(produksiHariIni.estimasi_waktu_selesai)}</p>
+                    <p className="text-sm text-gray-700 mt-0.5">{produksiHarian ? formatTime(produksiHarian.estimasi_waktu_selesai) : 'Belum diatur'}</p>
                   </div>
                 </div>
               </div>
@@ -106,7 +122,7 @@ const Produksi = ({ user }: Props) => {
                   <BookmarkCheck className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
                   <div>
                     <p className="text-xs text-gray-400 tracking-widest">PROGRESS</p>
-                    <p className="text-sm text-gray-700 mt-0.5">{progress.toFixed(3)}%</p>
+                    <p className="text-sm text-gray-700 mt-0.5">{!produksiHarian ? 0 : progress === 100 ? 100 : progress.toFixed(3)}%</p>
                   </div>
                 </div>
               </div>

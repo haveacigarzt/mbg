@@ -74,9 +74,26 @@ export const pengirimanSchema = z.object({
   tujuan: z.array(tujuanSchema).min(1, 'Minimal pilih satu tujuan')
 });
 
+// 20/06/2026
 export const pengeluaranSchema = z.object({
   jumlah: z.number().min(1, 'Jumlah wajib diisi'),
   produk: z.string().min(1, 'Produk wajib diisi'),
   harga_satuan: z.number().min(1, 'Harga satuan wajib diisi'),
   satuan: z.string().min(1, 'Satuan wajib diisi')
 });
+export const alokasiSchema = z.object({
+  tanggal: z.string().min(10, 'Tanggal wajib diisi'),
+  jumlah: z.number().min(1, 'Jumlah wajib diisi')
+});
+export const produksiSchema = z
+  .object({
+    tanggal: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Format tanggal harus YYYY-MM-DD'),
+
+    waktu_mulai: z.string().datetime({ offset: true }),
+
+    estimasi_waktu_selesai: z.string().datetime({ offset: true })
+  })
+  .refine((data) => new Date(data.waktu_mulai).getTime() < new Date(data.estimasi_waktu_selesai).getTime(), {
+    path: ['estimasi_waktu_selesai'],
+    message: 'Estimasi waktu selesai harus setelah waktu mulai'
+  });

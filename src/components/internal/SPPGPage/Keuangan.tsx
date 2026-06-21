@@ -1,74 +1,88 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import Navbar from '../Navbar';
-import { getKecamatanQueryOptions, getKelurahanQueryOptions, getSPPGByIDQueryOptions } from '../../../queryOptions/sppg';
+import { createAlokasiMutationOptions, getAlokasiHarianQueryOptions, getPengeluaranHarianQueryOptions, getSPPGByIDQueryOptions } from '../../../queryOptions/sppg';
 import { Suspense, useState } from 'react';
 import type { AuthResponse } from '@/types/auth';
-import { Building2, MapPin, Phone, Mail, Users, ChefHat, CheckCircle, XCircle, ClockCheck, HandCoins, ShoppingCart, Wallet, Plus, History, CalendarClock, SquarePen } from 'lucide-react';
+import { HandCoins, ShoppingCart, Wallet, Plus, History, CalendarClock, SquarePen, Save, X, LoaderCircle } from 'lucide-react';
 import { WebSocketProvider } from '@/provider/websocket-provider';
-import { formatRupiah } from '@/lib/utils';
+import { formatRupiah, getTodaysDate } from '@/lib/utils';
 import PengeluaranTable from './PengeluaranTable';
 import DialogTambahPengeluaran from './Dialog/DialogTambahPengeluaran';
 import { Button } from '@/components/ui/button';
+import type { ApiError } from '@/api/client';
+import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
+import { errorToast, successToast } from '@/lib/constants';
+import { alokasiSchema } from '@/schema/formValidation';
 
 interface Props {
   user: AuthResponse;
 }
 
 const Keuangan = ({ user }: Props) => {
-  const [tab, setTab] = useState('sekolah');
   const { data: sppg, refetch: refetchSPPG } = useSuspenseQuery(getSPPGByIDQueryOptions(user.user.role.id_in_role));
-  const { data: kecamatan } = useSuspenseQuery(getKecamatanQueryOptions());
-  const { data: kelurahan } = useSuspenseQuery(getKelurahanQueryOptions(sppg.kecamatan_id));
-  const [tanggal, setTanggal] = useState(new Date().toLocaleDateString('sv-SE'));
-  const [date, setDate] = useState<Date | undefined>(new Date());
 
-  const tabs = [
-    { id: 'sekolah', label: 'Sekolah' },
-    { id: 'posyandu', label: 'Posyandu' },
-    { id: 'drivers', label: 'Driver' },
-    { id: 'pengiriman', label: 'Pengiriman' }
-  ];
-
-  const alokasiHarian = {
-    tanggal: '18/06/2026',
-    jumlah: 500000
+  // 20/06/2026
+  const today = getTodaysDate();
+  const { data: alokasiHarianData, refetch: refetchAlokasi } = useSuspenseQuery(getAlokasiHarianQueryOptions(sppg.id, today));
+  const alokasiHarian = alokasiHarianData ?? {
+    jumlah: 0,
+    id: 0,
+    sppg_id: sppg.id,
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+    tanggal: `${today}T00:00:00Z`
   };
+  const {
+    data: pengeluaranHarian,
+    isFetching,
+    refetch: refetchPengeluaran
+  } = useQuery({
+    ...getPengeluaranHarianQueryOptions(sppg.id, today),
+    enabled: alokasiHarian.id !== 0
+  });
+  const [isInput, setIsInput] = useState(false);
 
-  const pengeluaranHarian = [
-    {
-      id: 0,
-      created_at: '2026-06-18 17:30:45',
-      produk: 'Beras',
-      jumlah: 10,
-      satuan: 'kilo',
-      harga_satuan: 20000
+  const [isLoading, setIsLoading] = useState(false);
+  const mutation = useMutation({
+    ...createAlokasiMutationOptions(),
+    onSuccess: () => {
+      toast.success('Berhasil mengubah alokasi harian.', {
+        style: successToast as React.CSSProperties
+      });
+      refetchAlokasi();
     },
-    {
-      id: 1,
-      created_at: '2026-06-18 17:40:45',
-      produk: 'Minyak Goreng',
-      jumlah: 5,
-      satuan: 'liter',
-      harga_satuan: 10000
-    },
-    {
-      id: 2,
-      created_at: '2026-06-18 17:41:45',
-      produk: 'Tepung Terigu',
-      jumlah: 7,
-      satuan: 'kilo',
-      harga_satuan: 8000
-    },
-    {
-      id: 3,
-      created_at: '2026-06-18 17:43:45',
-      produk: 'Refill Gas 3 Kilo',
-      jumlah: 3,
-      satuan: 'tabung',
-      harga_satuan: 25000
+    onError: (error: ApiError) => {
+      toast.error('Gagal mengubah alokasi harian.', {
+        style: errorToast as React.CSSProperties
+      });
+      console.log('ERROR:', error);
     }
-  ];
+  });
+  const [alokasiHarianJumlah, setAlokasiHarianJumlah] = useState(alokasiHarian.jumlah);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    const payload = {
+      tanggal: today,
+      jumlah: alokasiHarianJumlah
+    };
+    const result = alokasiSchema.safeParse(payload);
 
+    if (!result.success) {
+      const firstError = Object.values(result.error.flatten().fieldErrors).flat()[0];
+
+      if (firstError) {
+        toast.error(firstError, {
+          style: errorToast as React.CSSProperties
+        });
+      }
+      return;
+    }
+    await mutation.mutateAsync({ sppg_id: sppg.id, input: payload });
+    setIsLoading(false);
+    setIsInput(false);
+  };
   return (
     <WebSocketProvider room_id={`sppg/${String(sppg.id)}`}>
       <div className="flex min-h-screen bg-gray-50">
@@ -96,26 +110,54 @@ const Keuangan = ({ user }: Props) => {
 
             <div className="grid grid-cols-3 gap-0 divide-x divide-gray-100">
               <div className="p-6 flex justify-between">
-                <div className="flex items-start gap-3">
-                  <HandCoins className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
-                  <div>
-                    <p className="text-xs text-gray-400 tracking-widest">ALOKASI</p>
-                    <p className="text-sm text-gray-700 mt-0.5">{formatRupiah(alokasiHarian.jumlah)}</p>
-                  </div>
-                </div>
-                <Button
-                  className="bg-blue-600 hover:bg-blue-700
+                {isInput ? (
+                  <>
+                    <div className="flex items-start gap-3">
+                      <Input type="number" placeholder="Masukan nominal alokasi" value={alokasiHarianJumlah} onChange={(e) => setAlokasiHarianJumlah(Number(e.target.value))} />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        className="bg-green-600 hover:bg-green-700
                              text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
-                >
-                  <SquarePen />
-                </Button>
+                        onClick={handleSubmit}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? <LoaderCircle /> : <Save />}
+                      </Button>
+                      <Button
+                        className="bg-red-600 hover:bg-red-700
+                             text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
+                        onClick={() => setIsInput(!isInput)}
+                      >
+                        <X />
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-start gap-3">
+                      <HandCoins className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                      <div>
+                        <p className="text-xs text-gray-400 tracking-widest">ALOKASI</p>
+                        <p className="text-sm text-gray-700 mt-0.5">{formatRupiah(alokasiHarian.jumlah)}</p>
+                      </div>
+                    </div>
+                    <Button
+                      className="bg-blue-600 hover:bg-blue-700
+                             text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
+                      onClick={() => setIsInput(!isInput)}
+                    >
+                      <SquarePen />
+                    </Button>
+                  </>
+                )}
               </div>
               <div className="p-6 flex flex-col gap-4">
                 <div className="flex items-start gap-3">
                   <ShoppingCart className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
                   <div>
                     <p className="text-xs text-gray-400 tracking-widest">TERPAKAI</p>
-                    <p className="text-sm text-gray-700 mt-0.5">{formatRupiah(pengeluaranHarian.reduce((acc, obj) => acc + obj.harga_satuan * obj.jumlah, 0))}</p>
+                    <p className="text-sm text-gray-700 mt-0.5">{pengeluaranHarian ? formatRupiah(pengeluaranHarian.reduce((acc, obj) => acc + obj.harga_satuan * obj.jumlah, 0)) : 0}</p>
                   </div>
                 </div>
               </div>
@@ -124,7 +166,9 @@ const Keuangan = ({ user }: Props) => {
                   <Wallet className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
                   <div>
                     <p className="text-xs text-gray-400 tracking-widest">SISA</p>
-                    <p className="text-sm text-gray-700 mt-0.5">{formatRupiah(alokasiHarian.jumlah - pengeluaranHarian.reduce((acc, obj) => acc + obj.harga_satuan * obj.jumlah, 0))}</p>
+                    <p className="text-sm text-gray-700 mt-0.5">
+                      {pengeluaranHarian ? formatRupiah(alokasiHarian.jumlah - pengeluaranHarian.reduce((acc, obj) => acc + obj.harga_satuan * obj.jumlah, 0)) : 0}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -135,10 +179,11 @@ const Keuangan = ({ user }: Props) => {
                   <p className="font-bold text-gray-800">Pengeluaran</p>
                 </div>
               </div>
-              <DialogTambahPengeluaran onPengeluaranUpdate={() => console.log('refetching pengeluaran...')}>
+              <DialogTambahPengeluaran sppg_id={sppg.id} alokasi_harian_id={alokasiHarian.id} onPengeluaranUpdate={refetchPengeluaran}>
                 <button
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300
                              text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
+                  disabled={alokasiHarian.id === 0}
                 >
                   <Plus className="w-4 h-4" />
                   Tambah
@@ -146,9 +191,12 @@ const Keuangan = ({ user }: Props) => {
               </DialogTambahPengeluaran>
             </div>
             <div className="px-4 pb-4">
-              <Suspense fallback={<div className="flex items-center justify-center py-12 text-gray-300 text-sm">Memuat data...</div>}>
-                <PengeluaranTable sppg_id={sppg.id} pengeluaran={pengeluaranHarian} />
-              </Suspense>
+              {isFetching && <div className="text-center text-sm py-5 text-muted-foreground">Memuat data...</div>}
+              {pengeluaranHarian ? (
+                <PengeluaranTable onDelete={() => refetchPengeluaran()} sppg_id={sppg.id} pengeluaran={pengeluaranHarian} />
+              ) : (
+                <div className="text-center text-sm py-5 text-muted-foreground">Belum ada data pengeluaran.</div>
+              )}
             </div>
           </div>
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">

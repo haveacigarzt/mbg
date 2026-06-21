@@ -1,4 +1,4 @@
-import type { Metadata } from "./metadata";
+import type { Metadata } from './metadata';
 
 export type SPPG = {
   id: number;
@@ -60,4 +60,72 @@ export type PostSPPG = {
   kelurahan_id: number;
   kapasitas_porsi: number;
   status_aktif: boolean;
+};
+
+// 20/06/2026
+export type FetchAlokasiHarianResponse = {
+  alokasi_harian: {
+    id: number;
+    created_at: string;
+    updated_at: string;
+    sppg_id: number;
+    jumlah: number;
+    tanggal: string;
+  };
+};
+export type FetchPengeluaranHarianResponse = {
+  metadata: Metadata;
+  pengeluaran_harian: [
+    {
+      id: number;
+      created_at: string;
+      updated_at: string;
+      alokasi_harian_id: number;
+      produk: string;
+      jumlah: number;
+      satuan: string;
+      harga_satuan: number;
+      subtotal: number;
+    }
+  ];
+};
+export type FetchSinglePengeluaranHarianResponse = {
+  pengeluaran_harian: {
+    id: number;
+    created_at: string;
+    updated_at: string;
+    alokasi_harian_id: number;
+    produk: string;
+    jumlah: number;
+    satuan: string;
+    harga_satuan: number;
+    subtotal: number;
+  };
+};
+export type CreatePengeluaranHarianInput = {
+  alokasi_harian_id: number;
+  produk: string;
+  jumlah: number;
+  satuan: string;
+  harga_satuan: number;
+};
+export type CreateAlokasiHarianInput = {
+  tanggal: string;
+  jumlah: number;
+};
+export type CreateProduksiHarianInput = {
+  tanggal: string;
+  waktu_mulai: string;
+  estimasi_waktu_selesai: string;
+};
+export type FetchProduksiHarianResponse = {
+  produksi_harian: {
+    id: number;
+    created_at: string;
+    updated_at: string;
+    sppg_id: number;
+    waktu_mulai: string;
+    estimasi_waktu_selesai: string;
+    tanggal: string;
+  };
 };

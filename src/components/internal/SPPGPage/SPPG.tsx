@@ -18,8 +18,6 @@ const SPPG = ({ user }: Props) => {
   const { data: sppg, refetch: refetchSPPG } = useSuspenseQuery(getSPPGByIDQueryOptions(user.user.role.id_in_role));
   const { data: kecamatan } = useSuspenseQuery(getKecamatanQueryOptions());
   const { data: kelurahan } = useSuspenseQuery(getKelurahanQueryOptions(sppg.kecamatan_id));
-  const [tanggal, setTanggal] = useState(new Date().toLocaleDateString('sv-SE'));
-  const [date, setDate] = useState<Date | undefined>(new Date());
 
   const tabs = [
     { id: 'sekolah', label: 'Sekolah' },

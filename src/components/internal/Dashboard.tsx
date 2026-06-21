@@ -1,15 +1,16 @@
-import { useQuery, useSuspenseQueries, useSuspenseQuery } from "@tanstack/react-query";
-import { getSekolahQueryOptions } from "../../queryOptions/sekolah";
-import { getPosyanduQueryOptions } from "../../queryOptions/posyandu";
-import { getSPPGQueryOptions } from "../../queryOptions/sppg";
-import DashboardMap from "./DashboardMap";
-import { getPengirimanQueryOptions } from "@/queryOptions/pengiriman";
-import { useEffect, useMemo } from "react";
-import { useWebSocket } from "@/contexts/websocket-context";
-import { queryClient } from "@/main";
-import { getTrackingQueryOptions } from "@/queryOptions/tracking";
-import Navbar from "./Navbar";
-import { Users, UtensilsCrossed, School, Heart, Truck } from "lucide-react";
+import { useQuery, useSuspenseQueries, useSuspenseQuery } from '@tanstack/react-query';
+import { getSekolahQueryOptions } from '../../queryOptions/sekolah';
+import { getPosyanduQueryOptions } from '../../queryOptions/posyandu';
+import { getAllProduksiHarianQueryOptions, getKeuanganHarianQueryOptions, getProduksiHarianQueryOptions, getSPPGQueryOptions } from '../../queryOptions/sppg';
+import DashboardMap from './DashboardMap';
+import { getPengirimanQueryOptions } from '@/queryOptions/pengiriman';
+import { useEffect, useMemo, useRef } from 'react';
+import { useWebSocket } from '@/contexts/websocket-context';
+import { queryClient } from '@/main';
+import { getTrackingQueryOptions } from '@/queryOptions/tracking';
+import Navbar from './Navbar';
+import { Users, UtensilsCrossed, School, Heart, Truck } from 'lucide-react';
+import { getTodaysDate } from '@/lib/utils';
 
 interface Props {
   role_id: number;
@@ -17,52 +18,147 @@ interface Props {
 
 const Dashboard = ({ role_id }: Props) => {
   const [{ data: sekolah }, { data: posyandu }, { data: sppg }] = useSuspenseQueries({
-    queries: [getSekolahQueryOptions(), getPosyanduQueryOptions(), getSPPGQueryOptions()],
+    queries: [getSekolahQueryOptions(), getPosyanduQueryOptions(), getSPPGQueryOptions()]
   });
 
-  const { data: pengiriman } = useSuspenseQuery(getPengirimanQueryOptions({ status: "berangkat" }));
+  const { data: pengiriman } = useSuspenseQuery(getPengirimanQueryOptions({ status: 'berangkat' }));
 
   const pengirimanIds = useMemo(() => [...new Set(pengiriman.pengiriman.map((item) => item.id))], [pengiriman.pengiriman]);
 
   const { data: tracking } = useQuery(getTrackingQueryOptions(pengirimanIds));
   const { lastMessage } = useWebSocket();
 
-  useEffect(() => {
-    if (!lastMessage) return;
-    if (lastMessage.type === "pengiriman:update") {
-      queryClient.invalidateQueries({ queryKey: ["pengiriman"] });
-      if (lastMessage.status !== "berangkat") {
-        queryClient.setQueriesData({ queryKey: ["tracking"] }, (old: any) => {
+  // useEffect(() => {
+  //   if (!lastMessage) return;
+  //   if (lastMessage.type === 'pengiriman:update') {
+  //     queryClient.invalidateQueries({ queryKey: ['pengiriman'] });
+  //     if (lastMessage.status !== 'berangkat') {
+  //       queryClient.setQueriesData({ queryKey: ['tracking'] }, (old: any) => {
+  //         if (!old?.tracking) return old;
+  //         const exists = old.tracking.some((t: any) => t.pengiriman_id === lastMessage.data.pengiriman_id);
+  //         if (exists) {
+  //           return { ...old, tracking: old.tracking.filter((e: any) => e.pengiriman_id !== lastMessage.data.pengiriman_id) };
+  //         }
+  //         return { ...old };
+  //       });
+  //     }
+  //   }
+  //   if (lastMessage.type === 'tracking:created') {
+  //     queryClient.setQueriesData({ queryKey: ['tracking'] }, (old: any) => {
+  //       if (!old?.tracking) return old;
+  //       const exists = old.tracking.some((t: any) => t.pengiriman_id === lastMessage.data.pengiriman_id);
+  //       if (exists) {
+  //         return { ...old, tracking: old.tracking.map((t: any) => (t.pengiriman_id === lastMessage.data.pengiriman_id ? lastMessage.data : t)) };
+  //       }
+  //       return { ...old, tracking: [lastMessage.data, ...old.tracking] };
+  //     });
+  //   }
+  //   if (lastMessage.type === 'keuangan:updated') {
+  //     console.log(lastMessage.data);
+  //     queryClient.setQueriesData({ queryKey: ['keuangan_harian'] }, (old: any) => {
+  //       return lastMessage.data;
+  //     });
+  //   }
+  // }, [lastMessage]);
+
+  function handleWSMessage(message: any, queryClient: any) {
+    switch (message.type) {
+      case 'pengiriman:updated': {
+        queryClient.invalidateQueries({ queryKey: ['pengiriman'] });
+
+        if (message.data.status !== 'berangkat') {
+          queryClient.setQueriesData({ queryKey: ['tracking'] }, (old: any) => {
+            if (!old?.tracking) return old;
+
+            return {
+              ...old,
+              tracking: old.tracking.filter((e: any) => e.pengiriman_id !== message.data.pengiriman_id)
+            };
+          });
+        }
+
+        break;
+      }
+
+      case 'tracking:created': {
+        queryClient.setQueriesData({ queryKey: ['tracking'] }, (old: any) => {
           if (!old?.tracking) return old;
-          const exists = old.tracking.some((t: any) => t.pengiriman_id === lastMessage.data.pengiriman_id);
-          if (exists) {
-            return { ...old, tracking: old.tracking.filter((e: any) => e.pengiriman_id !== lastMessage.data.pengiriman_id) };
-          }
-          return { ...old };
+
+          const exists = old.tracking.some((t: any) => t.pengiriman_id === message.data.pengiriman_id);
+
+          return {
+            ...old,
+            tracking: exists ? old.tracking.map((t: any) => (t.pengiriman_id === message.data.pengiriman_id ? message.data : t)) : [message.data, ...old.tracking]
+          };
         });
+
+        break;
+      }
+
+      case 'keuangan:updated': {
+        queryClient.setQueriesData({ queryKey: ['keuangan_harian'] }, () => message.data);
+        break;
+      }
+      case 'produksi:updated': {
+        queryClient.setQueriesData({ queryKey: ['produksi_harian_all'] }, () => message.data);
+        break;
       }
     }
-    if (lastMessage.type === "tracking:created") {
-      queryClient.setQueriesData({ queryKey: ["tracking"] }, (old: any) => {
-        if (!old?.tracking) return old;
-        const exists = old.tracking.some((t: any) => t.pengiriman_id === lastMessage.data.pengiriman_id);
-        if (exists) {
-          return { ...old, tracking: old.tracking.map((t: any) => (t.pengiriman_id === lastMessage.data.pengiriman_id ? lastMessage.data : t)) };
-        }
-        return { ...old, tracking: [lastMessage.data, ...old.tracking] };
-      });
-    }
+  }
+  const buffer = useRef<Map<string, any>>(new Map());
+
+  useEffect(() => {
+    if (!lastMessage) return;
+
+    const key = `${lastMessage.type}-${lastMessage.data?.id || Math.random()}`;
+
+    buffer.current.set(key, lastMessage);
   }, [lastMessage]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (buffer.current.size === 0) return;
+
+      const batch = Array.from(buffer.current.values());
+      buffer.current.clear();
+
+      batch.forEach((msg) => {
+        handleWSMessage(msg, queryClient);
+      });
+    }, 300);
+
+    return () => clearInterval(interval);
+  }, [queryClient]);
 
   const totalSasaran = sekolah.sekolah.reduce((sum, el) => sum + el.jumlah_siswa, 0);
   const totalIbuBalita = posyandu.posyandu.reduce((sum, el) => sum + el.jumlah_balita + el.jumlah_ibu_hamil, 0);
 
   const stats = [
-    { icon: <Users className="w-5 h-5 text-blue-500" />, iconBg: "bg-blue-50", label: "Total Sasaran", value: totalSasaran.toLocaleString("id-ID"), sub: "Jiwa Terdaftar", border: "border-blue-100" },
-    { icon: <School className="w-5 h-5 text-green-500" />, iconBg: "bg-green-50", label: "Sekolah", value: sekolah.metadata.total_records.toLocaleString("id-ID"), sub: "Titik Penerima", border: "border-green-100" },
-    { icon: <UtensilsCrossed className="w-5 h-5 text-orange-500" />, iconBg: "bg-orange-50", label: "Unit Produksi", value: sppg.metadata.total_records.toLocaleString("id-ID"), sub: "SPPG Aktif", border: "border-orange-100" },
-    { icon: <Heart className="w-5 h-5 text-red-400" />, iconBg: "bg-red-50", label: "Posyandu (3B)", value: totalIbuBalita.toLocaleString("id-ID"), sub: "Ibu & Balita", border: "border-red-100" },
+    { icon: <Users className="w-5 h-5 text-blue-500" />, iconBg: 'bg-blue-50', label: 'Total Sasaran', value: totalSasaran.toLocaleString('id-ID'), sub: 'Jiwa Terdaftar', border: 'border-blue-100' },
+    {
+      icon: <School className="w-5 h-5 text-green-500" />,
+      iconBg: 'bg-green-50',
+      label: 'Sekolah',
+      value: sekolah.metadata.total_records.toLocaleString('id-ID'),
+      sub: 'Titik Penerima',
+      border: 'border-green-100'
+    },
+    {
+      icon: <UtensilsCrossed className="w-5 h-5 text-orange-500" />,
+      iconBg: 'bg-orange-50',
+      label: 'Unit Produksi',
+      value: sppg.metadata.total_records.toLocaleString('id-ID'),
+      sub: 'SPPG Aktif',
+      border: 'border-orange-100'
+    },
+    { icon: <Heart className="w-5 h-5 text-red-400" />, iconBg: 'bg-red-50', label: 'Posyandu (3B)', value: totalIbuBalita.toLocaleString('id-ID'), sub: 'Ibu & Balita', border: 'border-red-100' }
   ];
+
+  // Keuangan dan Produksi Realtime
+  const today = getTodaysDate();
+  const { data: keuanganHarian } = useSuspenseQuery(getKeuanganHarianQueryOptions(today));
+  console.log(keuanganHarian);
+  const { data: produksiHarian } = useSuspenseQuery(getAllProduksiHarianQueryOptions(today));
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -74,7 +170,30 @@ const Dashboard = ({ role_id }: Props) => {
           <h1 className="text-xl font-black text-gray-800">Dashboard</h1>
           <p className="text-xs text-gray-400 tracking-widest mt-1">RINGKASAN DATA PROGRAM MBG — SANGGAU</p>
         </div>
-
+        <div className="flex flex-wrap gap-5">
+          {keuanganHarian.map((el) => (
+            <ul>
+              <li>row_id: {el.row_id}</li>
+              <li>sppg_id: {el.sppg_id}</li>
+              <li>sppg_nama: {el.sppg_nama}</li>
+              <li>tanggal: {el.tanggal}</li>
+              <li>alokasi: {el.alokasi}</li>
+              <li>terpakai: {el.terpakai}</li>
+              <li>sisa: {el.sisa}</li>
+            </ul>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-5">
+          {produksiHarian.map((el) => (
+            <ul>
+              <li>row_id: {el.row_id}</li>
+              <li>sppg_id: {el.sppg_id}</li>
+              <li>tanggal: {el.tanggal}</li>
+              <li>waktu_mulai: {el.waktu_mulai}</li>
+              <li>estimasi_waktu_selesai: {el.estimasi_waktu_selesai}</li>
+            </ul>
+          ))}
+        </div>
         {/* Stat Cards */}
         <div className="grid grid-cols-4 gap-4">
           {stats.map((item, i) => (
@@ -92,7 +211,7 @@ const Dashboard = ({ role_id }: Props) => {
         {/* Map + Pengiriman Aktif */}
         <div className="flex gap-4">
           {/* Map */}
-          <div className="flex-[3] bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="flex-3 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <DashboardMap tracking={tracking?.tracking} />
           </div>
 

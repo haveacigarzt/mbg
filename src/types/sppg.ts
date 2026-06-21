@@ -129,3 +129,30 @@ export type FetchProduksiHarianResponse = {
     tanggal: string;
   };
 };
+export type FetchProduksiHarianAllResponse = {
+  produksi_harian: [
+    {
+      id: number;
+      row_id: number;
+      created_at: string;
+      updated_at: string;
+      sppg_id: number;
+      waktu_mulai: string;
+      estimasi_waktu_selesai: string;
+      tanggal: string;
+    }
+  ];
+};
+export type FetchKeuanganHarianResponse = {
+  keuangan_harian: [
+    {
+      row_id: number;
+      sppg_id: number;
+      sppg_nama: string;
+      tanggal: string;
+      alokasi: number;
+      terpakai: number;
+      sisa: number;
+    }
+  ];
+};

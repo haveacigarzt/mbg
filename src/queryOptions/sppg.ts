@@ -4,8 +4,10 @@ import {
   getAlokasiHarian,
   getKecamatan,
   getKelurahan,
+  getKeuanganHarian,
   getPengeluaranHarian,
   getProduksiHarian,
+  getProduksiHarianAll,
   getSPPG,
   getSPPGByID,
   postAlokasi,
@@ -123,5 +125,19 @@ export function getProduksiHarianQueryOptions(sppg_id: number, tanggal: string) 
 export function createProduksiHarianMutationOptions() {
   return mutationOptions({
     mutationFn: ({ sppg_id, input }: { sppg_id: number; input: CreateProduksiHarianInput }) => postProduksiHarian(sppg_id, input)
+  });
+}
+
+// 21/06/2026
+export function getKeuanganHarianQueryOptions(tanggal: string) {
+  return queryOptions({
+    queryKey: ['keuangan_harian'],
+    queryFn: () => getKeuanganHarian(tanggal)
+  });
+}
+export function getAllProduksiHarianQueryOptions(tanggal: string) {
+  return queryOptions({
+    queryKey: ['produksi_harian_all', tanggal],
+    queryFn: () => getProduksiHarianAll(tanggal)
   });
 }

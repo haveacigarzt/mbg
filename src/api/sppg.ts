@@ -6,7 +6,9 @@ import type {
   FetchAlokasiHarianResponse,
   FetchKecamatanResponse,
   FetchKelurahanResponse,
+  FetchKeuanganHarianResponse,
   FetchPengeluaranHarianResponse,
+  FetchProduksiHarianAllResponse,
   FetchProduksiHarianResponse,
   FetchSinglePengeluaranHarianResponse,
   FetchSingleSPPGResponse,
@@ -104,6 +106,9 @@ export async function getPengeluaranHarian(sppg_id: number, tanggal: string) {
   return data.pengeluaran_harian;
 }
 export async function postPengeluaran(sppg_id: number, input: CreatePengeluaranHarianInput) {
+  if (input.alokasi_harian_id === 0) {
+    throw new Error('gagal menambahkan pengeluaran harian');
+  }
   const response = await apiFetch(`/v1/sppg/${sppg_id}/pengeluaranharian`, {
     method: 'POST',
     body: JSON.stringify(input)
@@ -143,6 +148,14 @@ export async function getProduksiHarian(sppg_id: number, tanggal: string) {
   const data: FetchProduksiHarianResponse = await response.json();
   return data.produksi_harian;
 }
+export async function getProduksiHarianAll(tanggal: string) {
+  const response = await apiFetch(`/v1/produksiharian?tanggal=${tanggal}`);
+  if (!response.ok) {
+    throw new Error('gagal mengambil produksi harian all');
+  }
+  const data: FetchProduksiHarianAllResponse = await response.json();
+  return data.produksi_harian;
+}
 export async function postProduksiHarian(sppg_id: number, input: CreateProduksiHarianInput) {
   const response = await apiFetch(`/v1/sppg/${sppg_id}/produksiharian`, {
     method: 'POST',
@@ -153,4 +166,14 @@ export async function postProduksiHarian(sppg_id: number, input: CreateProduksiH
   }
   const data: FetchProduksiHarianResponse = await response.json();
   return data.produksi_harian;
+}
+
+// 21/06/2026
+export async function getKeuanganHarian(tanggal: string) {
+  const response = await apiFetch(`/v1/keuanganharian?tanggal=${tanggal}`);
+  if (!response.ok) {
+    throw new Error('gagal mengambil list keuangan harian');
+  }
+  const data: FetchKeuanganHarianResponse = await response.json();
+  return data.keuangan_harian;
 }

@@ -1,20 +1,11 @@
-import type { ApiError } from "@/api/client";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Loader2 } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
-import { toast } from "sonner";
-import { antarPengirimanMutationOptions } from "@/queryOptions/pengiriman";
+import type { ApiError } from '@/api/client';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Loader2 } from 'lucide-react';
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { antarPengirimanMutationOptions } from '@/queryOptions/pengiriman';
 
 interface Props {
   children: React.ReactNode;
@@ -30,29 +21,25 @@ const DialogAntarPengiriman = ({ children, refetchAll, id, nama }: Props) => {
     onSuccess: () => {
       toast.success(`Berhasil mengambil pengataran ke ${nama}`, {
         style: {
-          "--normal-bg":
-            "color-mix(in oklab, light-dark(var(--color-green-600), var(--color-green-400)) 10%, var(--background))",
-          "--normal-text":
-            "light-dark(var(--color-green-600), var(--color-green-400))",
-          "--normal-border":
-            "light-dark(var(--color-green-600), var(--color-green-400))",
-        } as React.CSSProperties,
+          '--normal-bg': 'color-mix(in oklab, light-dark(var(--color-green-600), var(--color-green-400)) 10%, var(--background))',
+          '--normal-text': 'light-dark(var(--color-green-600), var(--color-green-400))',
+          '--normal-border': 'light-dark(var(--color-green-600), var(--color-green-400))'
+        } as React.CSSProperties
       });
       refetchAll();
       setOpen(false);
     },
     onError: (error: ApiError) => {
       toast.error(`Gagal mengambil pengataran ke ${nama}. ${error.message}`, {
-        position: "top-center",
+        position: 'top-center',
         style: {
-          "--normal-bg":
-            "color-mix(in oklab, var(--destructive) 10%, var(--background))",
-          "--normal-text": "var(--destructive)",
-          "--normal-border": "var(--destructive)",
-        } as React.CSSProperties,
+          '--normal-bg': 'color-mix(in oklab, var(--destructive) 10%, var(--background))',
+          '--normal-text': 'var(--destructive)',
+          '--normal-border': 'var(--destructive)'
+        } as React.CSSProperties
       });
       setOpen(false);
-    },
+    }
   });
 
   const handleAntar = async (id: number) => {
@@ -73,23 +60,22 @@ const DialogAntarPengiriman = ({ children, refetchAll, id, nama }: Props) => {
           "
       >
         <DialogHeader>
-          <DialogTitle className="text-lg me-7">
-            Antar pengiriman ini sekarang?
-          </DialogTitle>
-          <DialogDescription>
-            Anda akan bertanggung jawab atas pengantaran ke {nama}.
-          </DialogDescription>
+          <DialogTitle className="text-lg me-7">Antar pengiriman ini sekarang?</DialogTitle>
+          <DialogDescription>Anda akan bertanggung jawab atas pengantaran ke {nama}.</DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Batal</Button>
+            <Button variant="outline" className="text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
+              Batal
+            </Button>
           </DialogClose>
-          <Button onClick={() => handleAntar(id)} disabled={mutation.isPending}>
-            {mutation.isPending ? (
-              <Loader2 className="animate-spin" />
-            ) : (
-              "Lanjutkan"
-            )}
+          <Button
+            onClick={() => handleAntar(id)}
+            disabled={mutation.isPending}
+            className="bg-blue-600 hover:bg-blue-700
+                             text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
+          >
+            {mutation.isPending ? <Loader2 className="animate-spin" /> : 'Lanjutkan'}
           </Button>
         </DialogFooter>
       </DialogContent>

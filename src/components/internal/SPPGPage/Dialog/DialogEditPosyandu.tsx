@@ -1,30 +1,18 @@
-import type { ApiError } from "@/api/client";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
-import { Textarea } from "@/components/ui/textarea";
-import { updatePosyanduMutationOptions } from "@/queryOptions/posyandu";
-import { posyanduSchema } from "@/schema/formValidation";
-import type { PostPosyandu, Posyandu } from "@/types/posyandu";
-import type { Distrik } from "@/types/sppg";
-import { useMutation } from "@tanstack/react-query";
-import { Loader2, MapPin } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
+import type { ApiError } from '@/api/client';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
+import { Textarea } from '@/components/ui/textarea';
+import { updatePosyanduMutationOptions } from '@/queryOptions/posyandu';
+import { posyanduSchema } from '@/schema/formValidation';
+import type { PostPosyandu, Posyandu } from '@/types/posyandu';
+import type { Distrik } from '@/types/sppg';
+import { useMutation } from '@tanstack/react-query';
+import { Loader2, MapPin } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 interface DialogEditPosyanduProps {
   posyandu: Posyandu;
@@ -34,24 +22,16 @@ interface DialogEditPosyanduProps {
   kecamatan: string;
 }
 
-const DialogEditPosyandu = ({
-  children,
-  posyandu,
-  kelurahan,
-  onPosyanduUpdate,
-  kecamatan,
-}: DialogEditPosyanduProps) => {
+const DialogEditPosyandu = ({ children, posyandu, kelurahan, onPosyanduUpdate, kecamatan }: DialogEditPosyanduProps) => {
   const [open, setOpen] = useState(false);
   const initialForm = {
-    nama: posyandu.nama || "",
-    alamat: posyandu.alamat || "",
+    nama: posyandu.nama || '',
+    alamat: posyandu.alamat || '',
     latitude: posyandu.latitude || 0,
     longitude: posyandu.longitude || 0,
     jumlah_balita: posyandu.jumlah_balita || 0,
     jumlah_ibu_hamil: posyandu.jumlah_ibu_hamil || 0,
-    kelurahan_id: kelurahan.some((item) => item.id === posyandu.kelurahan_id)
-      ? posyandu.kelurahan_id
-      : 0,
+    kelurahan_id: kelurahan.some((item) => item.id === posyandu.kelurahan_id) ? posyandu.kelurahan_id : 0
   };
 
   const [form, setForm] = useState(initialForm);
@@ -65,69 +45,58 @@ const DialogEditPosyandu = ({
   function updateField(field: string, value: any) {
     setForm((prev) => ({
       ...prev,
-      [field]: value,
+      [field]: value
     }));
   }
 
   const mutation = useMutation({
     ...updatePosyanduMutationOptions(),
     onSuccess: () => {
-      toast.success("Berhasil memperbarui data Sekolah.", {
+      toast.success('Berhasil memperbarui data Sekolah.', {
         style: {
-          "--normal-bg":
-            "color-mix(in oklab, light-dark(var(--color-green-600), var(--color-green-400)) 10%, var(--background))",
-          "--normal-text":
-            "light-dark(var(--color-green-600), var(--color-green-400))",
-          "--normal-border":
-            "light-dark(var(--color-green-600), var(--color-green-400))",
-        } as React.CSSProperties,
+          '--normal-bg': 'color-mix(in oklab, light-dark(var(--color-green-600), var(--color-green-400)) 10%, var(--background))',
+          '--normal-text': 'light-dark(var(--color-green-600), var(--color-green-400))',
+          '--normal-border': 'light-dark(var(--color-green-600), var(--color-green-400))'
+        } as React.CSSProperties
       });
       onPosyanduUpdate();
       setOpen(false);
     },
     onError: (error: ApiError) => {
-      toast.error("Gagal memperbarui data Sekolah.", {
+      toast.error('Gagal memperbarui data Sekolah.', {
         style: {
-          "--normal-bg":
-            "color-mix(in oklab, light-dark(var(--color-red-600), var(--color-red-400)) 10%, var(--background))",
-          "--normal-text":
-            "light-dark(var(--color-red-600), var(--color-red-400))",
-          "--normal-border":
-            "light-dark(var(--color-red-400), var(--color-red-400))",
-        } as React.CSSProperties,
+          '--normal-bg': 'color-mix(in oklab, light-dark(var(--color-red-600), var(--color-red-400)) 10%, var(--background))',
+          '--normal-text': 'light-dark(var(--color-red-600), var(--color-red-400))',
+          '--normal-border': 'light-dark(var(--color-red-400), var(--color-red-400))'
+        } as React.CSSProperties
       });
-      console.log("ERROR:", error);
-    },
+      console.log('ERROR:', error);
+    }
   });
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    console.log("validating");
+    console.log('validating');
     const result = posyanduSchema.safeParse(form);
 
     if (!result.success) {
-      const firstError = Object.values(
-        result.error.flatten().fieldErrors,
-      ).flat()[0];
+      const firstError = Object.values(result.error.flatten().fieldErrors).flat()[0];
 
       if (firstError) {
         toast.error(firstError, {
           style: {
-            "--normal-bg":
-              "color-mix(in oklab, light-dark(var(--color-red-600), var(--color-red-400)) 10%, var(--background))",
-            "--normal-text":
-              "light-dark(var(--color-red-600), var(--color-red-400))",
-            "--normal-border":
-              "light-dark(var(--color-red-400), var(--color-red-400))",
-          } as React.CSSProperties,
+            '--normal-bg': 'color-mix(in oklab, light-dark(var(--color-red-600), var(--color-red-400)) 10%, var(--background))',
+            '--normal-text': 'light-dark(var(--color-red-600), var(--color-red-400))',
+            '--normal-border': 'light-dark(var(--color-red-400), var(--color-red-400))'
+          } as React.CSSProperties
         });
       }
       return;
     }
-    console.log("VALIDATED DATA:", result.data);
+    console.log('VALIDATED DATA:', result.data);
     await mutation.mutateAsync({
       posyandu_id: posyandu.id,
-      input: result.data as PostPosyandu,
+      input: result.data as PostPosyandu
     });
   }
 
@@ -145,21 +114,21 @@ const DialogEditPosyandu = ({
           ({ coords }) => {
             resolve({
               latitude: coords.latitude,
-              longitude: coords.longitude,
+              longitude: coords.longitude
             });
           },
           reject,
           {
             enableHighAccuracy: true,
             timeout: 10000,
-            maximumAge: 0,
-          },
+            maximumAge: 0
+          }
         );
       });
     }
     const location = await getLocation();
-    updateField("latitude", Number(location.latitude));
-    updateField("longitude", Number(location.longitude));
+    updateField('latitude', Number(location.latitude));
+    updateField('longitude', Number(location.longitude));
     setGetLocLoading(false);
   }
 
@@ -179,12 +148,8 @@ const DialogEditPosyandu = ({
       >
         <form onSubmit={handleSubmit}>
           <DialogHeader className="gap-0">
-            <DialogTitle className="text-lg font-semibold">
-              Tambah data Posyandu
-            </DialogTitle>
-            <DialogDescription>
-              Tambah data Posyandu di SPPG anda. Klik simpan saat selesai.
-            </DialogDescription>
+            <DialogTitle className="text-lg font-semibold">Tambah data Posyandu</DialogTitle>
+            <DialogDescription>Tambah data Posyandu di SPPG anda. Klik simpan saat selesai.</DialogDescription>
           </DialogHeader>
           <div className="flex gap-4 py-5">
             <div className="flex flex-1 flex-col gap-5">
@@ -192,25 +157,13 @@ const DialogEditPosyandu = ({
                 <Label htmlFor="nama" className="mb-1">
                   Nama Posyandu
                 </Label>
-                <Input
-                  id="nama"
-                  placeholder="Nama"
-                  value={form.nama}
-                  onChange={(e) => updateField("nama", e.target.value)}
-                  required
-                />
+                <Input id="nama" placeholder="Nama" value={form.nama} onChange={(e) => updateField('nama', e.target.value)} required />
               </div>
               <div>
                 <Label htmlFor="alamat" className="mb-1">
                   Alamat
                 </Label>
-                <Textarea
-                  id="alamat"
-                  placeholder="Alamat"
-                  value={form.alamat}
-                  onChange={(e) => updateField("alamat", e.target.value)}
-                  required
-                />
+                <Textarea id="alamat" placeholder="Alamat" value={form.alamat} onChange={(e) => updateField('alamat', e.target.value)} required />
               </div>
             </div>
             <div className="flex flex-1 flex-col gap-5">
@@ -218,9 +171,7 @@ const DialogEditPosyandu = ({
                 <div>
                   <Label className="mb-1">Kecamatan</Label>
                   <NativeSelect disabled defaultValue={0} className="w-full">
-                    <NativeSelectOption value="0">
-                      {kecamatan}
-                    </NativeSelectOption>
+                    <NativeSelectOption value="0">{kecamatan}</NativeSelectOption>
                   </NativeSelect>
                 </div>
                 <div>
@@ -230,17 +181,13 @@ const DialogEditPosyandu = ({
                   <NativeSelect
                     id="kelurahan"
                     onChange={(e) => {
-                      updateField("kelurahan_id", Number(e.target.value));
+                      updateField('kelurahan_id', Number(e.target.value));
                     }}
                     defaultValue={form.kelurahan_id}
                     className="w-full"
                   >
                     {initialForm.kelurahan_id === 0 && (
-                      <NativeSelectOption
-                        disabled
-                        value={0}
-                        className="text-center"
-                      >
+                      <NativeSelectOption disabled value={0} className="text-center">
                         --- Pilih Kelurahan ---
                       </NativeSelectOption>
                     )}
@@ -258,31 +205,13 @@ const DialogEditPosyandu = ({
                   <Label htmlFor="jumlah_balita" className="mb-1">
                     Jumlah Balita
                   </Label>
-                  <Input
-                    id="jumlah_balita"
-                    type="number"
-                    placeholder="Jumlah Balita"
-                    value={form.jumlah_balita}
-                    onChange={(e) =>
-                      updateField("jumlah_balita", e.target.value)
-                    }
-                    required
-                  />
+                  <Input id="jumlah_balita" type="number" placeholder="Jumlah Balita" value={form.jumlah_balita} onChange={(e) => updateField('jumlah_balita', e.target.value)} required />
                 </div>
                 <div>
                   <Label htmlFor="jumlah_ibu_hamil" className="mb-1">
                     Jumlah Ibu Hamil
                   </Label>
-                  <Input
-                    id="jumlah_ibu_hamil"
-                    type="number"
-                    placeholder="Jumlah Ibu Hamil"
-                    value={form.jumlah_ibu_hamil}
-                    onChange={(e) =>
-                      updateField("jumlah_ibu_hamil", e.target.value)
-                    }
-                    required
-                  />
+                  <Input id="jumlah_ibu_hamil" type="number" placeholder="Jumlah Ibu Hamil" value={form.jumlah_ibu_hamil} onChange={(e) => updateField('jumlah_ibu_hamil', e.target.value)} required />
                 </div>
               </div>
               <div className="grid grid-cols-7 gap-2 items-end">
@@ -290,42 +219,16 @@ const DialogEditPosyandu = ({
                   <Label htmlFor="lat" className="mb-1">
                     Laltitude
                   </Label>
-                  <Input
-                    id="lat"
-                    type="number"
-                    placeholder="Latitude"
-                    value={form.latitude}
-                    onChange={(e) =>
-                      updateField("latitude", Number(e.target.value))
-                    }
-                    required
-                  />
+                  <Input id="lat" type="number" placeholder="Latitude" value={form.latitude} onChange={(e) => updateField('latitude', Number(e.target.value))} required />
                 </div>
                 <div className="col-span-3">
                   <Label htmlFor="lon" className="mb-1">
                     Longitude
                   </Label>
-                  <Input
-                    id="lon"
-                    type="number"
-                    placeholder="Longitude"
-                    value={form.longitude}
-                    onChange={(e) =>
-                      updateField("longitude", Number(e.target.value))
-                    }
-                    required
-                  />
+                  <Input id="lon" type="number" placeholder="Longitude" value={form.longitude} onChange={(e) => updateField('longitude', Number(e.target.value))} required />
                 </div>
-                <Button
-                  className="col-span-1"
-                  type="button"
-                  onClick={getLocation}
-                >
-                  {getLocLoading ? (
-                    <Loader2 className="animate-spin" />
-                  ) : (
-                    <MapPin />
-                  )}
+                <Button className="col-span-1 bg-blue-600 rounded-xl text-white hover:bg-blue-700" type="button" onClick={getLocation}>
+                  {getLocLoading ? <Loader2 className="animate-spin" /> : <MapPin />}
                 </Button>
               </div>
               <div></div>
@@ -333,14 +236,17 @@ const DialogEditPosyandu = ({
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Batal</Button>
+              <Button variant="outline" className="text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
+                Batal
+              </Button>
             </DialogClose>
-            <Button type="submit" disabled={!isDirty || mutation.isPending}>
-              {mutation.isPending ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                "Simpan"
-              )}
+            <Button
+              type="submit"
+              disabled={!isDirty || mutation.isPending}
+              className="bg-blue-600 hover:bg-blue-700
+                             text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
+            >
+              {mutation.isPending ? <Loader2 className="animate-spin" /> : 'Simpan'}
             </Button>
           </DialogFooter>
         </form>

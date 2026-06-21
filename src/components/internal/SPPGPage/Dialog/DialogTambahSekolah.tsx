@@ -1,30 +1,18 @@
-import type { ApiError } from "@/api/client";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
-import { Textarea } from "@/components/ui/textarea";
-import { createSekolahMutationOptions } from "@/queryOptions/sekolah";
-import { sekolahSchema } from "@/schema/formValidation";
-import type { PostSekolah } from "@/types/sekolah";
-import type { Distrik } from "@/types/sppg";
-import { useMutation } from "@tanstack/react-query";
-import { Loader2, MapPin } from "lucide-react";
-import React, { useState } from "react";
-import { toast } from "sonner";
+import type { ApiError } from '@/api/client';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
+import { Textarea } from '@/components/ui/textarea';
+import { createSekolahMutationOptions } from '@/queryOptions/sekolah';
+import { sekolahSchema } from '@/schema/formValidation';
+import type { PostSekolah } from '@/types/sekolah';
+import type { Distrik } from '@/types/sppg';
+import { useMutation } from '@tanstack/react-query';
+import { Loader2, MapPin } from 'lucide-react';
+import React, { useState } from 'react';
+import { toast } from 'sonner';
 
 interface DialogTambahSekolahProps {
   onSekolahUpdate: () => void;
@@ -35,24 +23,17 @@ interface DialogTambahSekolahProps {
   kelurahan_id: number;
 }
 
-const DialogTambahSekolah = ({
-  children,
-  kelurahan,
-  onSekolahUpdate,
-  kecamatan,
-  kecamatan_id,
-  kelurahan_id,
-}: DialogTambahSekolahProps) => {
+const DialogTambahSekolah = ({ children, kelurahan, onSekolahUpdate, kecamatan, kecamatan_id, kelurahan_id }: DialogTambahSekolahProps) => {
   const [open, setOpen] = useState(false);
   const initialForm = {
-    nama: "",
-    alamat: "",
-    latitude: "",
-    longitude: "",
-    jumlah_siswa: "",
-    tingkat: "SD" as "SD" | "SMP" | "SMA",
+    nama: '',
+    alamat: '',
+    latitude: '',
+    longitude: '',
+    jumlah_siswa: '',
+    tingkat: 'SD' as 'SD' | 'SMP' | 'SMA',
     kelurahan_id,
-    kecamatan_id,
+    kecamatan_id
   };
 
   const [form, setForm] = useState(initialForm);
@@ -60,39 +41,33 @@ const DialogTambahSekolah = ({
   function updateField(field: string, value: any) {
     setForm((prev) => ({
       ...prev,
-      [field]: value,
+      [field]: value
     }));
   }
 
   const mutation = useMutation({
     ...createSekolahMutationOptions(),
     onSuccess: () => {
-      toast.success("Berhasil memperbarui data Sekolah.", {
+      toast.success('Berhasil memperbarui data Sekolah.', {
         style: {
-          "--normal-bg":
-            "color-mix(in oklab, light-dark(var(--color-green-600), var(--color-green-400)) 10%, var(--background))",
-          "--normal-text":
-            "light-dark(var(--color-green-600), var(--color-green-400))",
-          "--normal-border":
-            "light-dark(var(--color-green-600), var(--color-green-400))",
-        } as React.CSSProperties,
+          '--normal-bg': 'color-mix(in oklab, light-dark(var(--color-green-600), var(--color-green-400)) 10%, var(--background))',
+          '--normal-text': 'light-dark(var(--color-green-600), var(--color-green-400))',
+          '--normal-border': 'light-dark(var(--color-green-600), var(--color-green-400))'
+        } as React.CSSProperties
       });
       onSekolahUpdate?.();
       setOpen(false);
     },
     onError: (error: ApiError) => {
-      toast.error("Gagal memperbarui data Sekolah.", {
+      toast.error('Gagal memperbarui data Sekolah.', {
         style: {
-          "--normal-bg":
-            "color-mix(in oklab, light-dark(var(--color-red-600), var(--color-red-400)) 10%, var(--background))",
-          "--normal-text":
-            "light-dark(var(--color-red-600), var(--color-red-400))",
-          "--normal-border":
-            "light-dark(var(--color-red-400), var(--color-red-400))",
-        } as React.CSSProperties,
+          '--normal-bg': 'color-mix(in oklab, light-dark(var(--color-red-600), var(--color-red-400)) 10%, var(--background))',
+          '--normal-text': 'light-dark(var(--color-red-600), var(--color-red-400))',
+          '--normal-border': 'light-dark(var(--color-red-400), var(--color-red-400))'
+        } as React.CSSProperties
       });
-      console.log("ERROR:", error);
-    },
+      console.log('ERROR:', error);
+    }
   });
 
   async function handleSubmit(e: React.FormEvent) {
@@ -102,31 +77,26 @@ const DialogTambahSekolah = ({
       latitude: Number(form.latitude),
       longitude: Number(form.longitude),
       jumlah_siswa: Number(form.jumlah_siswa),
-      kelurahan_id: Number(form.kelurahan_id),
+      kelurahan_id: Number(form.kelurahan_id)
     };
     const result = sekolahSchema.safeParse(payload);
 
     if (!result.success) {
-      const firstError = Object.values(
-        result.error.flatten().fieldErrors,
-      ).flat()[0];
+      const firstError = Object.values(result.error.flatten().fieldErrors).flat()[0];
 
       if (firstError) {
         toast.error(firstError, {
           style: {
-            "--normal-bg":
-              "color-mix(in oklab, light-dark(var(--color-red-600), var(--color-red-400)) 10%, var(--background))",
-            "--normal-text":
-              "light-dark(var(--color-red-600), var(--color-red-400))",
-            "--normal-border":
-              "light-dark(var(--color-red-400), var(--color-red-400))",
-          } as React.CSSProperties,
+            '--normal-bg': 'color-mix(in oklab, light-dark(var(--color-red-600), var(--color-red-400)) 10%, var(--background))',
+            '--normal-text': 'light-dark(var(--color-red-600), var(--color-red-400))',
+            '--normal-border': 'light-dark(var(--color-red-400), var(--color-red-400))'
+          } as React.CSSProperties
         });
       }
       return;
     }
     await mutation.mutateAsync({
-      input: result.data as PostSekolah,
+      input: result.data as PostSekolah
     });
   }
 
@@ -144,21 +114,21 @@ const DialogTambahSekolah = ({
           ({ coords }) => {
             resolve({
               latitude: coords.latitude,
-              longitude: coords.longitude,
+              longitude: coords.longitude
             });
           },
           reject,
           {
             enableHighAccuracy: true,
             timeout: 10000,
-            maximumAge: 0,
-          },
+            maximumAge: 0
+          }
         );
       });
     }
     const location = await getLocation();
-    updateField("latitude", Number(location.latitude));
-    updateField("longitude", Number(location.longitude));
+    updateField('latitude', Number(location.latitude));
+    updateField('longitude', Number(location.longitude));
     setGetLocLoading(false);
   }
 
@@ -178,12 +148,8 @@ const DialogTambahSekolah = ({
       >
         <form onSubmit={handleSubmit}>
           <DialogHeader className="gap-0">
-            <DialogTitle className="text-lg font-semibold">
-              Tambah data Sekolah
-            </DialogTitle>
-            <DialogDescription>
-              Tambah data Sekolah di SPPG anda. Klik simpan saat selesai.
-            </DialogDescription>
+            <DialogTitle className="text-lg font-semibold">Tambah data Sekolah</DialogTitle>
+            <DialogDescription>Tambah data Sekolah di SPPG anda. Klik simpan saat selesai.</DialogDescription>
           </DialogHeader>
           <div className="flex gap-4 py-5">
             <div className="flex flex-1 flex-col gap-5">
@@ -191,25 +157,13 @@ const DialogTambahSekolah = ({
                 <Label htmlFor="sppg" className="mb-1">
                   Nama Sekolah
                 </Label>
-                <Input
-                  id="sppg"
-                  placeholder="Nama"
-                  value={form.nama}
-                  onChange={(e) => updateField("nama", e.target.value)}
-                  required
-                />
+                <Input id="sppg" placeholder="Nama" value={form.nama} onChange={(e) => updateField('nama', e.target.value)} required />
               </div>
               <div>
                 <Label htmlFor="alamat" className="mb-1">
                   Alamat
                 </Label>
-                <Textarea
-                  id="alamat"
-                  placeholder="Alamat"
-                  value={form.alamat}
-                  onChange={(e) => updateField("alamat", e.target.value)}
-                  required
-                />
+                <Textarea id="alamat" placeholder="Alamat" value={form.alamat} onChange={(e) => updateField('alamat', e.target.value)} required />
               </div>
             </div>
             <div className="flex flex-1 flex-col gap-5">
@@ -217,9 +171,7 @@ const DialogTambahSekolah = ({
                 <div>
                   <Label className="mb-1">Kecamatan</Label>
                   <NativeSelect disabled defaultValue={0} className="w-full">
-                    <NativeSelectOption value="0">
-                      {kecamatan}
-                    </NativeSelectOption>
+                    <NativeSelectOption value="0">{kecamatan}</NativeSelectOption>
                   </NativeSelect>
                 </div>
                 <div>
@@ -229,7 +181,7 @@ const DialogTambahSekolah = ({
                   <NativeSelect
                     id="kelurahan"
                     onChange={(e) => {
-                      updateField("kelurahan_id", Number(e.target.value));
+                      updateField('kelurahan_id', Number(e.target.value));
                     }}
                     defaultValue={form.kelurahan_id}
                     className="w-full"
@@ -247,12 +199,7 @@ const DialogTambahSekolah = ({
                   <Label htmlFor="tingkat" className="mb-1">
                     Tingkat
                   </Label>
-                  <NativeSelect
-                    className="w-full"
-                    id="tingkat"
-                    value={form.tingkat}
-                    onChange={(e) => updateField("tingkat", e.target.value)}
-                  >
+                  <NativeSelect className="w-full" id="tingkat" value={form.tingkat} onChange={(e) => updateField('tingkat', e.target.value)}>
                     <NativeSelectOption value="SD">SD</NativeSelectOption>
                     <NativeSelectOption value="SMP">SMP</NativeSelectOption>
                     <NativeSelectOption value="SMA">SMA</NativeSelectOption>
@@ -262,16 +209,7 @@ const DialogTambahSekolah = ({
                   <Label htmlFor="jumlah_siswa" className="mb-1">
                     Jumlah Siswa
                   </Label>
-                  <Input
-                    id="jumlah_siswa"
-                    type="number"
-                    placeholder="Jumlah Siswa"
-                    value={form.jumlah_siswa}
-                    onChange={(e) =>
-                      updateField("jumlah_siswa", e.target.value)
-                    }
-                    required
-                  />
+                  <Input id="jumlah_siswa" type="number" placeholder="Jumlah Siswa" value={form.jumlah_siswa} onChange={(e) => updateField('jumlah_siswa', e.target.value)} required />
                 </div>
               </div>
               <div className="grid grid-cols-7 gap-2 items-end">
@@ -279,38 +217,16 @@ const DialogTambahSekolah = ({
                   <Label htmlFor="lat" className="mb-1">
                     Laltitude
                   </Label>
-                  <Input
-                    id="lat"
-                    type="number"
-                    placeholder="Latitude"
-                    value={form.latitude}
-                    onChange={(e) => updateField("latitude", e.target.value)}
-                    required
-                  />
+                  <Input id="lat" type="number" placeholder="Latitude" value={form.latitude} onChange={(e) => updateField('latitude', e.target.value)} required />
                 </div>
                 <div className="col-span-3">
                   <Label htmlFor="lon" className="mb-1">
                     Longitude
                   </Label>
-                  <Input
-                    id="lon"
-                    type="number"
-                    placeholder="Longitude"
-                    value={form.longitude}
-                    onChange={(e) => updateField("longitude", e.target.value)}
-                    required
-                  />
+                  <Input id="lon" type="number" placeholder="Longitude" value={form.longitude} onChange={(e) => updateField('longitude', e.target.value)} required />
                 </div>
-                <Button
-                  className="col-span-1"
-                  type="button"
-                  onClick={getLocation}
-                >
-                  {getLocLoading ? (
-                    <Loader2 className="animate-spin" />
-                  ) : (
-                    <MapPin />
-                  )}
+                <Button className="col-span-1 bg-blue-600 rounded-xl text-white hover:bg-blue-700" type="button" onClick={getLocation}>
+                  {getLocLoading ? <Loader2 className="animate-spin" /> : <MapPin />}
                 </Button>
               </div>
               <div></div>
@@ -318,14 +234,17 @@ const DialogTambahSekolah = ({
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Batal</Button>
+              <Button variant="outline" className="text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
+                Batal
+              </Button>
             </DialogClose>
-            <Button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                "Simpan"
-              )}
+            <Button
+              type="submit"
+              disabled={mutation.isPending}
+              className="bg-blue-600 hover:bg-blue-700
+                             text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
+            >
+              {mutation.isPending ? <Loader2 className="animate-spin" /> : 'Simpan'}
             </Button>
           </DialogFooter>
         </form>

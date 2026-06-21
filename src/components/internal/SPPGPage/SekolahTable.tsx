@@ -1,13 +1,13 @@
-import { createColumnHelper, flexRender, getCoreRowModel, useReactTable, type SortingState } from "@tanstack/react-table";
-import type { Sekolah } from "../../../types/sekolah";
-import { useEffect, useState } from "react";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { getSekolahQueryOptions } from "../../../queryOptions/sekolah";
-import DialogEditSekolah from "./Dialog/DialogEditSekolah";
-import type { Distrik } from "@/types/sppg";
-import DialogHapusSekolah from "./Dialog/DialogHapusSekolah";
-import DialogTambahSekolah from "./Dialog/DialogTambahSekolah";
-import { Search, Plus, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { createColumnHelper, flexRender, getCoreRowModel, useReactTable, type SortingState } from '@tanstack/react-table';
+import type { Sekolah } from '../../../types/sekolah';
+import { useEffect, useState } from 'react';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { getSekolahQueryOptions } from '../../../queryOptions/sekolah';
+import DialogEditSekolah from './Dialog/DialogEditSekolah';
+import type { Distrik } from '@/types/sppg';
+import DialogHapusSekolah from './Dialog/DialogHapusSekolah';
+import DialogTambahSekolah from './Dialog/DialogTambahSekolah';
+import { Search, Plus, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
 interface Props {
   sppg_id: number;
@@ -19,18 +19,18 @@ interface Props {
 
 const columnHelper = createColumnHelper<Sekolah>();
 const columns = [
-  columnHelper.accessor("nama", { header: "Nama", enableSorting: true }),
-  columnHelper.accessor("alamat", { header: "Alamat", enableSorting: true }),
-  columnHelper.accessor("kelurahan", { header: "Kelurahan", enableSorting: true }),
-  columnHelper.accessor("jumlah_siswa", { header: "Jumlah Siswa", enableSorting: true }),
+  columnHelper.accessor('nama', { header: 'Nama', enableSorting: true }),
+  columnHelper.accessor('alamat', { header: 'Alamat', enableSorting: true }),
+  columnHelper.accessor('kelurahan', { header: 'Kelurahan', enableSorting: true }),
+  columnHelper.accessor('jumlah_siswa', { header: 'Jumlah Siswa', enableSorting: true })
 ];
 
 const SekolahTable = ({ sppg_id, kelurahan, kecamatan, kecamatan_id, kelurahan_id }: Props) => {
-  const [searchSekolah, setSearchSekolah] = useState("");
+  const [searchSekolah, setSearchSekolah] = useState('');
   const [page, setPage] = useState(1);
   const page_size = 10;
   const [sorting, setSorting] = useState<SortingState>([]);
-  const sort = sorting[0] ? `${sorting[0].desc ? "-" : ""}${sorting[0].id}` : "";
+  const sort = sorting[0] ? `${sorting[0].desc ? '-' : ''}${sorting[0].id}` : '';
 
   const { data, refetch } = useSuspenseQuery(getSekolahQueryOptions({ sppg_id, page, page_size, nama: searchSekolah, sort }));
   const sekolah = data.sekolah;
@@ -46,7 +46,7 @@ const SekolahTable = ({ sppg_id, kelurahan, kecamatan, kecamatan_id, kelurahan_i
     state: { sorting },
     onSortingChange: setSorting,
     manualSorting: true,
-    getCoreRowModel: getCoreRowModel(),
+    getCoreRowModel: getCoreRowModel()
   });
 
   return (
@@ -81,11 +81,15 @@ const SekolahTable = ({ sppg_id, kelurahan, kecamatan, kecamatan_id, kelurahan_i
             {table.getHeaderGroups().map((hg) => (
               <tr key={hg.id} className="bg-gray-50 border-b border-gray-100">
                 {hg.headers.map((header) => (
-                  <th key={header.id} onClick={header.column.getToggleSortingHandler()} className="px-4 py-3 text-left text-xs text-gray-400 tracking-widest font-semibold cursor-pointer hover:text-gray-600 transition-colors">
+                  <th
+                    key={header.id}
+                    onClick={header.column.getToggleSortingHandler()}
+                    className="px-4 py-3 text-left text-xs text-gray-400 tracking-widest font-semibold cursor-pointer hover:text-gray-600 transition-colors"
+                  >
                     <div className="flex items-center gap-1">
                       {flexRender(header.column.columnDef.header, header.getContext())}
-                      {header.column.getIsSorted() === "asc" && <ArrowUp className="w-3 h-3" />}
-                      {header.column.getIsSorted() === "desc" && <ArrowDown className="w-3 h-3" />}
+                      {header.column.getIsSorted() === 'asc' && <ArrowUp className="w-3 h-3" />}
+                      {header.column.getIsSorted() === 'desc' && <ArrowDown className="w-3 h-3" />}
                       {!header.column.getIsSorted() && <ArrowUpDown className="w-3 h-3 opacity-30" />}
                     </div>
                   </th>
@@ -99,7 +103,7 @@ const SekolahTable = ({ sppg_id, kelurahan, kecamatan, kecamatan_id, kelurahan_i
               <tr
                 key={row.id}
                 className={`border-b border-gray-50 hover:bg-gray-50 transition-colors
-                  ${i % 2 === 0 ? "bg-white" : "bg-gray-50/30"}`}
+                  ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'}`}
               >
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} className="px-4 py-3 text-sm text-gray-700">
@@ -111,7 +115,7 @@ const SekolahTable = ({ sppg_id, kelurahan, kecamatan, kecamatan_id, kelurahan_i
                     <DialogEditSekolah sekolah={row.original} kelurahan={kelurahan} onSekolahUpdate={refetch} kecamatan={kecamatan}>
                       <button
                         className="text-xs font-semibold text-gray-600 bg-gray-100
-                                         hover:bg-gray-200 px-3 py-1.5 rounded-lg transition-colors"
+                                         hover:bg-blue-300 px-3 py-1.5 rounded-lg transition-colors"
                       >
                         Edit
                       </button>
@@ -153,7 +157,7 @@ const SekolahTable = ({ sppg_id, kelurahan, kecamatan, kecamatan_id, kelurahan_i
               onClick={() => setPage(p)}
               disabled={p === page}
               className={`w-8 h-8 rounded-lg text-xs font-semibold transition-all
-                ${p === page ? "bg-blue-600 text-white" : "border border-gray-200 text-gray-500 hover:border-blue-300 hover:text-blue-500"}`}
+                ${p === page ? 'bg-blue-600 text-white' : 'border border-gray-200 text-gray-500 hover:border-blue-300 hover:text-blue-500'}`}
             >
               {p}
             </button>

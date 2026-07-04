@@ -21,6 +21,7 @@ import { Route as SppgProfilRouteImport } from './routes/sppg/profil'
 import { Route as SppgProduksiRouteImport } from './routes/sppg/produksi'
 import { Route as SppgPengirimanRouteImport } from './routes/sppg/pengiriman'
 import { Route as SppgKeuanganRouteImport } from './routes/sppg/keuangan'
+import { Route as RegisterTokenRouteImport } from './routes/register/$token'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -82,6 +83,11 @@ const SppgKeuanganRoute = SppgKeuanganRouteImport.update({
   path: '/sppg/keuangan',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RegisterTokenRoute = RegisterTokenRouteImport.update({
+  id: '/register/$token',
+  path: '/register/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -91,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/data': typeof DataRoute
   '/driver': typeof DriverRoute
   '/login': typeof LoginRoute
+  '/register/$token': typeof RegisterTokenRoute
   '/sppg/keuangan': typeof SppgKeuanganRoute
   '/sppg/pengiriman': typeof SppgPengirimanRoute
   '/sppg/produksi': typeof SppgProduksiRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/data': typeof DataRoute
   '/driver': typeof DriverRoute
   '/login': typeof LoginRoute
+  '/register/$token': typeof RegisterTokenRoute
   '/sppg/keuangan': typeof SppgKeuanganRoute
   '/sppg/pengiriman': typeof SppgPengirimanRoute
   '/sppg/produksi': typeof SppgProduksiRoute
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/data': typeof DataRoute
   '/driver': typeof DriverRoute
   '/login': typeof LoginRoute
+  '/register/$token': typeof RegisterTokenRoute
   '/sppg/keuangan': typeof SppgKeuanganRoute
   '/sppg/pengiriman': typeof SppgPengirimanRoute
   '/sppg/produksi': typeof SppgProduksiRoute
@@ -136,6 +145,7 @@ export interface FileRouteTypes {
     | '/data'
     | '/driver'
     | '/login'
+    | '/register/$token'
     | '/sppg/keuangan'
     | '/sppg/pengiriman'
     | '/sppg/produksi'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/data'
     | '/driver'
     | '/login'
+    | '/register/$token'
     | '/sppg/keuangan'
     | '/sppg/pengiriman'
     | '/sppg/produksi'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/data'
     | '/driver'
     | '/login'
+    | '/register/$token'
     | '/sppg/keuangan'
     | '/sppg/pengiriman'
     | '/sppg/produksi'
@@ -179,6 +191,7 @@ export interface RootRouteChildren {
   DataRoute: typeof DataRoute
   DriverRoute: typeof DriverRoute
   LoginRoute: typeof LoginRoute
+  RegisterTokenRoute: typeof RegisterTokenRoute
   SppgKeuanganRoute: typeof SppgKeuanganRoute
   SppgPengirimanRoute: typeof SppgPengirimanRoute
   SppgProduksiRoute: typeof SppgProduksiRoute
@@ -272,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SppgKeuanganRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/register/$token': {
+      id: '/register/$token'
+      path: '/register/$token'
+      fullPath: '/register/$token'
+      preLoaderRoute: typeof RegisterTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -283,6 +303,7 @@ const rootRouteChildren: RootRouteChildren = {
   DataRoute: DataRoute,
   DriverRoute: DriverRoute,
   LoginRoute: LoginRoute,
+  RegisterTokenRoute: RegisterTokenRoute,
   SppgKeuanganRoute: SppgKeuanganRoute,
   SppgPengirimanRoute: SppgPengirimanRoute,
   SppgProduksiRoute: SppgProduksiRoute,

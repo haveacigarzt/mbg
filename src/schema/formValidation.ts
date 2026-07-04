@@ -30,6 +30,46 @@ export const sppgSchema = z.object({
   )
 });
 
+export const sppgNewSchema = z
+  .object({
+    nama: z.string().trim().min(1, 'Nama SPPG wajib diisi'),
+
+    alamat: z.string().trim().min(1, 'Alamat wajib diisi'),
+
+    kepala_sppg: z.string().trim().min(1, 'Nama kepala SPPG wajib diisi'),
+
+    nomor_telepon: z
+      .string()
+      .trim()
+      .min(10, 'Nomor telepon tidak valid')
+      .max(15, 'Nomor telepon tidak valid')
+      .regex(/^[0-9]+$/, 'Nomor telepon hanya boleh berisi angka'),
+
+    email: z.string().trim().email('Email SPPG tidak valid'),
+
+    kelurahan_id: z.number().min(1, 'Kelurahan wajib dipilih'),
+
+    kecamatan_id: z.number().min(1, 'Kecamatan wajib dipilih'),
+
+    kapasitas_porsi: z.number().min(1, 'Kapasitas porsi harus lebih dari 0'),
+
+    latitude: z.number().min(-90, 'Latitude tidak valid').max(90, 'Latitude tidak valid'),
+
+    longitude: z.number().min(-180, 'Longitude tidak valid').max(180, 'Longitude tidak valid'),
+
+    sosmed_url: z.array(z.string().url('URL media sosial tidak valid')),
+
+    email_user: z.string().trim().email('Email pengguna tidak valid'),
+
+    password: z.string().min(8, 'Password minimal 8 karakter'),
+
+    konfirmasi_password: z.string().min(1, 'Konfirmasi password wajib diisi')
+  })
+  .refine((data) => data.password === data.konfirmasi_password, {
+    path: ['konfirmasi_password'],
+    message: 'Konfirmasi password tidak sama'
+  });
+
 export const sekolahSchema = z.object({
   nama: z.string().min(1, 'Nama wajib diisi'),
   alamat: z.string().min(1, 'Alamat wajib diisi'),
@@ -85,6 +125,23 @@ export const alokasiSchema = z.object({
   tanggal: z.string().min(10, 'Tanggal wajib diisi'),
   jumlah: z.number().min(1, 'Jumlah wajib diisi')
 });
+export const tambahUserSchema = z
+  .object({
+    role_id: z.enum(['2', '3']),
+    name: z.string().trim().min(3, 'Nama minimal 3 karakter').max(100, 'Nama maksimal 100 karakter'),
+    email: z.string().trim().email('Format email tidak valid'),
+    password: z
+      .string()
+      .min(8, 'Password minimal 8 karakter')
+      .max(15, 'Password maksimal 15 karakter')
+      .regex(/^(?=.*[A-Za-z])(?=.*\d).+$/, 'Password harus mengandung huruf dan angka'),
+
+    konfirmasi_password: z.string()
+  })
+  .refine((data) => data.password === data.konfirmasi_password, {
+    message: 'Konfirmasi password tidak sesuai',
+    path: ['konfirmasi_password']
+  });
 export const produksiSchema = z
   .object({
     tanggal: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Format tanggal harus YYYY-MM-DD'),

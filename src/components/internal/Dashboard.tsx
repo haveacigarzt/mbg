@@ -1,12 +1,11 @@
-import { useQuery, useSuspenseQueries, useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useSuspenseQueries, useSuspenseQuery } from '@tanstack/react-query';
 import { getSekolahQueryOptions } from '../../queryOptions/sekolah';
 import { getPosyanduQueryOptions } from '../../queryOptions/posyandu';
-import { getAllProduksiHarianQueryOptions, getKeuanganHarianQueryOptions, getProduksiHarianQueryOptions, getSPPGQueryOptions } from '../../queryOptions/sppg';
+import { getAllProduksiHarianQueryOptions, getKeuanganHarianQueryOptions, getSPPGQueryOptions } from '../../queryOptions/sppg';
 import DashboardMap from './DashboardMap';
 import { getPengirimanQueryOptions } from '@/queryOptions/pengiriman';
 import { useEffect, useMemo, useRef } from 'react';
 import { useWebSocket } from '@/contexts/websocket-context';
-import { queryClient } from '@/main';
 import { getTrackingQueryOptions } from '@/queryOptions/tracking';
 import Navbar from './Navbar';
 import { Users, UtensilsCrossed, School, Heart, Truck } from 'lucide-react';
@@ -60,6 +59,7 @@ const Dashboard = ({ role_id }: Props) => {
   //     });
   //   }
   // }, [lastMessage]);
+  const queryClient = useQueryClient();
 
   function handleWSMessage(message: any, queryClient: any) {
     switch (message.type) {

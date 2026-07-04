@@ -3,8 +3,9 @@ import { deleteAuthTokenMutationOptions } from '@/queryOptions/auth';
 import { useMutation } from '@tanstack/react-query';
 import { Link, useRouter } from '@tanstack/react-router';
 import { toast } from 'sonner';
-import { LayoutDashboard, Building2, ShieldCheck, Truck, LogOut } from 'lucide-react';
+import { LayoutDashboard, Building2, Truck, LogOut, UserStar } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { errorToast, successToast } from '@/lib/constants';
 
 interface Props {
   role_id: number;
@@ -16,22 +17,14 @@ const Navbar = ({ role_id }: Props) => {
     ...deleteAuthTokenMutationOptions(),
     onSuccess: () => {
       toast.success('Berhasil logout. Sampai jumpa lagi', {
-        style: {
-          '--normal-bg': 'color-mix(in oklab, light-dark(var(--color-green-600), var(--color-green-400)) 10%, var(--background))',
-          '--normal-text': 'light-dark(var(--color-green-600), var(--color-green-400))',
-          '--normal-border': 'light-dark(var(--color-green-600), var(--color-green-400))'
-        } as React.CSSProperties
+        style: successToast as React.CSSProperties
       });
       router.navigate({ to: '/login' });
     },
     onError: (error: ApiError) => {
       toast.error('Terjadi kesalahan server. Harap menunggu beberapa saat', {
         position: 'top-center',
-        style: {
-          '--normal-bg': 'color-mix(in oklab, var(--destructive) 10%, var(--background))',
-          '--normal-text': 'var(--destructive)',
-          '--normal-border': 'var(--destructive)'
-        } as React.CSSProperties
+        style: errorToast as React.CSSProperties
       });
       console.log(error);
     }
@@ -82,7 +75,7 @@ const Navbar = ({ role_id }: Props) => {
                        hover:bg-blue-50 hover:text-blue-600 transition-all
                        [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
           >
-            <ShieldCheck className="w-4 h-4" />
+            <UserStar className="w-4 h-4" />
             Admin
           </Link>
         )}

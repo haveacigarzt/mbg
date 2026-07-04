@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { errorToast, successToast } from '@/lib/constants';
 import { getKelurahanQueryOptions, updateSPPGMutationOptions } from '@/queryOptions/sppg';
 import { sppgSchema } from '@/schema/formValidation';
 import type { Distrik, PostSPPG, SPPG } from '@/types/sppg';
@@ -60,22 +61,14 @@ export function DialogEditSPPG({ data, kecamatan, kelurahan, onSPPGUpdate }: Pro
     ...updateSPPGMutationOptions(),
     onSuccess: () => {
       toast.success('Berhasil memperbarui data SPPG.', {
-        style: {
-          '--normal-bg': 'color-mix(in oklab, light-dark(var(--color-green-600), var(--color-green-400)) 10%, var(--background))',
-          '--normal-text': 'light-dark(var(--color-green-600), var(--color-green-400))',
-          '--normal-border': 'light-dark(var(--color-green-600), var(--color-green-400))'
-        } as React.CSSProperties
+        style: successToast as React.CSSProperties
       });
       onSPPGUpdate?.();
       setOpen(false);
     },
     onError: (error: ApiError) => {
       toast.error('Gagal memperbarui data SPPG.', {
-        style: {
-          '--normal-bg': 'color-mix(in oklab, light-dark(var(--color-red-600), var(--color-red-400)) 10%, var(--background))',
-          '--normal-text': 'light-dark(var(--color-red-600), var(--color-red-400))',
-          '--normal-border': 'light-dark(var(--color-red-400), var(--color-red-400))'
-        } as React.CSSProperties
+        style: errorToast as React.CSSProperties
       });
       console.log('ERROR:', error);
     }
@@ -90,11 +83,7 @@ export function DialogEditSPPG({ data, kecamatan, kelurahan, onSPPGUpdate }: Pro
 
       if (firstError) {
         toast.error(firstError, {
-          style: {
-            '--normal-bg': 'color-mix(in oklab, light-dark(var(--color-red-600), var(--color-red-400)) 10%, var(--background))',
-            '--normal-text': 'light-dark(var(--color-red-600), var(--color-red-400))',
-            '--normal-border': 'light-dark(var(--color-red-400), var(--color-red-400))'
-          } as React.CSSProperties
+          style: errorToast as React.CSSProperties
         });
       }
       return;

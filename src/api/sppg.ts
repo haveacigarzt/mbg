@@ -1,4 +1,4 @@
-import { apiFetch } from './client';
+import { ApiError, apiFetch } from './client';
 import type {
   CreateAlokasiHarianInput,
   CreatePengeluaranHarianInput,
@@ -16,6 +16,7 @@ import type {
   GetSPPGParams,
   PostSPPG
 } from '../types/sppg';
+import type { CreateSPPGByInvitationRequest } from '@/types/sppg_invitations';
 
 export async function getSPPG(params?: GetSPPGParams) {
   const searchParams = new URLSearchParams();
@@ -62,6 +63,9 @@ export async function getKecamatan() {
 }
 
 export async function getKelurahan(kecamatan_id: number) {
+  if (kecamatan_id == 0) {
+    return [];
+  }
   const response = await apiFetch(`/v1/kelurahan/${kecamatan_id}`);
 
   if (!response.ok) {
@@ -176,4 +180,17 @@ export async function getKeuanganHarian(tanggal: string) {
   }
   const data: FetchKeuanganHarianResponse = await response.json();
   return data.keuangan_harian;
+}
+
+// 26/06/2026
+export async function createSPPGByInvitation(input: CreateSPPGByInvitationRequest, token: string) {
+  const response = await apiFetch(`/v1/register/${token}`, {
+    method: 'POST',
+    body: JSON.stringify(input)
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new ApiError(data?.message || data?.error || 'Create sppg gagal', response.status, data);
+  }
+  // return data.keuangan_harian;
 }

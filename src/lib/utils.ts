@@ -13,6 +13,21 @@ export function formatTanggalIndonesia(tanggal: string | Date): string {
   }).format(new Date(tanggal));
 }
 
+export function formatTanggal2Indonesia(datetime: string): string {
+  const bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+  const date = new Date(datetime.replace(' ', 'T'));
+
+  const tanggal = date.getDate();
+  const namaBulan = bulan[date.getMonth()];
+  const tahun = date.getFullYear();
+
+  const jam = String(date.getHours()).padStart(2, '0');
+  const menit = String(date.getMinutes()).padStart(2, '0');
+
+  return `${tanggal} ${namaBulan} ${tahun} ${jam}:${menit} WIB`;
+}
+
 export function formatRupiah(value: number): string {
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',

@@ -13,6 +13,17 @@ export function formatTanggalIndonesia(tanggal: string | Date): string {
   }).format(new Date(tanggal));
 }
 
+export function hasPassed(datetime: string): boolean {
+  const date = new Date(datetime);
+
+  // Invalid date
+  if (isNaN(date.getTime())) {
+    throw new Error('Invalid datetime');
+  }
+
+  return Date.now() > date.getTime();
+}
+
 export function formatTanggal2Indonesia(datetime: string): string {
   const bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 

@@ -194,3 +194,13 @@ export async function createSPPGByInvitation(input: CreateSPPGByInvitationReques
   }
   // return data.keuangan_harian;
 }
+export async function deleteSPPGInvitation(token: string) {
+  const response = await apiFetch(`/v1/invitation/${token}`, {
+    method: 'DELETE'
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new ApiError(data?.message || data?.error || 'Delete sppg invitasi gagal', response.status, data);
+  }
+  // return data.keuangan_harian;
+}

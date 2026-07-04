@@ -1,8 +1,8 @@
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown, EllipsisVertical, Trash, Send } from 'lucide-react';
-import { formatTanggal2Indonesia } from '@/lib/utils';
+import { formatTanggal2Indonesia, formatTanggalIndonesia, hasPassed } from '@/lib/utils';
 import { toast } from 'sonner';
 import { errorToast, successToast } from '@/lib/constants';
 import type { ApiError } from '@/api/client';
@@ -10,6 +10,8 @@ import { deletePengeluaranMutationOptions } from '@/queryOptions/sppg';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { FetchSPPGInvitationsResponse, SPPGInvitation } from '@/types/sppg_invitations';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { deleteSPPGInvitationQueryOptions } from '@/queryOptions/sppg_invitations';
 
 interface Props {
   data: NoInfer<FetchSPPGInvitationsResponse> | undefined;
@@ -68,26 +70,117 @@ const InvitationsTable = ({ data, page, setPage }: Props) => {
       id: 'aksi',
       header: 'Aksi',
       enableSorting: false,
-      cell: () => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              <EllipsisVertical />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>
-              <Send />
-              Kirim Ulang
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive">
-              <Trash />
-              Hapus
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
+      cell: (info) => {
+        const { token, nama_sppg: namaSPPG, expires_at, id } = info.row.original;
+        const linkPendaftaran = `https://192.168.1.10:5173/register/${token}`;
+        const pesan = `🏢 *UNDANGAN PENGELOLA SPPG - MBG*
+
+        Halo,
+
+        Anda diundang untuk bergabung sebagai *Pengelola ${namaSPPG || '...'}* pada Sistem MBG.
+
+        📝 *Daftar melalui:*
+        *${linkPendaftaran}*
+
+        Tautan undangan ini berlaku hingga ${formatTanggalIndonesia(expires_at.Time)}.
+
+        ⏳ Setelah mendaftar, akun Anda akan menunggu persetujuan dari administrator sebelum dapat digunakan.
+
+        Terima kasih.
+
+        *Tim MBG*`;
+        const plain = `
+  🏢 UNDANGAN PENGELOLA SPPG - MBG
+
+      Halo,
+
+      Anda diundang untuk bergabung sebagai Pengelola SPPG ${namaSPPG || '...'} pada Sistem MBG.
+
+      📝 Daftar melalui:
+      ${linkPendaftaran}
+
+      Tautan undangan ini berlaku hingga ${formatTanggalIndonesia(expires_at.Time)}.
+
+      ⏳ Setelah mendaftar, akun Anda akan menunggu persetujuan dari administrator sebelum dapat digunakan.
+
+      Terima kasih.
+
+      Tim MBG  
+    `;
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <EllipsisVertical />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {!hasPassed(expires_at.Time) && (
+                <>
+                  <Dialog>
+                    <DialogTrigger>
+                      <Button variant="ghost">
+                        <Send />
+                        Kirim Ulang
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-lg">
+                      <DialogHeader>
+                        <DialogTitle className="text-base">Invite User SPPG</DialogTitle>
+                        <DialogDescription>Kirim pesan berikut kepada calon pengelola SPPG untuk melakukan pendaftaran.</DialogDescription>
+                      </DialogHeader>
+                      <div className="rounded-xl border bg-muted/40 p-4 text-sm whitespace-pre-wrap">
+                        <div className="space-y-4 text-sm">
+                          <h3 className="font-semibold text-base">🏢 UNDANGAN PENGELOLA SPPG - MBG</h3>
+                          <p>Halo,</p>
+                          <p>
+                            Anda diundang untuk bergabung sebagai <strong>Pengelola {namaSPPG || '...'}</strong> pada Sistem MBG.
+                          </p>
+                          <p className="mb-0">📝 Daftar melalui:</p>
+                          <p>
+                            <a href={linkPendaftaran} className="font-semibold underline text-blue-600">
+                              {linkPendaftaran}
+                            </a>
+                          </p>
+                          <p>Tautan undangan ini berlaku hingga {formatTanggalIndonesia(expires_at.Time)}.</p>
+                          <p>⏳ Setelah mendaftar, akun Anda akan menunggu persetujuan dari administrator sebelum dapat digunakan.</p>
+                          <p className="font-medium">Tim MBG</p>
+                        </div>
+                      </div>
+                      <DialogFooter className="flex justify-between">
+                        <Button
+                          className="flex items-center gap-2 bg-blue-50 hover:bg-blue-100 disabled:bg-blue-50 text-blue-700 disabled:text-blue-300 text-sm font-semibold p-3 rounded-xl transition-colors"
+                          onClick={async () => {
+                            await copyToClipboard(plain);
+
+                            toast.success('Undangan berhasil disalin');
+                          }}
+                        >
+                          Salin Undangan
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            window.open(`https://wa.me?text=${encodeURIComponent(pesan)}`, '_blank');
+                          }}
+                          className=" bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white text-sm font-semibold rounded-xl transition-colors px-3"
+                        >
+                          Kirim via WhatsApp
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                  <DropdownMenuSeparator />
+                </>
+              )}
+
+              <DropdownMenuItem variant="destructive" onClick={() => handleDelete(token)}>
+                <Trash />
+                Hapus
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      }
     })
   ];
   const table = useReactTable({
@@ -98,24 +191,44 @@ const InvitationsTable = ({ data, page, setPage }: Props) => {
     manualSorting: true,
     getCoreRowModel: getCoreRowModel()
   });
+  const queryClient = useQueryClient();
   const mutation = useMutation({
-    ...deletePengeluaranMutationOptions(),
+    ...deleteSPPGInvitationQueryOptions(),
     onSuccess: () => {
-      toast.success('Berhasil menghapus pengeluaran harian.', {
+      toast.success('Berhasil menghapus invitasi.', {
         style: successToast as React.CSSProperties
       });
-      // onDelete();
+      queryClient.invalidateQueries({ queryKey: ['invitations'] });
     },
     onError: (error: ApiError) => {
-      toast.error('Gagal menghapus pengeluaran harian.', {
+      toast.error('Gagal menghapus invitasi.', {
         style: errorToast as React.CSSProperties
       });
       console.log('ERROR:', error);
     }
   });
-  const handleDelete = async (id: number) => {
-    console.log('deleting', id);
-    // await mutation.mutateAsync({ sppg_id, id });
+  const handleDelete = async (token: string) => {
+    console.log('deleting', token);
+    await mutation.mutateAsync({ token });
+  };
+  const copyToClipboard = async (text: string) => {
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+
+    document.execCommand('copy');
+
+    document.body.removeChild(textarea);
   };
   return (
     <div className="flex flex-col gap-4">

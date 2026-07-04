@@ -1,4 +1,4 @@
-import { createSPPGByInvitation } from '@/api/sppg';
+import { createSPPGByInvitation, deleteSPPGInvitation } from '@/api/sppg';
 import { createSPPGInvitations, getSPPGInvitation, getSPPGInvitations } from '@/api/sppg_invitations';
 import type { CreateSPPGByInvitationRequest, CreateSPPGInvitationsInput, GetSPPGInvitationParams } from '@/types/sppg_invitations';
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
@@ -22,6 +22,12 @@ export function getSPPGInvitationQueryOptions(token: string) {
     queryKey: ['invitation', token],
     queryFn: () => getSPPGInvitation(token),
     refetchOnWindowFocus: false
+  });
+}
+
+export function deleteSPPGInvitationQueryOptions() {
+  return mutationOptions({
+    mutationFn: ({ token }: { token: string }) => deleteSPPGInvitation(token)
   });
 }
 

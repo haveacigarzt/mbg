@@ -139,21 +139,21 @@ const Admin = () => {
   const plain = `
   🏢 UNDANGAN PENGELOLA SPPG - MBG
 
-Halo,
+      Halo,
 
-Anda diundang untuk bergabung sebagai Pengelola SPPG ${namaSPPG || '...'} pada Sistem MBG.
+      Anda diundang untuk bergabung sebagai Pengelola SPPG ${namaSPPG || '...'} pada Sistem MBG.
 
-📝 Daftar melalui:
-${linkPendaftaran}
+      📝 Daftar melalui:
+      ${linkPendaftaran}
 
-Tautan undangan ini berlaku hingga ${validThru}.
+      Tautan undangan ini berlaku hingga ${validThru}.
 
-⏳ Setelah mendaftar, akun Anda akan menunggu persetujuan dari administrator sebelum dapat digunakan.
+      ⏳ Setelah mendaftar, akun Anda akan menunggu persetujuan dari administrator sebelum dapat digunakan.
 
-Terima kasih.
+      Terima kasih.
 
-Tim MBG  
-  `;
+      Tim MBG  
+    `;
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Navbar role_id={1} />

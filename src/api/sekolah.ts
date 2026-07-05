@@ -1,9 +1,6 @@
-import { apiFetch } from "./client";
-import type {
-  FetchSekolahResponse,
-  GetSekolahParams,
-  PostSekolah,
-} from "../types/sekolah";
+import { apiFetch } from './client';
+import type { FetchSekolahResponse, GetSekolahParams, PostSekolah } from '../types/sekolah';
+import { redirect } from '@tanstack/react-router';
 
 export async function getSekolah(params?: GetSekolahParams) {
   const searchParams = new URLSearchParams();
@@ -15,9 +12,13 @@ export async function getSekolah(params?: GetSekolahParams) {
   });
 
   const response = await apiFetch(`/v1/sekolah?${searchParams.toString()}`);
+  if (response.status === 401) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('token_expiry');
+  }
 
   if (!response.ok) {
-    throw new Error("gagal mengambil sekolah");
+    throw new Error('gagal mengambil sekolah');
   }
 
   const data: FetchSekolahResponse = await response.json();
@@ -27,12 +28,12 @@ export async function getSekolah(params?: GetSekolahParams) {
 
 export async function updateSekolah(sekolah_id: number, input: PostSekolah) {
   const response = await apiFetch(`/v1/sekolah/${sekolah_id}`, {
-    method: "PATCH",
-    body: JSON.stringify(input),
+    method: 'PATCH',
+    body: JSON.stringify(input)
   });
 
   if (!response.ok) {
-    throw new Error("gagal update sekolah");
+    throw new Error('gagal update sekolah');
   }
 
   const data: FetchSekolahResponse = await response.json();
@@ -42,12 +43,12 @@ export async function updateSekolah(sekolah_id: number, input: PostSekolah) {
 
 export async function createSekolah(input: PostSekolah) {
   const response = await apiFetch(`/v1/sekolah`, {
-    method: "POST",
-    body: JSON.stringify(input),
+    method: 'POST',
+    body: JSON.stringify(input)
   });
 
   if (!response.ok) {
-    throw new Error("gagal create sekolah");
+    throw new Error('gagal create sekolah');
   }
 
   const data: FetchSekolahResponse = await response.json();
@@ -57,11 +58,11 @@ export async function createSekolah(input: PostSekolah) {
 
 export async function deleteSekolah(sekolah_id: number) {
   const response = await apiFetch(`/v1/sekolah/${sekolah_id}`, {
-    method: "DELETE",
+    method: 'DELETE'
   });
 
   if (!response.ok) {
-    throw new Error("gagal menghapus sekolah");
+    throw new Error('gagal menghapus sekolah');
   }
 
   const data: FetchSekolahResponse = await response.json();

@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 export const Route = createFileRoute('/admin')({
   beforeLoad: async () => {
     const { user } = await requireAuth();
+    console.log(user);
     if (user.role.role_id !== 1) {
       toast.error('Access denied', {
         style: {

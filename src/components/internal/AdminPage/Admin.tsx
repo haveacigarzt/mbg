@@ -37,14 +37,14 @@ const Admin = () => {
       sort
     })
   );
-  console.log(akun);
+  // console.log(akun);
   const { data: summary, isFetching: isFetchingSummary } = useQuery(getUsersSummaryQueryOptions());
   const [page_invitations, setPageInvitations] = useState(1);
   const page_size_invitations = 10;
   const [sorting_invitations] = useState<SortingState>([]);
   const sort_invitations = sorting_invitations[0] ? `${sorting_invitations[0].desc ? '-' : ''}${sorting_invitations[0].id}` : '';
   const { data: invitations, isFetching: isFetchingInvitations } = useQuery(getSPPGInvitationsQueryOptions({ page: page_invitations, page_size: page_size_invitations }));
-  console.log(invitations);
+  // console.log(invitations);
   const [isUndangan, setIsUndangan] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [namaSPPGBefore, setNamaSPPGBefore] = useState('');

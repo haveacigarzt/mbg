@@ -50,51 +50,64 @@ const Driver = ({ user }: Props) => {
 
   return (
     <WebSocketProvider room_id={`sppg/${String(driver.driver.sppg.id)}`}>
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex min-h-screen bg-slate-50">
         <Navbar role_id={4} />
+
         {/* Wrapper */}
-        <div className="ml-[15%] flex-1 p-6 flex flex-col gap-6">
+        <div className="ml-[15%] flex-1 p-8 flex flex-col gap-8">
+          {/* Page Header */}
           <div>
-            <h1 className="text-xl font-black text-gray-800">Halaman Driver</h1>
-            <p className="text-xs text-gray-400 tracking-widest mt-1">MANAJEMEN DATA SATUAN PELAYANAN PEMENUHAN GIZI</p>
+            <h1 className="text-2xl font-black text-slate-800">Halaman Driver</h1>
+            <p className="text-xs text-slate-500 font-semibold tracking-widest mt-1 uppercase">Manajemen Data Satuan Pelayanan Pemenuhan Gizi</p>
           </div>
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden p-6">
-            {/* Header */}
-            <div className="flex gap-3">
-              <div className="rounded-xl bg-blue-50 p-2 h-[50%]">
-                <ChefHat className="w-5 h-5 text-blue-500" />
+
+          {/* Section 1: SPPG & Tracking Map */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col xl:flex-row gap-8">
+            {/* SPPG Info */}
+            <div className="xl:w-1/3 flex gap-4 xl:border-r border-slate-100 pr-4">
+              <div className="rounded-xl bg-blue-50 p-3 h-fit border border-blue-100">
+                <ChefHat className="w-6 h-6 text-blue-600" />
               </div>
-              <div>
-                <b>Data SPPG</b>
-                <p>{driver.driver.sppg.nama}</p>
-                <p>{driver.driver.sppg.alamat}</p>
-              </div>
-              <div className="flex-1">
-                <TrackingDriver pengiriman={pengirimanAktif} refetchAll={refetchAll} sppg_id={driver.driver.sppg.id} />
+              <div className="flex flex-col">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Data SPPG</span>
+                <h2 className="text-lg font-bold text-slate-800">{driver.driver.sppg.nama}</h2>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">{driver.driver.sppg.alamat}</p>
               </div>
             </div>
-            <div className="bg-white mt-6">
-              <div className="flex gap-3">
-                <div className="rounded-xl bg-blue-50 p-2 ">
-                  <Truck className="w-5 h-5 text-blue-500"></Truck>
-                </div>
-                <b className="mt-1">Pengiriman Hari Ini</b>
+
+            {/* Tracking Driver Map */}
+            <div className="flex-1">
+              <TrackingDriver pengiriman={pengirimanAktif} refetchAll={refetchAll} sppg_id={driver.driver.sppg.id} />
+            </div>
+          </div>
+
+          {/* Section 2: Tabel Pengiriman */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            {/* Card Header */}
+            <div className="flex items-center gap-4 mb-6 pb-4 border-b border-slate-100">
+              <div className="rounded-xl bg-blue-50 p-3 border border-blue-100">
+                <Truck className="w-6 h-6 text-blue-600" />
               </div>
-              {/* Tabel */}
-              <div className="mt-6">
-                <PengirimanTableDriver
-                  pengiriman={pengiriman}
-                  refetchAll={refetchAll}
-                  setPage={setPage}
-                  searchPengiriman={searchPengiriman}
-                  sorting={sorting}
-                  setSorting={setSorting}
-                  setTanggal={setTanggal}
-                  setSearchPengiriman={setSearchPengiriman}
-                  metadata={metadata}
-                  page={page}
-                />
+              <div>
+                <h2 className="text-lg font-bold text-slate-800">Pengiriman Hari Ini</h2>
+                <p className="text-sm text-slate-500">Daftar jadwal rute pengiriman</p>
               </div>
+            </div>
+
+            {/* Data Table */}
+            <div className="mt-2">
+              <PengirimanTableDriver
+                pengiriman={pengiriman}
+                refetchAll={refetchAll}
+                setPage={setPage}
+                searchPengiriman={searchPengiriman}
+                sorting={sorting}
+                setSorting={setSorting}
+                setTanggal={setTanggal}
+                setSearchPengiriman={setSearchPengiriman}
+                metadata={metadata}
+                page={page}
+              />
             </div>
           </div>
         </div>

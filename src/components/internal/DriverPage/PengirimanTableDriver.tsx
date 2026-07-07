@@ -154,7 +154,9 @@ const PengirimanTableDriver = ({ pengiriman, setPage, searchPengiriman, sorting,
                 ))}
                 <td>
                   <DialogAntarPengiriman refetchAll={refetchAll} id={row.original.id} nama={row.original.tujuan_nama}>
-                    <Button disabled={row.original.status !== 'menunggu'}>Ambil</Button>
+                    <Button disabled={row.original.status !== 'menunggu'} className="rounded-xl bg-blue-500 hover:bg-blue-700">
+                      Ambil
+                    </Button>
                   </DialogAntarPengiriman>
                 </td>
               </tr>

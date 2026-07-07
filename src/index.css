@@ -5,6 +5,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+.leaflet-routing-container {
+  display: none !important;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;

@@ -32,6 +32,10 @@ export async function updateSekolah(sekolah_id: number, input: PostSekolah) {
     body: JSON.stringify(input)
   });
 
+  if (response.status === 401) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('token_expiry');
+  }
   if (!response.ok) {
     throw new Error('gagal update sekolah');
   }
@@ -46,6 +50,10 @@ export async function createSekolah(input: PostSekolah) {
     method: 'POST',
     body: JSON.stringify(input)
   });
+  if (response.status === 401) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('token_expiry');
+  }
 
   if (!response.ok) {
     throw new Error('gagal create sekolah');
@@ -60,6 +68,10 @@ export async function deleteSekolah(sekolah_id: number) {
   const response = await apiFetch(`/v1/sekolah/${sekolah_id}`, {
     method: 'DELETE'
   });
+  if (response.status === 401) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('token_expiry');
+  }
 
   if (!response.ok) {
     throw new Error('gagal menghapus sekolah');

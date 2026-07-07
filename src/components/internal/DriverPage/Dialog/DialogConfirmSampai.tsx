@@ -6,6 +6,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { antarPengirimanMutationOptions, updatePengirimanMutationOptions } from '@/queryOptions/pengiriman';
+import { errorToast, successToast } from '@/lib/constants';
 
 interface Props {
   children: React.ReactNode;
@@ -20,11 +21,7 @@ const DialogConfirmSampai = ({ children, refetchAll, id, nama }: Props) => {
     ...updatePengirimanMutationOptions(),
     onSuccess: () => {
       toast.success(`Berhasil update status pengiriman ke ${nama}`, {
-        style: {
-          '--normal-bg': 'color-mix(in oklab, light-dark(var(--color-green-600), var(--color-green-400)) 10%, var(--background))',
-          '--normal-text': 'light-dark(var(--color-green-600), var(--color-green-400))',
-          '--normal-border': 'light-dark(var(--color-green-600), var(--color-green-400))'
-        } as React.CSSProperties
+        style: successToast as React.CSSProperties
       });
       refetchAll();
       setOpen(false);
@@ -32,11 +29,7 @@ const DialogConfirmSampai = ({ children, refetchAll, id, nama }: Props) => {
     onError: (error: ApiError) => {
       toast.error(`Gagal update status pengiriman ke ${nama}. ${error.message}`, {
         position: 'top-center',
-        style: {
-          '--normal-bg': 'color-mix(in oklab, var(--destructive) 10%, var(--background))',
-          '--normal-text': 'var(--destructive)',
-          '--normal-border': 'var(--destructive)'
-        } as React.CSSProperties
+        style: errorToast as React.CSSProperties
       });
       setOpen(false);
     }

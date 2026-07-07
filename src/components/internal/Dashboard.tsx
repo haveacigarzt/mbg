@@ -25,40 +25,8 @@ const Dashboard = ({ role_id }: Props) => {
   const pengirimanIds = useMemo(() => [...new Set(pengiriman.pengiriman.map((item) => item.id))], [pengiriman.pengiriman]);
 
   const { data: tracking } = useQuery(getTrackingQueryOptions(pengirimanIds));
-  const { lastMessage } = useWebSocket();
 
-  // useEffect(() => {
-  //   if (!lastMessage) return;
-  //   if (lastMessage.type === 'pengiriman:update') {
-  //     queryClient.invalidateQueries({ queryKey: ['pengiriman'] });
-  //     if (lastMessage.status !== 'berangkat') {
-  //       queryClient.setQueriesData({ queryKey: ['tracking'] }, (old: any) => {
-  //         if (!old?.tracking) return old;
-  //         const exists = old.tracking.some((t: any) => t.pengiriman_id === lastMessage.data.pengiriman_id);
-  //         if (exists) {
-  //           return { ...old, tracking: old.tracking.filter((e: any) => e.pengiriman_id !== lastMessage.data.pengiriman_id) };
-  //         }
-  //         return { ...old };
-  //       });
-  //     }
-  //   }
-  //   if (lastMessage.type === 'tracking:created') {
-  //     queryClient.setQueriesData({ queryKey: ['tracking'] }, (old: any) => {
-  //       if (!old?.tracking) return old;
-  //       const exists = old.tracking.some((t: any) => t.pengiriman_id === lastMessage.data.pengiriman_id);
-  //       if (exists) {
-  //         return { ...old, tracking: old.tracking.map((t: any) => (t.pengiriman_id === lastMessage.data.pengiriman_id ? lastMessage.data : t)) };
-  //       }
-  //       return { ...old, tracking: [lastMessage.data, ...old.tracking] };
-  //     });
-  //   }
-  //   if (lastMessage.type === 'keuangan:updated') {
-  //     console.log(lastMessage.data);
-  //     queryClient.setQueriesData({ queryKey: ['keuangan_harian'] }, (old: any) => {
-  //       return lastMessage.data;
-  //     });
-  //   }
-  // }, [lastMessage]);
+  const { lastMessage } = useWebSocket();
   const queryClient = useQueryClient();
 
   function handleWSMessage(message: any, queryClient: any) {
@@ -157,7 +125,6 @@ const Dashboard = ({ role_id }: Props) => {
   // Keuangan dan Produksi Realtime
   const today = getTodaysDate();
   const { data: keuanganHarian } = useSuspenseQuery(getKeuanganHarianQueryOptions(today));
-  console.log(keuanganHarian);
   const { data: produksiHarian } = useSuspenseQuery(getAllProduksiHarianQueryOptions(today));
 
   return (

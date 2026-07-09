@@ -39,7 +39,7 @@ const DashboardMap = ({ tracking }: Props) => {
 
   // State dan ref overlay
   const [showOverlay, setShowOverlay] = useState(false);
-  const overlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const overlayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const handleRequireCtrl = useCallback(() => {
     setShowOverlay(true);
     if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
@@ -54,35 +54,33 @@ const DashboardMap = ({ tracking }: Props) => {
   }, []);
 
   return (
-    <div>
-      <div style={{ height: 'calc(100vh - 280px)', width: '100%', position: 'relative' }}>
-        {/* Overlay Alert */}
-        <div className={`absolute inset-0 z-[9999] pointer-events-none flex items-center justify-center bg-black/40 transition-opacity duration-300 ${showOverlay ? 'opacity-100' : 'opacity-0'}`}>
-          <span className="text-white text-2xl font-semibold tracking-wide text-center px-4">Use ctrl + scroll to zoom the map</span>
-        </div>
-
-        <MapContainer center={[0.12174351770078276, 110.59555590575488]} zoom={15} style={{ height: '100%', width: '100%' }} scrollWheelZoom={false}>
-          {/*Passing fungsi trigger alert ke komponen CtrlScrollZoom */}
-          <CtrlScrollZoom onRequireCtrl={handleRequireCtrl} />
-
-          <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
-          {tracking?.map((el) => (
-            /* 2. OPTIMASI: Fragment eksternal dihapus, key diletakkan di Fragment utama yang membungkus semua elemen anak. */
-            <Fragment key={el.pengiriman_id}>
-              <AnimatedMarker color={colors[el.pengiriman_id % colors.length]} tracking={el} />
-
-              <Marker position={[el.tujuan_lat, el.tujuan_lng]}>
-                <Tooltip permanent direction="top" offset={[-15, -13]}>
-                  {el.tujuan_nama}
-                </Tooltip>
-              </Marker>
-
-              <RoutingMachine currLat={el.latitude} currLng={el.longitude} tujuanLat={el.tujuan_lat} tujuanLng={el.tujuan_lng} />
-            </Fragment>
-          ))}
-        </MapContainer>
+    <div style={{ height: '100%', width: '100%', position: 'relative' }}>
+      {/* Overlay Alert */}
+      <div className={`absolute inset-0 z-[9999] pointer-events-none flex items-center justify-center bg-black/40 transition-opacity duration-300 ${showOverlay ? 'opacity-100' : 'opacity-0'}`}>
+        <span className="text-white text-2xl font-semibold tracking-wide text-center px-4">Use ctrl + scroll to zoom the map</span>
       </div>
+
+      <MapContainer center={[0.12174351770078276, 110.59555590575488]} zoom={15} style={{ height: '100%', width: '100%' }} scrollWheelZoom={false}>
+        {/*Passing fungsi trigger alert ke komponen CtrlScrollZoom */}
+        <CtrlScrollZoom onRequireCtrl={handleRequireCtrl} />
+
+        <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+
+        {tracking?.map((el) => (
+          /* 2. OPTIMASI: Fragment eksternal dihapus, key diletakkan di Fragment utama yang membungkus semua elemen anak. */
+          <Fragment key={el.pengiriman_id}>
+            <AnimatedMarker color={colors[el.pengiriman_id % colors.length]} tracking={el} />
+
+            <Marker position={[el.tujuan_lat, el.tujuan_lng]}>
+              <Tooltip permanent direction="top" offset={[-15, -13]}>
+                {el.tujuan_nama}
+              </Tooltip>
+            </Marker>
+
+            <RoutingMachine currLat={el.latitude} currLng={el.longitude} tujuanLat={el.tujuan_lat} tujuanLng={el.tujuan_lng} />
+          </Fragment>
+        ))}
+      </MapContainer>
     </div>
   );
 };

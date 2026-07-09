@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PedaganglokalRouteImport } from './routes/pedaganglokal'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DriverRouteImport } from './routes/driver'
 import { Route as DataRouteImport } from './routes/data'
@@ -23,6 +24,11 @@ import { Route as SppgPengirimanRouteImport } from './routes/sppg/pengiriman'
 import { Route as SppgKeuanganRouteImport } from './routes/sppg/keuangan'
 import { Route as RegisterTokenRouteImport } from './routes/register/$token'
 
+const PedaganglokalRoute = PedaganglokalRouteImport.update({
+  id: '/pedaganglokal',
+  path: '/pedaganglokal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -97,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/data': typeof DataRoute
   '/driver': typeof DriverRoute
   '/login': typeof LoginRoute
+  '/pedaganglokal': typeof PedaganglokalRoute
   '/register/$token': typeof RegisterTokenRoute
   '/sppg/keuangan': typeof SppgKeuanganRoute
   '/sppg/pengiriman': typeof SppgPengirimanRoute
@@ -112,6 +119,7 @@ export interface FileRoutesByTo {
   '/data': typeof DataRoute
   '/driver': typeof DriverRoute
   '/login': typeof LoginRoute
+  '/pedaganglokal': typeof PedaganglokalRoute
   '/register/$token': typeof RegisterTokenRoute
   '/sppg/keuangan': typeof SppgKeuanganRoute
   '/sppg/pengiriman': typeof SppgPengirimanRoute
@@ -128,6 +136,7 @@ export interface FileRoutesById {
   '/data': typeof DataRoute
   '/driver': typeof DriverRoute
   '/login': typeof LoginRoute
+  '/pedaganglokal': typeof PedaganglokalRoute
   '/register/$token': typeof RegisterTokenRoute
   '/sppg/keuangan': typeof SppgKeuanganRoute
   '/sppg/pengiriman': typeof SppgPengirimanRoute
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
     | '/data'
     | '/driver'
     | '/login'
+    | '/pedaganglokal'
     | '/register/$token'
     | '/sppg/keuangan'
     | '/sppg/pengiriman'
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
     | '/data'
     | '/driver'
     | '/login'
+    | '/pedaganglokal'
     | '/register/$token'
     | '/sppg/keuangan'
     | '/sppg/pengiriman'
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '/data'
     | '/driver'
     | '/login'
+    | '/pedaganglokal'
     | '/register/$token'
     | '/sppg/keuangan'
     | '/sppg/pengiriman'
@@ -191,6 +203,7 @@ export interface RootRouteChildren {
   DataRoute: typeof DataRoute
   DriverRoute: typeof DriverRoute
   LoginRoute: typeof LoginRoute
+  PedaganglokalRoute: typeof PedaganglokalRoute
   RegisterTokenRoute: typeof RegisterTokenRoute
   SppgKeuanganRoute: typeof SppgKeuanganRoute
   SppgPengirimanRoute: typeof SppgPengirimanRoute
@@ -201,6 +214,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/pedaganglokal': {
+      id: '/pedaganglokal'
+      path: '/pedaganglokal'
+      fullPath: '/pedaganglokal'
+      preLoaderRoute: typeof PedaganglokalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -303,6 +323,7 @@ const rootRouteChildren: RootRouteChildren = {
   DataRoute: DataRoute,
   DriverRoute: DriverRoute,
   LoginRoute: LoginRoute,
+  PedaganglokalRoute: PedaganglokalRoute,
   RegisterTokenRoute: RegisterTokenRoute,
   SppgKeuanganRoute: SppgKeuanganRoute,
   SppgPengirimanRoute: SppgPengirimanRoute,

@@ -8,7 +8,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useWebSocket } from '@/contexts/websocket-context';
 import { getTrackingQueryOptions } from '@/queryOptions/tracking';
 import Navbar from './Navbar';
-import { Truck, Wallet, CheckCircle2, ChefHat, Users } from 'lucide-react';
+import { Truck, Wallet, CheckCircle2, ChefHat, Users, ArrowRight } from 'lucide-react';
 import { getTodaysDate } from '@/lib/utils';
 
 interface Props {
@@ -181,7 +181,10 @@ const Dashboard = ({ role_id }: Props) => {
                       <p className="text-xs font-bold text-gray-700">{el.sppg_nama}</p>
                     </div>
                     <p className="text-xs text-gray-400 pl-4">Driver: {el.driver_nama}</p>
-                    <p className="text-xs text-gray-400 pl-4">→ {el.tujuan_nama}</p>
+                    <div className="flex items-center gap-1 text-xs text-gray-400 pl-4 ">
+                      <ArrowRight size={15} />
+                      {el.tujuan_nama}
+                    </div>
                   </div>
                 ))
               )}

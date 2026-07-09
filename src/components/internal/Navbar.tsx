@@ -3,7 +3,7 @@ import { deleteAuthTokenMutationOptions } from '@/queryOptions/auth';
 import { useMutation } from '@tanstack/react-query';
 import { Link, useRouter } from '@tanstack/react-router';
 import { toast } from 'sonner';
-import { LayoutDashboard, Building2, Truck, LogOut, UserStar } from 'lucide-react';
+import { LayoutDashboard, Building2, Truck, LogOut, UserStar, Store } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { errorToast, successToast } from '@/lib/constants';
 
@@ -81,52 +81,63 @@ const Navbar = ({ role_id }: Props) => {
         )}
 
         {role_id === 3 && (
-          <Accordion type="single" collapsible defaultValue="item-1">
-            <AccordionItem value="item-1" className="max-h-125">
-              <AccordionTrigger
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500
-                       hover:bg-blue-50 hover:text-blue-600 transition-all
-                       [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
-              >
-                <Building2 className="w-4 h-4" />
-                SPPG
-              </AccordionTrigger>
-              <AccordionContent>
-                <Link
-                  to="/sppg/profil"
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500 ms-7
+          <>
+            <Accordion type="single" collapsible defaultValue="item-1">
+              <AccordionItem value="item-1" className="max-h-125">
+                <AccordionTrigger
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500
                        hover:bg-blue-50 hover:text-blue-600 transition-all
                        [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
                 >
-                  Profil
-                </Link>
-                <Link
-                  to="/sppg/keuangan"
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500 ms-7
+                  <Building2 className="w-4 h-4" />
+                  SPPG
+                </AccordionTrigger>
+                <AccordionContent>
+                  <Link
+                    to="/sppg/profil"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500 ms-7
                        hover:bg-blue-50 hover:text-blue-600 transition-all
                        [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
-                >
-                  Keuangan
-                </Link>
-                <Link
-                  to="/sppg/pengiriman"
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500 ms-7
+                  >
+                    Profil
+                  </Link>
+                  <Link
+                    to="/sppg/keuangan"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500 ms-7
                        hover:bg-blue-50 hover:text-blue-600 transition-all
                        [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
-                >
-                  Pengiriman
-                </Link>
-                <Link
-                  to="/sppg/produksi"
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500 ms-7
+                  >
+                    Keuangan
+                  </Link>
+                  <Link
+                    to="/sppg/pengiriman"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500 ms-7
                        hover:bg-blue-50 hover:text-blue-600 transition-all
                        [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
-                >
-                  Produksi
-                </Link>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+                  >
+                    Pengiriman
+                  </Link>
+                  <Link
+                    to="/sppg/produksi"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500 ms-7
+                       hover:bg-blue-50 hover:text-blue-600 transition-all
+                       [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
+                  >
+                    Produksi
+                  </Link>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+            <Link
+              to="/pedaganglokal"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500
+                       hover:bg-blue-50 hover:text-blue-600 transition-all
+                       [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
+            >
+              <Store className="w-4 h-4" />
+              Pedagang Lokal
+            </Link>
+          </>
         )}
       </div>
 

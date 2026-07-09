@@ -1,6 +1,7 @@
-import { CircleMarker, Tooltip } from "react-leaflet";
-import { useEffect, useRef, useState } from "react";
-import type { Tracking } from "@/types/tracking";
+import { CircleMarker, Tooltip } from 'react-leaflet';
+import { useEffect, useRef, useState } from 'react';
+import type { Tracking } from '@/types/tracking';
+import { ArrowRight } from 'lucide-react';
 
 interface Props {
   tracking: Tracking;
@@ -10,7 +11,7 @@ interface Props {
 export default function AnimatedMarker({ tracking, color }: Props) {
   const [position, setPosition] = useState({
     lat: tracking.latitude,
-    lng: tracking.longitude,
+    lng: tracking.longitude
   });
 
   const animationRef = useRef<number>(0);
@@ -32,7 +33,7 @@ export default function AnimatedMarker({ tracking, color }: Props) {
 
       setPosition({
         lat: startLat + (endLat - startLat) * progress,
-        lng: startLng + (endLng - startLng) * progress,
+        lng: startLng + (endLng - startLng) * progress
       });
 
       if (progress < 1) {
@@ -53,9 +54,9 @@ export default function AnimatedMarker({ tracking, color }: Props) {
         center={[position.lat, position.lng]}
         radius={14}
         pathOptions={{
-          color: "transparent",
+          color: 'transparent',
           fillColor: color,
-          fillOpacity: 0.4,
+          fillOpacity: 0.4
         }}
         className="pulse"
       />
@@ -66,12 +67,18 @@ export default function AnimatedMarker({ tracking, color }: Props) {
         pathOptions={{
           color,
           fillColor: color,
-          fillOpacity: 1,
+          fillOpacity: 1
         }}
       >
         <Tooltip permanent direction="top" offset={[1, -13]}>
-          {tracking.id}
-          <div>{tracking.sppg_nama}</div>({tracking.driver_nama})
+          {tracking.sppg_nama}
+          <br />
+          Driver: {tracking.driver_nama}
+          <br />
+          <div className="flex items-center gap-1">
+            <ArrowRight size={15} />
+            {tracking.tujuan_nama}
+          </div>
         </Tooltip>
       </CircleMarker>
     </>

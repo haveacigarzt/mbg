@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import Navbar from '../Navbar';
 import { createAlokasiMutationOptions, getAlokasiHarianQueryOptions, getPengeluaranHarianQueryOptions, getSPPGByIDQueryOptions } from '../../../queryOptions/sppg';
-import { Suspense, useState } from 'react';
+import { useState } from 'react';
 import type { AuthResponse } from '@/types/auth';
 import { HandCoins, ShoppingCart, Wallet, Plus, History, CalendarClock, SquarePen, Save, X, LoaderCircle } from 'lucide-react';
 import { WebSocketProvider } from '@/provider/websocket-provider';
@@ -14,13 +14,15 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { errorToast, successToast } from '@/lib/constants';
 import { alokasiSchema } from '@/schema/formValidation';
+import type { SortingState } from '@tanstack/react-table';
+import { getPedagangLokalQueryOptions } from '@/queryOptions/pedaganglokal';
 
 interface Props {
   user: AuthResponse;
 }
 
 const Keuangan = ({ user }: Props) => {
-  const { data: sppg, refetch: refetchSPPG } = useSuspenseQuery(getSPPGByIDQueryOptions(user.user.role.id_in_role));
+  const { data: sppg } = useSuspenseQuery(getSPPGByIDQueryOptions(user.user.role.id_in_role));
 
   // 20/06/2026
   const today = getTodaysDate();
@@ -34,13 +36,26 @@ const Keuangan = ({ user }: Props) => {
     tanggal: `${today}T00:00:00Z`
   };
   const {
-    data: pengeluaranHarian,
+    data: pengeluaran,
     isFetching,
     refetch: refetchPengeluaran
   } = useQuery({
     ...getPengeluaranHarianQueryOptions(sppg.id, today),
     enabled: alokasiHarian.id !== 0
   });
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const sort = sorting[0] ? `${sorting[0].desc ? '-' : ''}${sorting[0].id}` : '';
+
+  const { data, refetch } = useQuery(
+    getPedagangLokalQueryOptions({
+      page,
+      nama: search,
+      sort
+    })
+  );
+  const pedagangLokal = data?.pedagang_lokal;
   const [isInput, setIsInput] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -157,7 +172,7 @@ const Keuangan = ({ user }: Props) => {
                   <ShoppingCart className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
                   <div>
                     <p className="text-xs text-gray-400 tracking-widest">TERPAKAI</p>
-                    <p className="text-sm text-gray-700 mt-0.5">{pengeluaranHarian ? formatRupiah(pengeluaranHarian.reduce((acc, obj) => acc + obj.harga_satuan * obj.jumlah, 0)) : 0}</p>
+                    <p className="text-sm text-gray-700 mt-0.5">{pengeluaran ? formatRupiah(pengeluaran.pengeluaran_harian.reduce((acc, obj) => acc + obj.harga_satuan * obj.jumlah, 0)) : 0}</p>
                   </div>
                 </div>
               </div>
@@ -167,7 +182,7 @@ const Keuangan = ({ user }: Props) => {
                   <div>
                     <p className="text-xs text-gray-400 tracking-widest">SISA</p>
                     <p className="text-sm text-gray-700 mt-0.5">
-                      {pengeluaranHarian ? formatRupiah(alokasiHarian.jumlah - pengeluaranHarian.reduce((acc, obj) => acc + obj.harga_satuan * obj.jumlah, 0)) : 0}
+                      {pengeluaran ? formatRupiah(alokasiHarian.jumlah - pengeluaran.pengeluaran_harian.reduce((acc, obj) => acc + obj.harga_satuan * obj.jumlah, 0)) : 0}
                     </p>
                   </div>
                 </div>
@@ -179,7 +194,7 @@ const Keuangan = ({ user }: Props) => {
                   <p className="font-bold text-gray-800">Pengeluaran</p>
                 </div>
               </div>
-              <DialogTambahPengeluaran sppg_id={sppg.id} alokasi_harian_id={alokasiHarian.id} onPengeluaranUpdate={refetchPengeluaran}>
+              <DialogTambahPengeluaran sppg_id={sppg.id} alokasi_harian_id={alokasiHarian.id} onPengeluaranUpdate={refetchPengeluaran} pedagangLokal={pedagangLokal}>
                 <button
                   className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300
                              text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
@@ -192,8 +207,8 @@ const Keuangan = ({ user }: Props) => {
             </div>
             <div className="px-4 pb-4">
               {isFetching && <div className="text-center text-sm py-5 text-muted-foreground">Memuat data...</div>}
-              {pengeluaranHarian ? (
-                <PengeluaranTable onDelete={() => refetchPengeluaran()} sppg_id={sppg.id} pengeluaran={pengeluaranHarian} />
+              {pengeluaran ? (
+                <PengeluaranTable onDelete={() => refetchPengeluaran()} sppg_id={sppg.id} pengeluaran={pengeluaran.pengeluaran_harian} metadata={pengeluaran.metadata} />
               ) : (
                 <div className="text-center text-sm py-5 text-muted-foreground">Belum ada data pengeluaran.</div>
               )}

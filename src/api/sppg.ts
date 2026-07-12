@@ -107,7 +107,7 @@ export async function getPengeluaranHarian(sppg_id: number, tanggal: string) {
     throw new Error('gagal mengambil pengeluaran harian');
   }
   const data: FetchPengeluaranHarianResponse = await response.json();
-  return data.pengeluaran_harian;
+  return data;
 }
 export async function postPengeluaran(sppg_id: number, input: CreatePengeluaranHarianInput) {
   if (input.alokasi_harian_id === 0) {

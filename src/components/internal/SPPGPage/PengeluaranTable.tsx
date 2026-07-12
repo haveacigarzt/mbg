@@ -1,18 +1,13 @@
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable, type SortingState } from '@tanstack/react-table';
-import type { Sekolah } from '../../../types/sekolah';
 import { useEffect, useState } from 'react';
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
-import { getSekolahQueryOptions } from '../../../queryOptions/sekolah';
-import DialogEditSekolah from './Dialog/DialogEditSekolah';
-import type { Distrik } from '@/types/sppg';
-import DialogHapusSekolah from './Dialog/DialogHapusSekolah';
-import DialogTambahSekolah from './Dialog/DialogTambahSekolah';
-import { Search, Plus, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { useMutation } from '@tanstack/react-query';
+import { ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { formatRupiah } from '@/lib/utils';
 import { toast } from 'sonner';
 import { errorToast, successToast } from '@/lib/constants';
 import type { ApiError } from '@/api/client';
 import { deletePengeluaranMutationOptions } from '@/queryOptions/sppg';
+import type { Metadata } from '@/types/metadata';
 
 type Pengeluaran = {
   id: number;
@@ -28,6 +23,7 @@ interface Props {
   sppg_id: number;
   pengeluaran: Pengeluaran[];
   onDelete: () => void;
+  metadata: Metadata;
 }
 
 const columnHelper = createColumnHelper<Pengeluaran>();
@@ -64,24 +60,12 @@ const columns = [
   })
 ];
 
-const PengeluaranTable = ({ sppg_id, pengeluaran, onDelete }: Props) => {
+const PengeluaranTable = ({ sppg_id, pengeluaran, onDelete, metadata }: Props) => {
   const [searchSekolah, setSearchSekolah] = useState('');
   const [page, setPage] = useState(1);
   const page_size = 10;
   const [sorting, setSorting] = useState<SortingState>([]);
   const sort = sorting[0] ? `${sorting[0].desc ? '-' : ''}${sorting[0].id}` : '';
-
-  const { data, refetch } = useSuspenseQuery(
-    getSekolahQueryOptions({
-      sppg_id,
-      page,
-      page_size,
-      nama: searchSekolah,
-      sort
-    })
-  );
-  const sekolah = data.sekolah;
-  const metadata = data.metadata;
 
   useEffect(() => {
     setPage(1);

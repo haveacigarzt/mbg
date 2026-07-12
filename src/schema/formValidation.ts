@@ -119,6 +119,7 @@ export const pengeluaranSchema = z.object({
   jumlah: z.number().min(1, 'Jumlah wajib diisi'),
   produk: z.string().min(1, 'Produk wajib diisi'),
   harga_satuan: z.number().min(1, 'Harga satuan wajib diisi'),
+  pedagang_lokal_id: z.number().min(0, 'Pedagang lokal wajib dipilih'),
   satuan: z.string().min(1, 'Satuan wajib diisi')
 });
 export const alokasiSchema = z.object({

@@ -1,23 +1,30 @@
-import { useSuspenseQueries } from "@tanstack/react-query";
-import { getSekolahQueryOptions } from "../../queryOptions/sekolah";
-import { getPosyanduQueryOptions } from "../../queryOptions/posyandu";
-import { getSPPGQueryOptions } from "../../queryOptions/sppg";
-import { Link } from "@tanstack/react-router";
+import { useState } from 'react';
+import { useSuspenseQueries } from '@tanstack/react-query';
+import { getSekolahQueryOptions } from '../../queryOptions/sekolah';
+import { getPosyanduQueryOptions } from '../../queryOptions/posyandu';
+import { getSPPGQueryOptions } from '../../queryOptions/sppg';
+import { Link } from '@tanstack/react-router';
 
 const home = () => {
   const [{ data: sekolah }, { data: posyandu }, { data: sppg }] = useSuspenseQueries({
-    queries: [getSekolahQueryOptions(), getPosyanduQueryOptions(), getSPPGQueryOptions()],
+    queries: [getSekolahQueryOptions(), getPosyanduQueryOptions(), getSPPGQueryOptions()]
   });
+
+  // state buat toggle menu mobile (hamburger)
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <div className="flex items-center justify-center">
-      <main className="min-h-screen bg-gray-50 pt-32">
+      <main className="min-h-screen bg-gray-50 pt-24 md:pt-32">
         {/* Navbar */}
-        <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-16 py-5 bg-white/70 shadow-sm backdrop-blur-md border-b border-white/20">
+        <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-8 lg:px-16 py-4 md:py-5 bg-white/70 shadow-sm backdrop-blur-md border-b border-white/20">
           <div>
-            <p className="text-blue-600 font-bold text-lg">SIAP-MBG</p>
-            <p className="text-gray-500 text-xs">BGN NEW ERIDU</p>
+            <p className="text-blue-600 font-bold text-base md:text-lg">SIAP-MBG</p>
+            <p className="text-gray-500 text-[10px] md:text-xs">BGN SANGGAU</p>
           </div>
-          <div className="flex items-center gap-10">
+
+          {/* Menu desktop */}
+          <div className="hidden md:flex items-center gap-6 lg:gap-10">
             <a href="#stats" className="text-sm text-gray-600 hover:text-blue-600">
               STATISTIK
             </a>
@@ -34,12 +41,44 @@ const home = () => {
               <button className="border border-blue-600 text-blue-600 text-sm px-5 py-2 rounded-full hover:bg-blue-600 hover:text-white transition-all">LOGIN OPERATOR</button>
             </Link>
           </div>
+
+          {/* Hamburger Button */}
+          <button className="md:hidden p-2 text-gray-700" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {menuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+
+          {/* Dropdown menu */}
+          {menuOpen && (
+            <div className="absolute top-full left-0 right-0 md:hidden bg-white shadow-lg border-t border-gray-100 flex flex-col items-center gap-4 py-6">
+              <a href="#stats" className="text-sm text-gray-600 hover:text-blue-600" onClick={() => setMenuOpen(false)}>
+                STATISTIK
+              </a>
+              <a href="#feature" className="text-sm text-gray-600 hover:text-blue-600" onClick={() => setMenuOpen(false)}>
+                PROGRAM
+              </a>
+              <Link to="/data" className="text-sm text-gray-600 hover:text-blue-600" onClick={() => setMenuOpen(false)}>
+                DATA TERBUKA
+              </Link>
+              <a href="#contact" className="text-sm text-gray-600 hover:text-blue-600" onClick={() => setMenuOpen(false)}>
+                KONTAK
+              </a>
+              <Link to="/login" onClick={() => setMenuOpen(false)}>
+                <button className="border border-blue-600 text-blue-600 text-sm px-5 py-2 rounded-full hover:bg-blue-600 hover:text-white transition-all">LOGIN OPERATOR</button>
+              </Link>
+            </div>
+          )}
         </nav>
 
         {/* QUOTE CARDS */}
-        <section className="flex justify-center gap-12 px-16 py-12">
-          <div className="bg-white rounded-2xl shadow-sm py-10 px-6 flex gap-4 max-w-md transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110">
-            <img src="https://i.pinimg.com/1200x/78/1d/d3/781dd31d9eb409989ab342650dc72a29.jpg" alt="placeholder" className="w-20 h-24 object-cover rounded-lg" />
+        <section className="flex flex-col md:flex-row justify-center gap-6 md:gap-12 px-4 sm:px-8 lg:px-16 py-8 md:py-12">
+          <div className="bg-white rounded-2xl shadow-sm py-6 md:py-10 px-6 flex gap-4 w-full md:max-w-md transition delay-150 duration-300 ease-in-out hover:-translate-y-1 md:hover:scale-110">
+            <img src="https://i.pinimg.com/1200x/78/1d/d3/781dd31d9eb409989ab342650dc72a29.jpg" alt="placeholder" className="w-16 h-20 md:w-20 md:h-24 object-cover rounded-lg shrink-0" />
             <div>
               <p className="font-bold text-gray-800">JOHN DOE</p>
               <p className="text-blue-500 text-xs mb-2">NEW ERIDIAN REPUBLIC PRESIDENT</p>
@@ -47,8 +86,8 @@ const home = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm py-10 px-6 flex gap-4 max-w-md transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110">
-            <img src="https://i.pinimg.com/736x/52/51/6b/52516b29fe96104dca47c38b4e763267.jpg" alt="placeholder" className="w-20 h-24 object-cover rounded-lg" />
+          <div className="bg-white rounded-2xl shadow-sm py-6 md:py-10 px-6 flex gap-4 w-full md:max-w-md transition delay-150 duration-300 ease-in-out hover:-translate-y-1 md:hover:scale-110">
+            <img src="https://i.pinimg.com/736x/52/51/6b/52516b29fe96104dca47c38b4e763267.jpg" alt="placeholder" className="w-16 h-20 md:w-20 md:h-24 object-cover rounded-lg shrink-0" />
             <div>
               <p className="font-bold text-gray-800">JANE DOE</p>
               <p className="text-green-500 text-xs mb-2">NEW ERIDIAN REPUBLIC VICE PRESIDENT</p>
@@ -58,75 +97,90 @@ const home = () => {
         </section>
 
         {/* HERO SECTION */}
-        <section id="hero" className="flex flex-col items-center text-center px-16 py-8 gap-6">
-          <span className="text-xs text-cyan-500 border border-cyan-300 rounded-full px-4 py-1">#GENERASIEMASNEWERIDU</span>
+        <section id="hero" className="flex flex-col items-center text-center px-4 sm:px-8 lg:px-16 py-8 gap-4 md:gap-6">
+          <span className="text-xs text-cyan-500 border border-cyan-300 rounded-full px-4 py-1">#GENERASIEMASSANGGAU</span>
 
-          <h1 className="text-6xl font-black text-gray-900 leading-tight max-w-2xl">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 leading-tight max-w-2xl">
             MEMBANGUN <span className="text-blue-600 italic">MASA DEPAN</span> MELALUI GIZI SEIMBANG.
           </h1>
 
-          <p className="text-gray-500 max-w-lg">Portal resmi transparansi Program Makan Bergizi Gratis (MBG) di Kabupaten New Eridu. Memastikan setiap anak mendapatkan nutrisi terbaik secara terukur dan digital.</p>
+          <p className="text-gray-500 max-w-lg text-sm md:text-base px-2">
+            Portal resmi transparansi Program Makan Bergizi Gratis (MBG) di Kabupaten Sanggau. Memastikan setiap anak mendapatkan nutrisi terbaik secara terukur dan digital.
+          </p>
 
-          <button className="bg-blue-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-blue-700 transition-all flex items-center gap-2">LIHAT DATA REAL-TIME →</button>
+          <button className="bg-blue-600 text-white px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold hover:bg-blue-700 transition-all flex items-center gap-2 text-sm md:text-base">
+            LIHAT DATA REAL-TIME →
+          </button>
         </section>
 
         {/* HERO IMAGE SECTION */}
-        <section id="sub-hero" className="px-64 py-8 mt-4">
-          <div className="relative overflow-hidden rounded-3xl group cursor-pointer">
+        <section id="sub-hero" className="px-4 sm:px-8 md:px-16 lg:px-32 xl:px-64 py-8 mt-4">
+          <div className="relative overflow-hidden rounded-2xl md:rounded-3xl group cursor-pointer">
             {/* IMAGE dengan zoom effect on hover */}
-            <img src="https://i.pinimg.com/736x/0b/62/73/0b62737af35565e0e95e787bc2cebedc.jpg" alt="Hero" className="w-full h-[500px] object-cover transition-transform duration-700 ease-in-out group-hover:scale-105" />
+            <img
+              src="https://i.pinimg.com/736x/0b/62/73/0b62737af35565e0e95e787bc2cebedc.jpg"
+              alt="Hero"
+              className="w-full h-[220px] sm:h-[320px] md:h-[400px] lg:h-[500px] object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
+            />
 
             {/* Overlay gelap tipis */}
             <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-all duration-700" />
 
             {/* Floating card STATUS DISTRIBUSI */}
-            <div className="absolute bottom-6 left-6 bg-white rounded-2xl shadow-lg px-5 py-4 flex items-center gap-3">
-              <div className="bg-green-100 rounded-xl p-2">
-                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="absolute bottom-3 left-3 md:bottom-6 md:left-6 bg-white rounded-xl md:rounded-2xl shadow-lg px-3 py-2 md:px-5 md:py-4 flex items-center gap-2 md:gap-3">
+              <div className="bg-green-100 rounded-xl p-1.5 md:p-2">
+                <svg className="w-4 h-4 md:w-5 md:h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                 </svg>
               </div>
               <div>
-                <p className="text-xs text-gray-400 uppercase tracking-widest">Status Distribusi</p>
-                <p className="text-sm font-bold text-gray-800">98.4% Tepat Waktu</p>
+                <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-widest">Status Distribusi</p>
+                <p className="text-xs md:text-sm font-bold text-gray-800">98.4% Tepat Waktu</p>
               </div>
             </div>
           </div>
         </section>
 
         {/* STATS SECTION */}
-        <section id="stats" className="py-24 px-16 bg-gray-50">
+        <section id="stats" className="py-16 md:py-24 px-4 sm:px-8 lg:px-16 bg-gray-50">
           {/* Header */}
-          <div className="flex flex-col items-center mb-16">
+          <div className="flex flex-col items-center mb-10 md:mb-16 text-center">
             <p className="text-blue-500 text-xs font-semibold tracking-widest mb-3">TRANSPARANSI DATA</p>
-            <h2 className="text-4xl font-black text-gray-900 mb-4">JANGKAUAN PROGRAM SAAT INI</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900 mb-4">JANGKAUAN PROGRAM SAAT INI</h2>
             <div className="w-16 h-1 bg-blue-600 rounded-full" />
           </div>
 
           {/* Cards */}
-          <div className="flex items-center justify-center gap-6 mb-12">
+          <div className="grid grid-cols-2 lg:flex lg:items-center lg:justify-center gap-4 md:gap-6 mb-10 md:mb-12">
             {/* Card 1 - Total Sasaran */}
             <div
-              className="bg-white rounded-3xl p-10 flex flex-col items-center gap-4 shadow-sm
+              className="bg-white rounded-2xl md:rounded-3xl p-5 md:p-10 flex flex-col items-center gap-2 md:gap-4 shadow-sm
                     hover:-translate-y-2 hover:shadow-xl transition-all duration-300 cursor-pointer group"
             >
-              <div className="bg-red-100 rounded-2xl p-4 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">
-                <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              <div className="bg-red-100 rounded-2xl p-3 md:p-4 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">
+                <svg className="w-6 h-6 md:w-8 md:h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                  />
                 </svg>
               </div>
-              <p className="text-4xl font-black text-gray-900 group-hover:text-blue-600 transition-colors duration-300">{sekolah.sekolah.reduce((sum, el) => sum + el.jumlah_siswa, 0).toLocaleString("id-ID")}</p>
+              <p className="text-2xl md:text-4xl font-black text-gray-900 group-hover:text-blue-600 transition-colors duration-300 text-center">
+                {sekolah.sekolah.reduce((sum, el) => sum + el.jumlah_siswa, 0).toLocaleString('id-ID')}
+              </p>
               <div className="w-10 h-0.5 bg-blue-300 rounded-full group-hover:w-15 group-hover:h-1 group-hover:bg-shadow-blue-500 transition-all duration-300" />
-              <p className="text-xs text-gray-400 tracking-widest uppercase">Total Sasaran Jiwa</p>
+              <p className="text-[10px] md:text-xs text-gray-400 tracking-widest uppercase text-center">Total Sasaran Jiwa</p>
             </div>
 
             {/* Card 2 - Sekolah */}
             <div
-              className="bg-white rounded-3xl p-10 flex flex-col items-center gap-4 shadow-sm
+              className="bg-white rounded-2xl md:rounded-3xl p-5 md:p-10 flex flex-col items-center gap-2 md:gap-4 shadow-sm
                     hover:-translate-y-2 hover:shadow-xl transition-all duration-300 cursor-pointer group"
             >
-              <div className="bg-blue-100 rounded-2xl p-4 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">
-                <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="bg-blue-100 rounded-2xl p-3 md:p-4 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">
+                <svg className="w-6 h-6 md:w-8 md:h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -135,18 +189,18 @@ const home = () => {
                   />
                 </svg>
               </div>
-              <p className="text-4xl font-black text-gray-900 group-hover:text-blue-600 transition-colors duration-300">{sekolah.metadata.total_records}</p>
+              <p className="text-2xl md:text-4xl font-black text-gray-900 group-hover:text-blue-600 transition-colors duration-300 text-center">{sekolah.metadata.total_records}</p>
               <div className="w-10 h-0.5 bg-blue-300 rounded-full group-hover:w-15 group-hover:h-1 group-hover:bg-shadow-blue-500 transition-all duration-300" />
-              <p className="text-xs text-gray-400 tracking-widest uppercase">Sekolah Penerima</p>
+              <p className="text-[10px] md:text-xs text-gray-400 tracking-widest uppercase text-center">Sekolah Penerima</p>
             </div>
 
             {/* Card 3 - Unit Produksi */}
             <div
-              className="bg-white rounded-3xl p-10 flex flex-col items-center gap-4 shadow-sm
+              className="bg-white rounded-2xl md:rounded-3xl p-5 md:p-10 flex flex-col items-center gap-2 md:gap-4 shadow-sm
                     hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 cursor-pointer group"
             >
-              <div className="bg-orange-100 rounded-2xl p-4 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">
-                <svg className="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="bg-orange-100 rounded-2xl p-3 md:p-4 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">
+                <svg className="w-6 h-6 md:w-8 md:h-8 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -155,36 +209,36 @@ const home = () => {
                   />
                 </svg>
               </div>
-              <p className="text-4xl font-black text-gray-900 group-hover:text-blue-600 transition-colors duration-300">{sppg.metadata.total_records}</p>
+              <p className="text-2xl md:text-4xl font-black text-gray-900 group-hover:text-blue-600 transition-colors duration-300 text-center">{sppg.metadata.total_records}</p>
               <div className="w-10 h-0.5 bg-blue-300 rounded-full group-hover:w-15 group-hover:h-1 group-hover:bg-shadow-blue-500 transition-all duration-300" />
-              <p className="text-xs text-gray-400 tracking-widest uppercase">Unit Produksi Aktif</p>
+              <p className="text-[10px] md:text-xs text-gray-400 tracking-widest uppercase text-center">Unit Produksi Aktif</p>
             </div>
 
             {/* Card 4 - Distrik */}
             <div
-              className="bg-white rounded-3xl p-10 flex flex-col items-center gap-4 shadow-sm
+              className="bg-white rounded-2xl md:rounded-3xl p-5 md:p-10 flex flex-col items-center gap-2 md:gap-4 shadow-sm
                     hover:-translate-y-2 hover:shadow-xl transition-all duration-300 cursor-pointer group"
             >
-              <div className="bg-green-100 rounded-2xl p-4 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">
-                <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="bg-green-100 rounded-2xl p-3 md:p-4 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">
+                <svg className="w-6 h-6 md:w-8 md:h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               </div>
-              <p className="text-4xl font-black text-gray-900 group-hover:text-blue-600 transition-colors duration-300">{new Set(sppg.sppg.map((el) => el.kecamatan)).size}</p>
+              <p className="text-2xl md:text-4xl font-black text-gray-900 group-hover:text-blue-600 transition-colors duration-300 text-center">{new Set(sppg.sppg.map((el) => el.kecamatan)).size}</p>
               <div className="w-10 h-0.5 bg-blue-300 rounded-full group-hover:w-15 group-hover:h-1 group-hover:bg-shadow-blue-500 transition-all duration-300" />
-              <p className="text-xs text-gray-400 tracking-widest uppercase">Distrik Terjangkau</p>
+              <p className="text-[10px] md:text-xs text-gray-400 tracking-widest uppercase text-center">Distrik Terjangkau</p>
             </div>
           </div>
 
           {/* CTA Button */}
-          <div className="flex justify-center">
+          <div className="flex justify-center px-4">
             <Link to="/data">
               <button
-                className="flex items-center gap-2 border border-blue-200 text-blue-500 px-8 py-4 rounded-full
-                       hover:bg-blue-50 hover:border-blue-400 transition-all duration-300 text-sm font-semibold"
+                className="flex items-center gap-2 border border-blue-200 text-blue-500 px-5 md:px-8 py-3 md:py-4 rounded-full
+                       hover:bg-blue-50 hover:border-blue-400 transition-all duration-300 text-xs md:text-sm font-semibold text-center"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -199,16 +253,20 @@ const home = () => {
         </section>
 
         {/* FEATURE SECTION */}
-        <section id="feature" className="px-32 py-24 bg-white">
-          <div className="max-w-7xl mx-auto px-8">
-            <div className="flex items-center gap-20">
+        <section id="feature" className="px-4 sm:px-8 md:px-16 lg:px-32 py-16 md:py-24 bg-white">
+          <div className="max-w-7xl mx-auto px-2 md:px-8">
+            <div className="flex flex-col md:flex-row items-center gap-10 md:gap-20">
               {/* KIRI GAMBAR DAN CARD*/}
-              <div className="relative flex-1">
+              <div className="relative flex-1 w-full flex justify-center">
                 {/* Gambar */}
-                <img src="https://i.pinimg.com/736x/94/23/b6/9423b6240a9c6cb6619d437b18c4cf10.jpg" alt="Dapur Produksi" className="w-[500px] h-[500px] object-cover rounded-3xl border-8 border-gray-200 shadow-xl" />
+                <img
+                  src="https://i.pinimg.com/736x/94/23/b6/9423b6240a9c6cb6619d437b18c4cf10.jpg"
+                  alt="Dapur Produksi"
+                  className="w-full max-w-[320px] sm:max-w-[400px] md:max-w-[500px] aspect-square object-cover rounded-2xl md:rounded-3xl border-4 md:border-8 border-gray-200 shadow-xl"
+                />
 
                 {/* Floating card */}
-                <div className="absolute top-4 right-1 bg-white rounded-2xl shadow-xl p-4 max-w-[200px] border border-gray-200">
+                <div className="absolute top-3 right-3 md:top-4 md:right-1 bg-white rounded-xl md:rounded-2xl shadow-xl p-3 md:p-4 max-w-[150px] md:max-w-[200px] border border-gray-200">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="bg-blue-100 rounded-lg p-1.5">
                       <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -220,28 +278,28 @@ const home = () => {
                         />
                       </svg>
                     </div>
-                    <p className="text-xs font-bold text-gray-700 uppercase tracking-wide">Standar Gizi</p>
+                    <p className="text-[10px] md:text-xs font-bold text-gray-700 uppercase tracking-wide">Standar Gizi</p>
                   </div>
-                  <p className="text-xs text-gray-500 font-semibold leading-relaxed">MENU DIAWASI AHLI GIZI UNTUK MEMENUHI AKG HARIAN.</p>
+                  <p className="text-[10px] md:text-xs text-gray-500 font-semibold leading-relaxed">MENU DIAWASI AHLI GIZI UNTUK MEMENUHI AKG HARIAN.</p>
                 </div>
               </div>
               {/* KANAN */}
-              <div className="flex-1 flex flex-col gap-6">
+              <div className="flex-1 flex flex-col gap-4 md:gap-6 text-center md:text-left items-center md:items-start">
                 {/* Label */}
                 <p className="text-blue-500 text-xs font-semibold tracking-widest uppercase">Standar Nutrisi</p>
 
                 {/* Headline */}
-                <h2 className="text-4xl font-black text-gray-900 leading-tight">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900 leading-tight">
                   LEBIH DARI SEKADAR <span className="text-blue-600 italic">MAKAN GRATIS.</span>
                 </h2>
 
                 {/* Deskripsi */}
-                <p className="text-gray-500 leading-relaxed">
-                  Program SIAP-MBG New Eridu menerapkan standar operasional yang ketat. Mulai dari pemilihan bahan baku lokal hingga proses pengiriman menggunakan sistem monitoring berbasis GPS.
+                <p className="text-gray-500 leading-relaxed text-sm md:text-base">
+                  Program SIAP-MBG Sanggau menerapkan standar operasional yang ketat. Mulai dari pemilihan bahan baku lokal hingga proses pengiriman menggunakan sistem monitoring berbasis GPS.
                 </p>
 
                 {/* Feature list */}
-                <div className="flex flex-col gap-6 mt-2">
+                <div className="flex flex-col gap-6 mt-2 w-full text-left">
                   {/* Item 1 */}
                   <div className="flex items-start gap-4">
                     <div className="bg-blue-50 rounded-xl p-3 shrink-0">
@@ -251,7 +309,7 @@ const home = () => {
                     </div>
                     <div>
                       <p className="font-bold text-gray-800 text-sm tracking-wide">BAHAN BAKU LOKAL</p>
-                      <p className="text-xs text-gray-400 tracking-widest mt-1">MEMPRIORITASKAN HASIL TANI DAN TERNAK MASYARAKAT NEW ERIDU.</p>
+                      <p className="text-xs text-gray-400 tracking-widest mt-1">MEMPRIORITASKAN HASIL TANI DAN TERNAK MASYARAKAT SANGGAU.</p>
                     </div>
                   </div>
 
@@ -298,21 +356,23 @@ const home = () => {
         </section>
 
         {/* TAGLINE SECTION */}
-        <section id="contact" className="py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-8">
-            <div className="bg-blue-500 rounded-4xl py-16 px-8 flex flex-col items-center text-center gap-6">
-              <h2 className="text-4xl font-black text-white leading-tight max-w-3xl">BERSAMA WUJUDKAN NEW ERIDU SEHAT & CERDAS.</h2>
+        <section id="contact" className="py-12 md:py-20 bg-white">
+          <div className="max-w-7xl mx-auto px-4 md:px-8">
+            <div className="bg-blue-500 rounded-3xl md:rounded-4xl py-10 md:py-16 px-6 md:px-8 flex flex-col items-center text-center gap-4 md:gap-6">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white leading-tight max-w-3xl">BERSAMA WUJUDKAN SANGGAU SEHAT & CERDAS.</h2>
               <p className="text-blue-100 text-xs tracking-widest max-w-lg">HUBUNGI KAMI UNTUK INFORMASI LEBIH LANJUT MENGENAI KEMITRAAN VENDOR ATAU MASUKAN PROGRAM.</p>
-              <button className="bg-white text-gray-800 font-bold text-small px-10 py-4 rounded-full hover:bg-blue-300 transition-all duration-300 tracking-widest mt-2">HUBUNGI KAMI</button>
+              <button className="bg-white text-gray-800 font-bold text-xs md:text-small px-8 md:px-10 py-3 md:py-4 rounded-full hover:bg-blue-300 transition-all duration-300 tracking-widest mt-2">
+                HUBUNGI KAMI
+              </button>
             </div>
           </div>
         </section>
 
         {/* FOOTER */}
-        <footer id="footer" className="bg-white border-t border-gray-100 py-6 px-32">
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-gray-400 tracking-widest">© 2026 BGN NEW ERIDU • SIAP-MBG • POWERED BY</p>
-            <div className="flex items-center gap-8">
+        <footer id="footer" className="bg-white border-t border-gray-100 py-6 px-4 sm:px-8 lg:px-16 xl:px-32">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-gray-400 tracking-widest text-center">© 2026 BGN SANGGAU • SIAP-MBG • POWERED BY</p>
+            <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8">
               <a href="#" className="text-xs text-gray-400 tracking-widest hover:text-blue-500 transition-colors">
                 PRIVACY POLICY
               </a>
@@ -325,9 +385,11 @@ const home = () => {
             </div>
           </div>
         </footer>
-        <div className=" bg-red-200">
+
+        {/* Debug section - hapus/comment kalau sudah nggak dipakai */}
+        <div className="bg-red-200 px-4 py-4">
           Routes khusus user:
-          <div className="flex gap-5 mb-2">
+          <div className="flex flex-wrap gap-5 mb-2">
             <Link to="/dashboard" className="font-medium text-blue-700 hover:underline">
               Dashboard
             </Link>
@@ -336,7 +398,7 @@ const home = () => {
             </Link>
           </div>
           Data publik (liat properti/tipe data di folder types)
-          <div className="flex">
+          <div className="flex flex-col md:flex-row gap-6">
             <ul>
               <b>Sekolah (Total: {sekolah.metadata.total_records})</b>
               {sekolah.sekolah.map((el) => (

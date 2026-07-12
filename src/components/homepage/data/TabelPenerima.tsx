@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Heart, School, ChevronLeft, ChevronRight, Ban } from "lucide-react";
+import { useState } from 'react';
+import { Heart, School, ChevronLeft, ChevronRight, Ban } from 'lucide-react';
 
 interface PosyanduItem {
   nama: string;
@@ -41,38 +41,38 @@ export default function TabelPenerima({ selected, posyandu, sekolah }: Props) {
       total: number;
     }
   > = {
-    "3B": {
+    '3B': {
       icon: <Heart className="w-4 h-4 text-pink-500" />,
-      iconBg: "bg-pink-50",
-      title: "DAFTAR POSYANDU PENERIMA MANFAAT (3B)",
-      columns: ["NAMA POSYANDU", "ALAMAT", "BALITA", "IBU HAMIL"],
+      iconBg: 'bg-pink-50',
+      title: 'DAFTAR POSYANDU PENERIMA MANFAAT (3B)',
+      columns: ['NAMA POSYANDU', 'ALAMAT', 'BALITA', 'IBU HAMIL'],
       rows: posyandu.map((el) => [
-        <span className="text-sm font-semibold text-gray-700">{el.nama}</span>,
-        <span className="text-xs text-gray-400">{el.alamat}</span>,
-        <span className="text-sm font-bold text-blue-500">
+        <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">{el.nama}</span>,
+        <span className="text-xs text-gray-400 whitespace-nowrap">{el.alamat}</span>,
+        <span className="text-sm font-bold text-blue-500 whitespace-nowrap">
           {el.jumlah_balita} <span className="text-gray-400 font-normal text-xs">jiwa</span>
         </span>,
-        <span className="text-sm font-bold text-pink-500">
+        <span className="text-sm font-bold text-pink-500 whitespace-nowrap">
           {el.jumlah_ibu_hamil} <span className="text-gray-400 font-normal text-xs">jiwa</span>
-        </span>,
+        </span>
       ]),
-      total: posyandu.length,
+      total: posyandu.length
     },
-    "Ps.D": {
+    'Ps.D': {
       icon: <School className="w-4 h-4 text-blue-500" />,
-      iconBg: "bg-blue-50",
-      title: "DAFTAR SEKOLAH PENERIMA MANFAAT",
-      columns: ["NAMA SEKOLAH", "ALAMAT", "TINGKAT", "JUMLAH SISWA"],
+      iconBg: 'bg-blue-50',
+      title: 'DAFTAR SEKOLAH PENERIMA MANFAAT',
+      columns: ['NAMA SEKOLAH', 'ALAMAT', 'TINGKAT', 'JUMLAH SISWA'],
       rows: sekolah.map((el) => [
-        <span className="text-sm font-semibold text-gray-700">{el.nama}</span>,
-        <span className="text-xs text-gray-400">{el.alamat}</span>,
-        <span className="bg-blue-50 text-blue-600 text-xs font-bold px-2 py-1 rounded-full">{el.tingkat}</span>,
-        <span className="text-sm font-bold text-blue-500">
-          {el.jumlah_siswa.toLocaleString("id-ID")} <span className="text-gray-400 font-normal text-xs">siswa</span>
-        </span>,
+        <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">{el.nama}</span>,
+        <span className="text-xs text-gray-400 whitespace-nowrap">{el.alamat}</span>,
+        <span className="bg-blue-50 text-blue-600 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap">{el.tingkat}</span>,
+        <span className="text-sm font-bold text-blue-500 whitespace-nowrap">
+          {el.jumlah_siswa.toLocaleString('id-ID')} <span className="text-gray-400 font-normal text-xs">siswa</span>
+        </span>
       ]),
-      total: sekolah.length,
-    },
+      total: sekolah.length
+    }
   };
 
   const current = config[selected];
@@ -95,38 +95,40 @@ export default function TabelPenerima({ selected, posyandu, sekolah }: Props) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100">
-        <div className={`${current.iconBg} rounded-lg p-2`}>{current.icon}</div>
-        <p className="text-sm font-bold text-gray-700 tracking-wide">{current.title}</p>
+      <div className="flex items-center gap-3 px-4 md:px-6 py-3 md:py-4 border-b border-gray-100">
+        <div className={`${current.iconBg} rounded-lg p-2 shrink-0`}>{current.icon}</div>
+        <p className="text-xs md:text-sm font-bold text-gray-700 tracking-wide">{current.title}</p>
       </div>
 
-      {/* Tabel */}
-      <table className="w-full">
-        <thead>
-          <tr className="border-b border-gray-100 bg-gray-50">
-            {current.columns.map((col, i) => (
-              <th key={i} className={`px-6 py-3 text-xs text-gray-400 tracking-widest font-semibold ${i === current.columns.length - 1 ? "text-right" : "text-left"}`}>
-                {col}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {paginated.map((row, i) => (
-            <tr key={i} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-              {row.map((cell, j) => (
-                <td key={j} className={`px-6 py-4 ${j === row.length - 1 ? "text-right" : "text-left"}`}>
-                  {cell}
-                </td>
+      {/* Tabel - dibungkus scroll horizontal biar kolom nggak kegencet di mobile */}
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[600px]">
+          <thead>
+            <tr className="border-b border-gray-100 bg-gray-50">
+              {current.columns.map((col, i) => (
+                <th key={i} className={`px-4 md:px-6 py-3 text-xs text-gray-400 tracking-widest font-semibold whitespace-nowrap ${i === current.columns.length - 1 ? 'text-right' : 'text-left'}`}>
+                  {col}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {paginated.map((row, i) => (
+              <tr key={i} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                {row.map((cell, j) => (
+                  <td key={j} className={`px-4 md:px-6 py-3 md:py-4 ${j === row.length - 1 ? 'text-right' : 'text-left'}`}>
+                    {cell}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* Paginasi */}
-      <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
-        <p className="text-xs text-gray-400">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 md:px-6 py-3 md:py-4 border-t border-gray-100">
+        <p className="text-xs text-gray-400 text-center sm:text-left">
           Halaman {page} dari {totalPages || 1} — <span className="font-bold text-gray-600">TOTAL {current.total} DATA</span>
         </p>
         <div className="flex items-center gap-2">

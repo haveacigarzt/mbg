@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { errorToast, successToast } from '@/lib/constants';
-import { formatRupiah } from '@/lib/utils';
+import { formatNumber, formatRupiah } from '@/lib/utils';
 import { createPengeluaranMutationOptions } from '@/queryOptions/sppg';
 import { pengeluaranSchema } from '@/schema/formValidation';
 import type { PedagangLokalType } from '@/types/pedaganglokal';
@@ -23,11 +23,10 @@ interface DialogTambahPengeluaranProps {
   pedagangLokal: PedagangLokalType[] | undefined;
 }
 
-const DialogTambahPengeluaran = ({ onPengeluaranUpdate, children, pedagangLokal }: DialogTambahPengeluaranProps) => {
+const DialogTambahPengeluaran = ({ onPengeluaranUpdate, children, pedagangLokal, sppg_id, alokasi_harian_id }: DialogTambahPengeluaranProps) => {
   const [open, setOpen] = useState(false);
-  const initialForm = { produk: '', jumlah: '', satuan: '', harga_satuan: '', pedagang_lokal_id: 0 };
+  const initialForm = { produk: '', jumlah: '', satuan: '', harga_satuan: '', pedagang_lokal_id: null, nama_pedagang_non_lokal: '' };
   const [form, setForm] = useState(initialForm);
-  console.log(pedagangLokal);
 
   function updateField(field: string, value: any) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -69,7 +68,7 @@ const DialogTambahPengeluaran = ({ onPengeluaranUpdate, children, pedagangLokal 
       }
       return;
     }
-    // await mutation.mutateAsync({ sppg_id: sppg_id, input: { ...payload, alokasi_harian_id } });
+    await mutation.mutateAsync({ sppg_id: sppg_id, input: { ...payload, alokasi_harian_id } });
     console.log({
       // input: result.data as PostDriver
       input: result.data
@@ -97,7 +96,7 @@ const DialogTambahPengeluaran = ({ onPengeluaranUpdate, children, pedagangLokal 
         <form onSubmit={handleSubmit}>
           <DialogHeader className="gap-0">
             <DialogTitle className="text-lg font-semibold">Tambah data Pengeluaran</DialogTitle>
-            <DialogDescription>Tambah data Pengeluaran Hari Ini di SPPG anda. Klik simpan saat selesai.</DialogDescription>
+            <DialogDescription>Insert data Pengeluaran Hari Ini di SPPG anda. Klik simpan saat selesai.</DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-4 py-5">
             <div>
@@ -109,37 +108,48 @@ const DialogTambahPengeluaran = ({ onPengeluaranUpdate, children, pedagangLokal 
                     setIsPedagangNonLokal(checked);
 
                     if (checked) {
-                      updateField('pedagang_lokal_id', 0);
+                      updateField('pedagang_lokal_id', null);
                       setPedagangValue('');
+                    } else {
+                      updateField('nama_pedagang_non_lokal', '');
                     }
                   }}
                 />
                 <Label htmlFor="pedagang-lokal">Pedagang Non Lokal</Label>
               </div>
-              <Combobox
-                items={pedagangLokal}
-                value={pedagangValue}
-                onValueChange={(value) => {
-                  setPedagangValue(value);
+              {isPedagangNonLokal ? (
+                <Input
+                  placeholder="Nama/identitas pedagang"
+                  value={form.nama_pedagang_non_lokal}
+                  onChange={(e) => updateField('nama_pedagang_non_lokal', e.target.value)}
+                  required={isPedagangNonLokal}
+                />
+              ) : (
+                <Combobox
+                  items={pedagangLokal}
+                  value={pedagangValue}
+                  onValueChange={(value) => {
+                    setPedagangValue(value);
 
-                  const selected = pedagangLokal?.find((item) => `${item.nama} - ${item.jenis_produk}` === value);
+                    const selected = pedagangLokal?.find((item) => `${item.nama} - ${item.jenis_produk}` === value);
 
-                  if (selected) {
-                    updateField('pedagang_lokal_id', selected.id);
-                  }
-                }}
-              >
-                <ComboboxInput placeholder="Pilih pedagang" disabled={isPedagangNonLokal} required={!isPedagangNonLokal} />
-                <ComboboxContent>
-                  <ComboboxList>
-                    {(item) => (
-                      <ComboboxItem key={item.id} value={`${item.nama} - ${item.jenis_produk}`}>
-                        {item.nama} - {item.jenis_produk}
-                      </ComboboxItem>
-                    )}
-                  </ComboboxList>
-                </ComboboxContent>
-              </Combobox>
+                    if (selected) {
+                      updateField('pedagang_lokal_id', selected.id);
+                    }
+                  }}
+                >
+                  <ComboboxInput placeholder="Pilih pedagang" disabled={isPedagangNonLokal} required={!isPedagangNonLokal} />
+                  <ComboboxContent>
+                    <ComboboxList>
+                      {(item) => (
+                        <ComboboxItem key={item.id} value={`${item.nama} - ${item.jenis_produk}`}>
+                          {item.nama} - {item.jenis_produk}
+                        </ComboboxItem>
+                      )}
+                    </ComboboxList>
+                  </ComboboxContent>
+                </Combobox>
+              )}
             </div>
             <div>
               <Label htmlFor="produk" className="mb-1">
@@ -157,7 +167,14 @@ const DialogTambahPengeluaran = ({ onPengeluaranUpdate, children, pedagangLokal 
               <Label htmlFor="jumlah" className="mb-1">
                 Jumlah {form.satuan && `(berapa ${form.satuan}?)`}
               </Label>
-              <Input id="jumlah" type="number" value={form.jumlah} onChange={(e) => updateField('jumlah', e.target.value)} required />
+              <Input
+                id="jumlah"
+                value={formatNumber(Number(form.jumlah))}
+                onChange={(e) => {
+                  const angka = Number(e.target.value.replace(/\D/g, ''));
+                  updateField('jumlah', angka);
+                }}
+              />
             </div>
             <div>
               <Label htmlFor="harga_satuan" className="mb-1">
@@ -178,13 +195,8 @@ const DialogTambahPengeluaran = ({ onPengeluaranUpdate, children, pedagangLokal 
                 Batal
               </Button>
             </DialogClose>
-            <Button
-              type="submit"
-              disabled={mutation.isPending}
-              className="bg-blue-600 hover:bg-blue-700
-                             text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
-            >
-              {mutation.isPending ? <Loader2 className="animate-spin" /> : 'Simpan'}
+            <Button type="submit" disabled={mutation.isPending} className="text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
+              {mutation.isPending ? <Loader2 className="animate-spin" /> : 'Tambah'}
             </Button>
           </DialogFooter>
         </form>

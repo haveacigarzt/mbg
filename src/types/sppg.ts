@@ -86,6 +86,9 @@ export type FetchPengeluaranHarianResponse = {
       satuan: string;
       harga_satuan: number;
       subtotal: number;
+      pedagang_lokal_id: number;
+      nama_pedagang_lokal: string;
+      nama_pedagang_non_lokal: string;
     }
   ];
 };

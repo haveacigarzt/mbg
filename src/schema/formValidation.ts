@@ -115,13 +115,39 @@ export const pengirimanSchema = z.object({
 });
 
 // 20/06/2026
-export const pengeluaranSchema = z.object({
-  jumlah: z.number().min(1, 'Jumlah wajib diisi'),
-  produk: z.string().min(1, 'Produk wajib diisi'),
-  harga_satuan: z.number().min(1, 'Harga satuan wajib diisi'),
-  pedagang_lokal_id: z.number().min(0, 'Pedagang lokal wajib dipilih'),
-  satuan: z.string().min(1, 'Satuan wajib diisi')
-});
+export const pengeluaranSchema = z
+  .object({
+    jumlah: z.number().min(1, 'Jumlah wajib diisi'),
+    produk: z.string().min(1, 'Produk wajib diisi'),
+    harga_satuan: z.number().min(1, 'Harga satuan wajib diisi'),
+
+    pedagang_lokal_id: z.number().nullable().optional(),
+    nama_pedagang_non_lokal: z.string().optional(),
+
+    satuan: z.string().min(1, 'Satuan wajib diisi')
+  })
+  .superRefine((data, ctx) => {
+    const hasPedagangLokal = data.pedagang_lokal_id !== null && data.pedagang_lokal_id !== undefined;
+
+    const hasPedagangNonLokal = data.nama_pedagang_non_lokal?.trim().length! > 0;
+
+    if (!hasPedagangLokal && !hasPedagangNonLokal) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['pedagang_lokal_id'],
+        message: 'Pilih pedagang lokal atau isi nama pedagang non lokal.'
+      });
+    }
+
+    if (hasPedagangLokal && hasPedagangNonLokal) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['nama_pedagang_non_lokal'],
+        message: 'Pilih salah satu: pedagang lokal atau pedagang non lokal.'
+      });
+    }
+  });
+
 export const alokasiSchema = z.object({
   tanggal: z.string().min(10, 'Tanggal wajib diisi'),
   jumlah: z.number().min(1, 'Jumlah wajib diisi')

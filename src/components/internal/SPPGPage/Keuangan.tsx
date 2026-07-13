@@ -5,7 +5,7 @@ import { useState } from 'react';
 import type { AuthResponse } from '@/types/auth';
 import { HandCoins, ShoppingCart, Wallet, Plus, History, CalendarClock, SquarePen, Save, X, LoaderCircle } from 'lucide-react';
 import { WebSocketProvider } from '@/provider/websocket-provider';
-import { formatRupiah, getTodaysDate } from '@/lib/utils';
+import { formatRupiah, formatTanggalIndonesia, getTodaysDate } from '@/lib/utils';
 import PengeluaranTable from './PengeluaranTable';
 import DialogTambahPengeluaran from './Dialog/DialogTambahPengeluaran';
 import { Button } from '@/components/ui/button';
@@ -43,6 +43,7 @@ const Keuangan = ({ user }: Props) => {
     ...getPengeluaranHarianQueryOptions(sppg.id, today),
     enabled: alokasiHarian.id !== 0
   });
+  console.log(pengeluaran);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -118,7 +119,7 @@ const Keuangan = ({ user }: Props) => {
                   <CalendarClock className="w-5 h-5 text-blue-500" />
                 </div>
                 <div>
-                  <p className="font-bold text-gray-800">Keuangan Hari Ini (Real Time)</p>
+                  <p className="font-bold text-gray-800">Keuangan Hari Ini, {formatTanggalIndonesia(`${today}T00:00:00Z`)}</p>
                 </div>
               </div>
             </div>
@@ -126,28 +127,29 @@ const Keuangan = ({ user }: Props) => {
             <div className="grid grid-cols-3 gap-0 divide-x divide-gray-100">
               <div className="p-6 flex justify-between">
                 {isInput ? (
-                  <>
-                    <div className="flex items-start gap-3">
-                      <Input type="number" placeholder="Masukan nominal alokasi" value={alokasiHarianJumlah} onChange={(e) => setAlokasiHarianJumlah(Number(e.target.value))} />
-                    </div>
+                  <div className="flex items-start gap-3">
+                    <Input
+                      placeholder="Masukan nominal alokasi"
+                      value={formatRupiah(Number(alokasiHarianJumlah))}
+                      onChange={(e) => {
+                        const angka = Number(e.target.value.replace(/\D/g, ''));
+                        setAlokasiHarianJumlah(Number(angka));
+                      }}
+                    />
                     <div className="flex gap-2">
                       <Button
-                        className="bg-green-600 hover:bg-green-700
-                             text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
+                        className="
+                        text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
                         onClick={handleSubmit}
                         disabled={isLoading}
                       >
                         {isLoading ? <LoaderCircle /> : <Save />}
                       </Button>
-                      <Button
-                        className="bg-red-600 hover:bg-red-700
-                             text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
-                        onClick={() => setIsInput(!isInput)}
-                      >
+                      <Button className="text-sm font-semibold px-4 py-2 rounded-xl transition-colors" variant="destructive" onClick={() => setIsInput(!isInput)}>
                         <X />
                       </Button>
                     </div>
-                  </>
+                  </div>
                 ) : (
                   <>
                     <div className="flex items-start gap-3">

@@ -1,8 +1,8 @@
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable, type SortingState } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
-import { formatRupiah } from '@/lib/utils';
+import { ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown, Trash } from 'lucide-react';
+import { formatRupiah, formatWaktuIndonesia } from '@/lib/utils';
 import { toast } from 'sonner';
 import { errorToast, successToast } from '@/lib/constants';
 import type { ApiError } from '@/api/client';
@@ -17,6 +17,9 @@ type Pengeluaran = {
   satuan: string;
   harga_satuan: number;
   subtotal: number;
+  pedagang_lokal_id: number;
+  nama_pedagang_lokal: string;
+  nama_pedagang_non_lokal: string;
 };
 
 interface Props {
@@ -32,13 +35,15 @@ const columns = [
     header: 'Produk',
     enableSorting: true
   }),
-  columnHelper.accessor('jumlah', {
+  columnHelper.accessor((row) => row.jumlah, {
+    id: 'jumlah',
     header: 'Jumlah',
-    enableSorting: true
-  }),
-  columnHelper.accessor('satuan', {
-    header: 'Satuan',
-    enableSorting: true
+    enableSorting: false,
+    cell: (info) => {
+      const jumlah = info.getValue();
+      const { satuan } = info.row.original;
+      return `${jumlah} ${satuan}`;
+    }
   }),
   columnHelper.accessor((row) => row.harga_satuan, {
     id: 'harga_satuan',
@@ -52,11 +57,29 @@ const columns = [
     enableSorting: true,
     cell: (info) => formatRupiah(info.getValue())
   }),
+  columnHelper.accessor((row) => row.pedagang_lokal_id, {
+    id: 'sumber',
+    header: 'Sumber',
+    enableSorting: false,
+    cell: (info) => {
+      const pedagang_lokal_id = info.getValue();
+      return pedagang_lokal_id ? 'Pedagang Lokal' : 'Pedagang Non Lokal';
+    }
+  }),
+  columnHelper.accessor((row) => row.id, {
+    id: 'nama_sumber',
+    header: 'Nama Sumber',
+    enableSorting: false,
+    cell: (info) => {
+      const { pedagang_lokal_id, nama_pedagang_lokal, nama_pedagang_non_lokal } = info.row.original;
+      return pedagang_lokal_id ? nama_pedagang_lokal : nama_pedagang_non_lokal;
+    }
+  }),
   columnHelper.accessor((row) => row.created_at, {
     id: 'created_at',
     header: 'Waktu Dibuat',
     enableSorting: true,
-    cell: (info) => info.getValue()
+    cell: (info) => formatWaktuIndonesia(info.getValue())
   })
 ];
 
@@ -120,7 +143,7 @@ const PengeluaranTable = ({ sppg_id, pengeluaran, onDelete, metadata }: Props) =
                     </div>
                   </th>
                 ))}
-                <th className="px-4 py-3 text-left text-xs text-gray-400 tracking-widest font-semibold">AKSI</th>
+                <th className="px-4 py-3 text-left text-xs text-gray-400 tracking-widest font-semibold">Aksi</th>
               </tr>
             ))}
           </thead>
@@ -143,7 +166,7 @@ const PengeluaranTable = ({ sppg_id, pengeluaran, onDelete, metadata }: Props) =
                         hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors"
                       onClick={() => handleDelete(row.original.id)}
                     >
-                      Hapus
+                      <Trash size={15} />
                     </button>
                   </div>
                 </td>

@@ -39,6 +39,15 @@ export function formatTanggal2Indonesia(datetime: string): string {
   return `${tanggal} ${namaBulan} ${tahun} ${jam}:${menit} WIB`;
 }
 
+export function formatWaktuIndonesia(datetime: string): string {
+  const date = new Date(datetime.replace(' ', 'T'));
+
+  const jam = String(date.getHours()).padStart(2, '0');
+  const menit = String(date.getMinutes()).padStart(2, '0');
+
+  return `${jam}:${menit} WIB`;
+}
+
 export function formatRupiah(value: number): string {
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
@@ -83,4 +92,8 @@ export function getTodaysDate() {
 }
 export function timeToDateTime(date: string, time: string) {
   return `${date}T${time}:00Z`;
+}
+
+export function formatNumber(value: number): string {
+  return new Intl.NumberFormat('id-ID').format(value);
 }

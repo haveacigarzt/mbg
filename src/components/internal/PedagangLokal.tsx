@@ -1,13 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Navbar from './Navbar';
 import { useQuery } from '@tanstack/react-query';
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable, type SortingState } from '@tanstack/react-table';
 import { getPedagangLokalQueryOptions } from '@/queryOptions/pedaganglokal';
 import type { PedagangLokalType } from '@/types/pedaganglokal';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, PenSquare, Plus, Trash } from 'lucide-react';
+import { Button } from '../ui/button';
+import DialogTambahPedagang from './SPPGPage/Dialog/DialogTambahPedagang';
+import DialogEditPedagang from './SPPGPage/Dialog/DialogEditPedagang';
+import DialogHapusPedagang from './SPPGPage/Dialog/DialogHapusPedagang';
 
 interface Props {
   role_id: number;
+  sppg_id: number;
 }
 
 const columnHelper = createColumnHelper<PedagangLokalType>();
@@ -33,13 +38,13 @@ const columns = [
     enableSorting: true
   }),
 
-  columnHelper.accessor('sppg_id', {
-    header: 'SPPG',
+  columnHelper.accessor('sppg_nama', {
+    header: 'Dibuat Oleh',
     enableSorting: true
   })
 ];
 
-const PedagangLokal = ({ role_id }: Props) => {
+const PedagangLokal = ({ role_id, sppg_id }: Props) => {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const page_size = 10;
@@ -69,18 +74,31 @@ const PedagangLokal = ({ role_id }: Props) => {
     manualSorting: true,
     getCoreRowModel: getCoreRowModel()
   });
+  const handleDelete = async (id: number) => {
+    console.log('deleting', id);
+  };
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Navbar role_id={role_id} />
 
       <div className="ml-[15%] flex-1 p-6 flex flex-col gap-6">
         {/* Header */}
-        <div>
-          <h1 className="text-xl font-black text-gray-800">Data Pedagang Lokal</h1>
-          <p className="text-xs text-gray-400 tracking-widest mt-1">KELOLA DATA PEDAGANG LOKAL SEBAGAI MITRA PENYEDIA PRODUK PROGRAM MBG</p>
+        <div className="flex justify-between items-end">
+          <div>
+            <h1 className="text-xl font-black text-gray-800">Data Pedagang Lokal</h1>
+            <p className="text-xs text-gray-400 tracking-widest mt-1">KELOLA DATA PEDAGANG LOKAL SEBAGAI MITRA PENYEDIA PRODUK PROGRAM MBG</p>
+          </div>
+          <div>
+            <DialogTambahPedagang sppg_id={sppg_id} onPedagangCreated={refetch}>
+              <Button>
+                <Plus className="w-4 h-4" />
+                Tambah
+              </Button>
+            </DialogTambahPedagang>
+          </div>
         </div>
         {/* Tabel */}
-        <div className="overflow-hidden rounded-xl border-gray-500 mt-5">
+        <div className="overflow-hidden border-gray-500">
           <table className="w-full">
             <thead>
               {table.getHeaderGroups().map((hg) => (
@@ -91,13 +109,15 @@ const PedagangLokal = ({ role_id }: Props) => {
                       onClick={header.column.getToggleSortingHandler()}
                       className="px-4 py-3 text-left text-xs text-gray-400 tracking-widest font-semibold cursor-pointer hover:text-gray-600 transition-colors"
                     >
-                      {flexRender(header.column.columnDef.header, header.getContext())}
-                      {{
-                        asc: ' ↑',
-                        desc: ' ↓'
-                      }[header.column.getIsSorted() as string] ?? null}
+                      <div className="flex items-center gap-1">
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {header.column.getIsSorted() === 'asc' && <ArrowUp className="w-3 h-3" />}
+                        {header.column.getIsSorted() === 'desc' && <ArrowDown className="w-3 h-3" />}
+                        {!header.column.getIsSorted() && <ArrowUpDown className="w-3 h-3 opacity-30" />}
+                      </div>
                     </th>
                   ))}
+                  <th className="px-4 py-3 text-left text-xs text-gray-400 tracking-widest font-semibold">Aksi</th>
                 </tr>
               ))}
             </thead>
@@ -114,13 +134,29 @@ const PedagangLokal = ({ role_id }: Props) => {
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}
+                  <td className="px-4 py-3">
+                    {sppg_id === row.original.sppg_id && (
+                      <div className="flex justify-center gap-1">
+                        <DialogEditPedagang onSuccess={refetch} sppg_id={sppg_id} data={row.original}>
+                          <Button variant="secondary" onClick={() => handleDelete(row.original.id)} title="Edit">
+                            <PenSquare size={15} />
+                          </Button>
+                        </DialogEditPedagang>
+                        <DialogHapusPedagang nama={row.original.nama} id={row.original.id} onSuccess={refetch}>
+                          <Button variant="destructive" onClick={() => handleDelete(row.original.id)} title="Hapus">
+                            <Trash size={15} />
+                          </Button>
+                        </DialogHapusPedagang>
+                      </div>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
         {/* Paginasi */}
-        <div className="flex items-center justify-between mt-5">
+        <div className="flex items-center justify-between">
           <p className="text-xs text-gray-400">
             Halaman {page} dari {metadata?.last_page} — <span className="font-bold text-gray-600">TOTAL {metadata?.total_records} DATA</span>
           </p>

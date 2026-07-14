@@ -17,6 +17,7 @@ export interface PedagangLokalType {
   latitude: number;
   jenis_produk: string;
   sppg_id: number;
+  sppg_nama: string | null;
   created_at: string;
   updated_at: string;
   version: number;

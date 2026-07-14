@@ -124,7 +124,7 @@ const PengeluaranTable = ({ sppg_id, pengeluaran, onDelete, metadata }: Props) =
   return (
     <div className="flex flex-col gap-4">
       {/* Tabel */}
-      <div className="rounded-xl border border-gray-100 overflow-hidden">
+      <div className="border border-gray-100 overflow-hidden">
         <table className="w-full">
           <thead>
             {table.getHeaderGroups().map((hg) => (

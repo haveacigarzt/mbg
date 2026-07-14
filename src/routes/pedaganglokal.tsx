@@ -23,7 +23,7 @@ function RouteComponent() {
   const { user } = Route.useRouteContext();
   return (
     <WebSocketProvider room_id={'open'}>
-      <PedagangLokal role_id={user.role.role_id} />
+      <PedagangLokal role_id={user.role.role_id} sppg_id={user.role.id_in_role} />
     </WebSocketProvider>
   );
 }

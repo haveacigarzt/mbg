@@ -152,6 +152,32 @@ export const alokasiSchema = z.object({
   tanggal: z.string().min(10, 'Tanggal wajib diisi'),
   jumlah: z.number().min(1, 'Jumlah wajib diisi')
 });
+export const pedagangSchema = z.object({
+  nama: z.string().min(1, 'Nama pedagang wajib diisi'),
+
+  alamat: z.string().min(1, 'Alamat wajib diisi'),
+
+  no_hp: z
+    .string()
+    .min(1, 'Nomor HP wajib diisi')
+    .regex(/^[0-9+\-\s]+$/, 'Nomor HP tidak valid'),
+
+  jenis_produk: z.string().min(1, 'Jenis produk wajib diisi'),
+
+  longitude: z.coerce
+    .number({
+      message: 'Longitude harus berupa angka'
+    })
+    .min(-180, 'Longitude tidak valid')
+    .max(180, 'Longitude tidak valid'),
+
+  latitude: z.coerce
+    .number({
+      message: 'Latitude harus berupa angka'
+    })
+    .min(-90, 'Latitude tidak valid')
+    .max(90, 'Latitude tidak valid')
+});
 export const tambahUserSchema = z
   .object({
     role_id: z.enum(['2', '3']),

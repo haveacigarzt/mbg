@@ -105,6 +105,23 @@ export type FetchSinglePengeluaranHarianResponse = {
     subtotal: number;
   };
 };
+export type PengeluaranHarianWithCoords = {
+  alokasi_harian_id: number;
+  created_at: string;
+  harga_satuan: number;
+  id: number;
+  jumlah: number;
+  latitude_pedagang_lokal: number;
+  longitude_pedagang_lokal: number;
+  nama_pedagang_lokal: string;
+  nama_pedagang_non_lokal: string;
+  pedagang_lokal_id: number;
+  produk: string;
+  satuan: string;
+  subtotal: number;
+  updated_at: string;
+};
+
 export type CreatePengeluaranHarianInput = {
   alokasi_harian_id: number;
   produk: string;

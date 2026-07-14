@@ -3,6 +3,8 @@ import { Fragment, useEffect, useState, useRef, useCallback } from 'react';
 import type { Tracking } from '@/types/tracking';
 import AnimatedMarker from './AnimatedMarker';
 import RoutingMachine from './RoutingMachine';
+import AutoPopupMarker from './AutoPopupMarker';
+import type { PengeluaranHarianWithCoords } from '@/types/sppg';
 
 const CtrlScrollZoom = ({ onRequireCtrl }: { onRequireCtrl: () => void }) => {
   const map = useMap();
@@ -32,9 +34,10 @@ const CtrlScrollZoom = ({ onRequireCtrl }: { onRequireCtrl: () => void }) => {
 
 interface Props {
   tracking: Tracking[] | undefined;
+  pengeluaranBaru: PengeluaranHarianWithCoords | null;
 }
 
-const DashboardMap = ({ tracking }: Props) => {
+const DashboardMap = ({ tracking, pengeluaranBaru }: Props) => {
   const colors = ['red', 'blue', 'green', 'orange', 'purple'];
 
   // State dan ref overlay
@@ -80,6 +83,7 @@ const DashboardMap = ({ tracking }: Props) => {
             <RoutingMachine currLat={el.latitude} currLng={el.longitude} tujuanLat={el.tujuan_lat} tujuanLng={el.tujuan_lng} />
           </Fragment>
         ))}
+        {pengeluaranBaru && <AutoPopupMarker pengeluaranBaru={pengeluaranBaru} />}
       </MapContainer>
     </div>
   );

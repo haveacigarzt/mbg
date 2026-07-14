@@ -4,12 +4,13 @@ import { getPosyanduQueryOptions } from '../../queryOptions/posyandu';
 import { getAllProduksiHarianQueryOptions, getKeuanganHarianQueryOptions, getSPPGQueryOptions } from '../../queryOptions/sppg';
 import DashboardMap from './DashboardMap';
 import { getPengirimanQueryOptions } from '@/queryOptions/pengiriman';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useWebSocket } from '@/contexts/websocket-context';
 import { getTrackingQueryOptions } from '@/queryOptions/tracking';
 import Navbar from './Navbar';
 import { Truck, Wallet, CheckCircle2, ChefHat, Users, ArrowRight } from 'lucide-react';
 import { getTodaysDate } from '@/lib/utils';
+import type { FetchSinglePengeluaranHarianResponse, PengeluaranHarianWithCoords } from '@/types/sppg';
 
 interface Props {
   role_id: number;
@@ -27,6 +28,8 @@ const Dashboard = ({ role_id }: Props) => {
   const pengirimanIds = useMemo(() => [...new Set(pengiriman.pengiriman.map((item) => item.id))], [pengiriman.pengiriman]);
 
   const { data: tracking } = useQuery(getTrackingQueryOptions(pengirimanIds));
+
+  const [pengeluaranBaru, setPengeluaranBaru] = useState<PengeluaranHarianWithCoords | null>(null);
 
   const { lastMessage } = useWebSocket();
   const queryClient = useQueryClient(); // ← pakai useQueryClient dari repo, bukan import langsung
@@ -57,6 +60,12 @@ const Dashboard = ({ role_id }: Props) => {
       }
       case 'produksi:updated': {
         queryClient.setQueriesData({ queryKey: ['produksi_harian_all'] }, () => message.data);
+        break;
+      }
+      case 'pengeluaran_lokal:created': {
+        const data = message.data as PengeluaranHarianWithCoords;
+        // pop up maps
+        setPengeluaranBaru(data);
         break;
       }
     }
@@ -157,7 +166,7 @@ const Dashboard = ({ role_id }: Props) => {
         <div className="flex gap-4 flex-1">
           {/* Map */}
           <div className="flex-[3] bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-h-[500px]">
-            <DashboardMap tracking={tracking?.tracking} />
+            <DashboardMap tracking={tracking?.tracking} pengeluaranBaru={pengeluaranBaru} />
           </div>
 
           {/* Pengiriman Aktif */}

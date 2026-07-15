@@ -7,6 +7,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { errorToast, successToast } from '@/lib/constants';
+import { deletePedagangLokalMutationOptions } from '@/queryOptions/sppg';
 
 interface Props {
   children: React.ReactNode;
@@ -18,7 +19,7 @@ interface Props {
 const DialogHapusPedagang = ({ children, onSuccess, id, nama }: Props) => {
   const [open, setOpen] = useState(false);
   const mutation = useMutation({
-    ...deletePosyanduMutationOptions(),
+    ...deletePedagangLokalMutationOptions(),
     onSuccess: () => {
       toast.success(`Berhasil menghapus data Pedagang Lokal ${nama}`, {
         style: successToast as React.CSSProperties
@@ -36,8 +37,8 @@ const DialogHapusPedagang = ({ children, onSuccess, id, nama }: Props) => {
   });
 
   const handleDelete = async (id: number) => {
-    // await mutation.mutateAsync(id);
-    console.log('delete', id);
+    await mutation.mutateAsync(id);
+    console.log('deleting', id);
   };
   return (
     <Dialog open={open} onOpenChange={(val) => setOpen(val)}>

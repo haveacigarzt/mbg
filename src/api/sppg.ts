@@ -17,6 +17,7 @@ import type {
   PostSPPG
 } from '../types/sppg';
 import type { CreateSPPGByInvitationRequest } from '@/types/sppg_invitations';
+import type { CreatePedagangLokalInput } from '@/types/pedaganglokal';
 
 export async function getSPPG(params?: GetSPPGParams) {
   const searchParams = new URLSearchParams();
@@ -203,4 +204,45 @@ export async function deleteSPPGInvitation(token: string) {
     throw new ApiError(data?.message || data?.error || 'Delete sppg invitasi gagal', response.status, data);
   }
   // return data.keuangan_harian;
+}
+export async function postPedagangLokal(sppg_id: number, input: CreatePedagangLokalInput) {
+  if (sppg_id === 0) {
+    throw new Error('gagal menambahkan pedagang lokal');
+  }
+  const response = await apiFetch(`/v1/pedaganglokal`, {
+    method: 'POST',
+    body: JSON.stringify(input)
+  });
+  if (!response.ok) {
+    throw new Error('gagal menambahkan pedagang lokal');
+  }
+  const data: { message: string } = await response.json();
+  return data.message;
+}
+export async function updatePedagangLokal(sppg_id: number, input: CreatePedagangLokalInput, id: number) {
+  if (sppg_id === 0 || id === 0) {
+    throw new Error('gagal mengubah pedagang lokal');
+  }
+  const response = await apiFetch(`/v1/pedaganglokal/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(input)
+  });
+  if (!response.ok) {
+    throw new Error('gagal mengubah pedagang lokal');
+  }
+  const data: { message: string } = await response.json();
+  return data.message;
+}
+export async function deletePedagangLokal(id: number) {
+  if (id === 0) {
+    throw new Error('gagal menghapus pedagang lokal');
+  }
+  const response = await apiFetch(`/v1/pedaganglokal/${id}`, {
+    method: 'DELETE'
+  });
+  if (!response.ok) {
+    throw new Error('gagal menghapus pedagang lokal');
+  }
+  const data: { message: string } = await response.json();
+  return data.message;
 }

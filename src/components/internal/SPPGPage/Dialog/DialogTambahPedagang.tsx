@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { errorToast, successToast } from '@/lib/constants';
-import { createPengeluaranMutationOptions } from '@/queryOptions/sppg';
+import { createPedagangLokalMutationOptions } from '@/queryOptions/sppg';
 import { pedagangSchema } from '@/schema/formValidation';
 import { useMutation } from '@tanstack/react-query';
 import { Loader2, Map } from 'lucide-react';
@@ -29,16 +29,16 @@ const DialogTambahPedagang = ({ onPedagangCreated, children, sppg_id }: DialogTa
   }
 
   const mutation = useMutation({
-    ...createPengeluaranMutationOptions(),
+    ...createPedagangLokalMutationOptions(),
     onSuccess: () => {
-      toast.success('Berhasil mengirim pengeluaran harian.', {
+      toast.success('Berhasil menambahkan pedagang lokal.', {
         style: successToast as React.CSSProperties
       });
       onPedagangCreated();
       setOpen(false);
     },
     onError: (error: ApiError) => {
-      toast.error('Gagal mengirim pengeluaran harian.', {
+      toast.error('Gagal menambahkan pedagang lokal.', {
         style: errorToast as React.CSSProperties
       });
       console.log('ERROR:', error);
@@ -48,7 +48,9 @@ const DialogTambahPedagang = ({ onPedagangCreated, children, sppg_id }: DialogTa
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const payload = {
-      ...form
+      ...form,
+      longitude: Number(form.longitude),
+      latitude: Number(form.latitude)
     };
 
     const result = pedagangSchema.safeParse(payload);
@@ -63,7 +65,7 @@ const DialogTambahPedagang = ({ onPedagangCreated, children, sppg_id }: DialogTa
       }
       return;
     }
-    // await mutation.mutateAsync({ sppg_id: sppg_id, input: { ...payload, alokasi_harian_id } });
+    await mutation.mutateAsync({ sppg_id: sppg_id, input: { ...payload } });
     console.log({
       // input: result.data as PostDriver
       input: result.data

@@ -27,3 +27,12 @@ export interface FetchPedagangLokalResponse {
   metadata: Metadata;
   pedagang_lokal: PedagangLokalType[];
 }
+
+export type CreatePedagangLokalInput = {
+  nama: string;
+  alamat: string;
+  no_hp: string;
+  longitude: number;
+  latitude: number;
+  jenis_produk: string;
+};

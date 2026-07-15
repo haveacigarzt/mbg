@@ -1,5 +1,6 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import {
+  deletePedagangLokal,
   deletePengeluaran,
   getAlokasiHarian,
   getKecamatan,
@@ -11,12 +12,15 @@ import {
   getSPPG,
   getSPPGByID,
   postAlokasi,
+  postPedagangLokal,
   postPengeluaran,
   postProduksiHarian,
+  updatePedagangLokal,
   updateSPPG
 } from '../api/sppg';
 import type { CreateAlokasiHarianInput, CreatePengeluaranHarianInput, CreateProduksiHarianInput, GetSPPGParams, PostSPPG } from '../types/sppg';
 import mockDataSppg from '../mocks/sppg.json';
+import type { CreatePedagangLokalInput } from '@/types/pedaganglokal';
 
 export function getSPPGQueryOptions(params?: GetSPPGParams) {
   return queryOptions({
@@ -139,5 +143,21 @@ export function getAllProduksiHarianQueryOptions(tanggal: string) {
   return queryOptions({
     queryKey: ['produksi_harian_all', tanggal],
     queryFn: () => getProduksiHarianAll(tanggal)
+  });
+}
+
+export function createPedagangLokalMutationOptions() {
+  return mutationOptions({
+    mutationFn: ({ sppg_id, input }: { sppg_id: number; input: CreatePedagangLokalInput }) => postPedagangLokal(sppg_id, input)
+  });
+}
+export function updatePedagangLokalMutationOptions() {
+  return mutationOptions({
+    mutationFn: ({ sppg_id, input, id }: { sppg_id: number; input: CreatePedagangLokalInput; id: number }) => updatePedagangLokal(sppg_id, input, id)
+  });
+}
+export function deletePedagangLokalMutationOptions() {
+  return mutationOptions({
+    mutationFn: (id: number) => deletePedagangLokal(id)
   });
 }

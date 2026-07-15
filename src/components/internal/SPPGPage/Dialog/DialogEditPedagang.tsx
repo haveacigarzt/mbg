@@ -5,13 +5,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { errorToast, successToast } from '@/lib/constants';
-import { createPengeluaranMutationOptions } from '@/queryOptions/sppg';
+import { createPengeluaranMutationOptions, updatePedagangLokalMutationOptions } from '@/queryOptions/sppg';
 import { pedagangSchema } from '@/schema/formValidation';
 import type { PedagangLokalType } from '@/types/pedaganglokal';
 import { useMutation } from '@tanstack/react-query';
-import { Loader2, MapPin } from 'lucide-react';
+import { Loader2, Map } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import DialogGetCoords from '../../DialogGetCoords';
 
 interface Props {
   onSuccess: () => void;
@@ -29,49 +30,17 @@ const DialogEditPedagang = ({ onSuccess, children, sppg_id, data }: Props) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
-  const [getLocLoading, setGetLocLoading] = useState(false);
-
-  async function getLocation() {
-    setGetLocLoading(true);
-    type Location = {
-      latitude: number;
-      longitude: number;
-    };
-    async function getLocation(): Promise<Location> {
-      return new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(
-          ({ coords }) => {
-            resolve({
-              latitude: coords.latitude,
-              longitude: coords.longitude
-            });
-          },
-          reject,
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-          }
-        );
-      });
-    }
-    const location = await getLocation();
-    updateField('latitude', Number(location.latitude));
-    updateField('longitude', Number(location.longitude));
-    setGetLocLoading(false);
-  }
-
   const mutation = useMutation({
-    ...createPengeluaranMutationOptions(),
+    ...updatePedagangLokalMutationOptions(),
     onSuccess: () => {
-      toast.success('Berhasil mengirim pengeluaran harian.', {
+      toast.success('Berhasil mengubah pedagang lokal.', {
         style: successToast as React.CSSProperties
       });
       onSuccess();
       setOpen(false);
     },
     onError: (error: ApiError) => {
-      toast.error('Gagal mengirim pengeluaran harian.', {
+      toast.error('Gagal mengubah pedagang lokal.', {
         style: errorToast as React.CSSProperties
       });
       console.log('ERROR:', error);
@@ -96,7 +65,7 @@ const DialogEditPedagang = ({ onSuccess, children, sppg_id, data }: Props) => {
       }
       return;
     }
-    // await mutation.mutateAsync({ sppg_id: sppg_id, input: { ...payload, alokasi_harian_id } });
+    await mutation.mutateAsync({ sppg_id: sppg_id, input: payload, id: data.id });
     console.log({
       // input: result.data as PostDriver
       input: result.data
@@ -164,9 +133,11 @@ const DialogEditPedagang = ({ onSuccess, children, sppg_id, data }: Props) => {
                 <Input id="lon" type="number" placeholder="Longitude" value={form.longitude} onChange={(e) => updateField('longitude', Number(e.target.value))} required />
               </div>
 
-              <Button title="Pakai lokasi perangkat saat ini" className="col-span-1 bg-blue-600 rounded-xl text-white hover:bg-blue-700" type="button" onClick={getLocation}>
-                {getLocLoading ? <Loader2 className="animate-spin" /> : <MapPin />}
-              </Button>
+              <DialogGetCoords updateField={updateField}>
+                <Button title="Buka map">
+                  <Map />
+                </Button>
+              </DialogGetCoords>
             </div>
           </div>
           <DialogFooter>

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import { Textarea } from '@/components/ui/textarea';
+import { errorToast, successToast } from '@/lib/constants';
 import { updatePosyanduMutationOptions } from '@/queryOptions/posyandu';
 import { posyanduSchema } from '@/schema/formValidation';
 import type { PostPosyandu, Posyandu } from '@/types/posyandu';
@@ -53,22 +54,14 @@ const DialogEditPosyandu = ({ children, posyandu, kelurahan, onPosyanduUpdate, k
     ...updatePosyanduMutationOptions(),
     onSuccess: () => {
       toast.success('Berhasil memperbarui data Sekolah.', {
-        style: {
-          '--normal-bg': 'color-mix(in oklab, light-dark(var(--color-green-600), var(--color-green-400)) 10%, var(--background))',
-          '--normal-text': 'light-dark(var(--color-green-600), var(--color-green-400))',
-          '--normal-border': 'light-dark(var(--color-green-600), var(--color-green-400))'
-        } as React.CSSProperties
+        style: successToast as React.CSSProperties
       });
       onPosyanduUpdate();
       setOpen(false);
     },
     onError: (error: ApiError) => {
       toast.error('Gagal memperbarui data Sekolah.', {
-        style: {
-          '--normal-bg': 'color-mix(in oklab, light-dark(var(--color-red-600), var(--color-red-400)) 10%, var(--background))',
-          '--normal-text': 'light-dark(var(--color-red-600), var(--color-red-400))',
-          '--normal-border': 'light-dark(var(--color-red-400), var(--color-red-400))'
-        } as React.CSSProperties
+        style: errorToast as React.CSSProperties
       });
       console.log('ERROR:', error);
     }
@@ -84,11 +77,7 @@ const DialogEditPosyandu = ({ children, posyandu, kelurahan, onPosyanduUpdate, k
 
       if (firstError) {
         toast.error(firstError, {
-          style: {
-            '--normal-bg': 'color-mix(in oklab, light-dark(var(--color-red-600), var(--color-red-400)) 10%, var(--background))',
-            '--normal-text': 'light-dark(var(--color-red-600), var(--color-red-400))',
-            '--normal-border': 'light-dark(var(--color-red-400), var(--color-red-400))'
-          } as React.CSSProperties
+          style: errorToast as React.CSSProperties
         });
       }
       return;

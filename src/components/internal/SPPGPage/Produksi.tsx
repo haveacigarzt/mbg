@@ -1,15 +1,14 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import Navbar from '../Navbar';
 import { getKecamatanQueryOptions, getKelurahanQueryOptions, getProduksiHarianQueryOptions, getSPPGByIDQueryOptions } from '../../../queryOptions/sppg';
-import { Suspense, useEffect, useState } from 'react';
-import SekolahTable from './SekolahTable';
-import PosyanduTable from './PosyanduTable';
-import { DialogEditSPPG } from './Dialog/DialogEditSPPG';
+import { useEffect, useState } from 'react';
 import type { AuthResponse } from '@/types/auth';
-import { Building2, MapPin, Phone, Mail, Users, ChefHat, CheckCircle, XCircle, HandHeart, CookingPot, Clock, ClockCheck, BookmarkCheck, SquarePen } from 'lucide-react';
+import { CookingPot, Clock, ClockCheck, BookmarkCheck, SquarePen, AlertCircleIcon } from 'lucide-react';
 import { WebSocketProvider } from '@/provider/websocket-provider';
 import { calculateProgress, formatTanggalIndonesia, formatTime, getTodaysDate } from '@/lib/utils';
 import DialogEditProduksi from './Dialog/DialogEditProduksi';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertTitle } from '@/components/ui/alert';
 
 interface Props {
   user: AuthResponse;
@@ -78,7 +77,7 @@ const Produksi = ({ user }: Props) => {
                   <CookingPot className="w-5 h-5 text-blue-500" />
                 </div>
                 <div>
-                  <p className="font-bold text-gray-800">Status Produksi Hari Ini (Real Time)</p>
+                  <p className="font-bold text-gray-800">Produksi Hari Ini, {formatTanggalIndonesia(`${today}T00:00:00Z`)}</p>
                 </div>
               </div>
               <DialogEditProduksi
@@ -88,34 +87,49 @@ const Produksi = ({ user }: Props) => {
                 waktu_mulai={produksiHarian ? toTimeInput(produksiHarian.waktu_mulai) : '00:00'}
                 estimasi_waktu_selesai={produksiHarian ? toTimeInput(produksiHarian.estimasi_waktu_selesai) : '00:00'}
               >
-                <button
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700
+                <div className="relative inline-block">
+                  <Button
+                    className="flex items-center gap-2 
                              text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
-                >
-                  <SquarePen className="w-4 h-4" />
-                  Edit
-                </button>
+                  >
+                    <SquarePen className="w-4 h-4" />
+                    Edit
+                  </Button>
+                  {!produksiHarian && <span className="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full bg-red-500 border-2 border-background" />}
+                </div>
               </DialogEditProduksi>
             </div>
 
             <div className="grid grid-cols-3 gap-0 divide-x divide-gray-100">
-              <div className="p-6 flex flex-col gap-4">
-                <div className="flex items-start gap-3">
+              <div className="p-6 flex flex-col">
+                <div className="flex gap-3 items-end">
                   <Clock className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
                   <div>
                     <p className="text-xs text-gray-400 tracking-widest">WAKTU MULAI</p>
-                    <p className="text-sm text-gray-700 mt-0.5">{produksiHarian ? formatTime(produksiHarian.waktu_mulai) : 'Belum diatur'}</p>
+                    {produksiHarian && <p className="text-sm text-gray-700 mt-0.5">{produksiHarian ? formatTime(produksiHarian.waktu_mulai) : 'Belum diatur'}</p>}
                   </div>
                 </div>
+                {!produksiHarian && (
+                  <Alert variant="warning" className="mt-2">
+                    <AlertCircleIcon className="h-4 w-4" />
+                    <AlertTitle>Harap atur waktu mulai produksi!</AlertTitle>
+                  </Alert>
+                )}
               </div>
-              <div className="p-6 flex flex-col gap-4">
-                <div className="flex items-start gap-3">
+              <div className="p-6 flex flex-col">
+                <div className="flex gap-3 items-end">
                   <ClockCheck className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
                   <div>
-                    <p className="text-xs text-gray-400 tracking-widest">ESTIMASI WAKTU SELESAI</p>
-                    <p className="text-sm text-gray-700 mt-0.5">{produksiHarian ? formatTime(produksiHarian.estimasi_waktu_selesai) : 'Belum diatur'}</p>
+                    <p className="text-xs tracking-widest text-gray-400">ESTIMASI WAKTU SELESAI</p>
+                    {produksiHarian && <p className="mt-0.5 text-sm text-gray-700">{formatTime(produksiHarian.estimasi_waktu_selesai)}</p>}
                   </div>
                 </div>
+                {!produksiHarian && (
+                  <Alert variant="warning" className="mt-2">
+                    <AlertCircleIcon className="h-4 w-4" />
+                    <AlertTitle>Harap atur estmasi waktu selesai!</AlertTitle>
+                  </Alert>
+                )}
               </div>
               <div className="p-6 flex flex-col gap-4">
                 <div className="flex items-start gap-3">

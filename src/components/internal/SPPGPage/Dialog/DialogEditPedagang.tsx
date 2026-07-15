@@ -9,10 +9,11 @@ import { createPengeluaranMutationOptions, updatePedagangLokalMutationOptions } 
 import { pedagangSchema } from '@/schema/formValidation';
 import type { PedagangLokalType } from '@/types/pedaganglokal';
 import { useMutation } from '@tanstack/react-query';
-import { Loader2, Map } from 'lucide-react';
-import { useState } from 'react';
+import { AlertCircleIcon, Loader2, Map } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import DialogGetCoords from '../../DialogGetCoords';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface Props {
   onSuccess: () => void;
@@ -25,6 +26,12 @@ const DialogEditPedagang = ({ onSuccess, children, sppg_id, data }: Props) => {
   const [open, setOpen] = useState(false);
   const initialForm = { nama: data.nama, alamat: data.alamat, no_hp: data.no_hp, jenis_produk: data.jenis_produk, longitude: data.longitude, latitude: data.latitude };
   const [form, setForm] = useState(initialForm);
+
+  useEffect(() => {
+    setForm(initialForm);
+  }, [data]);
+
+  const isDirty = JSON.stringify(form) !== JSON.stringify(initialForm);
 
   function updateField(field: string, value: any) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -72,6 +79,8 @@ const DialogEditPedagang = ({ onSuccess, children, sppg_id, data }: Props) => {
     });
   }
 
+  const [noChangesAlert, setNoChangesAlert] = useState(false);
+
   return (
     <Dialog open={open} onOpenChange={(val) => setOpen(val)} modal={false}>
       <DialogTrigger asChild>{children}</DialogTrigger>
@@ -94,7 +103,7 @@ const DialogEditPedagang = ({ onSuccess, children, sppg_id, data }: Props) => {
             <DialogTitle className="text-lg font-semibold">Ubah data Pedagang Lokal</DialogTitle>
             <DialogDescription>Perbarui data Pedagang Lokal. Klik simpan saat selesai.</DialogDescription>
           </DialogHeader>
-          <div className="flex flex-col gap-4 py-5">
+          <div className="flex flex-col gap-4 pb-3 pt-5">
             <div>
               <Label htmlFor="nama" className="mb-1">
                 Nama
@@ -140,15 +149,32 @@ const DialogEditPedagang = ({ onSuccess, children, sppg_id, data }: Props) => {
               </DialogGetCoords>
             </div>
           </div>
+          {noChangesAlert && (
+            <Alert variant="destructive" className="bg-red-50 border-red-200 mb-3">
+              <AlertCircleIcon className="w-4 h-4" />
+              <AlertTitle>Tidak ada perubahan data</AlertTitle>
+            </Alert>
+          )}
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline" className="text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
                 Batal
               </Button>
             </DialogClose>
-            <Button type="submit" disabled={mutation.isPending} className="text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
-              {mutation.isPending ? <Loader2 className="animate-spin" /> : 'Simpan'}
-            </Button>
+            <div
+              onClick={() => {
+                if (!isDirty) {
+                  setNoChangesAlert(true);
+                  setTimeout(() => {
+                    setNoChangesAlert(false);
+                  }, 2500);
+                }
+              }}
+            >
+              <Button type="submit" disabled={!isDirty || mutation.isPending} className="text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
+                {mutation.isPending ? <Loader2 className="animate-spin" /> : 'Simpan'}
+              </Button>
+            </div>
           </DialogFooter>
         </form>
       </DialogContent>

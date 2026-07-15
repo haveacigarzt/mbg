@@ -1,54 +1,28 @@
 import { useSuspenseQueries, useSuspenseQuery } from '@tanstack/react-query';
 import Navbar from '../Navbar';
-import { getKecamatanQueryOptions, getKelurahanQueryOptions, getSPPGByIDQueryOptions } from '../../../queryOptions/sppg';
 import { Suspense, useState } from 'react';
-import SekolahTable from './SekolahTable';
-import PosyanduTable from './PosyanduTable';
 import PengirimanTable from './PengirimanTable';
 import DriversTable from './DriversTable';
-import { DialogEditSPPG } from './Dialog/DialogEditSPPG';
-import type { AuthResponse } from '@/types/auth';
-import {
-  Building2,
-  MapPin,
-  Phone,
-  Mail,
-  Users,
-  ChefHat,
-  CheckCircle,
-  XCircle,
-  ClockCheck,
-  HandCoins,
-  ShoppingCart,
-  Wallet,
-  Plus,
-  History,
-  CalendarClock,
-  Truck,
-  CircleUserRound,
-  MapPinned,
-  Group,
-  LoaderCircle,
-  CheckCheck,
-  ListChecks
-} from 'lucide-react';
-import { WebSocketProvider } from '@/provider/websocket-provider';
-import { formatRupiah } from '@/lib/utils';
-import PengeluaranTable from './PengeluaranTable';
-import DialogTambahPengeluaran from './Dialog/DialogTambahPengeluaran';
+import { Truck, CircleUserRound, Group, LoaderCircle, ListChecks, AlertCircleIcon } from 'lucide-react';
 import { getPengirimanQueryOptions } from '@/queryOptions/pengiriman';
 import type { SortingState } from '@tanstack/react-table';
 import { getSekolahQueryOptions } from '@/queryOptions/sekolah';
 import { getPosyanduQueryOptions } from '@/queryOptions/posyandu';
+import { formatTanggalIndonesia, getTodaysDate } from '@/lib/utils';
+import { Alert, AlertTitle } from '@/components/ui/alert';
+import { getDriversQueryOptions } from '@/queryOptions/drivers';
 
 interface Props {
   sppg_id: number;
 }
 
 const Keuangan = ({ sppg_id }: Props) => {
+  const today = getTodaysDate();
+
   const [tanggal, setTanggal] = useState(new Date().toLocaleDateString('sv-SE'));
   const [date, setDate] = useState<Date | undefined>(new Date());
 
+  // Pengiriman Data
   const [page, setPage] = useState(1);
   const page_size = 10;
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -60,6 +34,23 @@ const Keuangan = ({ sppg_id }: Props) => {
 
   const menunggu = data.pengiriman.filter((el) => el.status === 'menunggu').length;
   const sampai = data.pengiriman.filter((el) => el.status === 'sampai').length;
+
+  // Drivers Data
+  const [searchDrivers, setSearchDrivers] = useState('');
+  const [pageDriver, setPageDriver] = useState(1);
+  const pageSizeDriver = 10;
+  const [sortingDriver, setSortingDriver] = useState<SortingState>([]);
+  const sortDriver = sortingDriver[0] ? `${sortingDriver[0].desc ? '-' : ''}${sortingDriver[0].id}` : '';
+
+  const { data: dataDriver, refetch: refetchDriver } = useSuspenseQuery(
+    getDriversQueryOptions({
+      sppg_id,
+      page: pageDriver,
+      page_size: pageSizeDriver,
+      nama: searchDrivers,
+      sort: sortDriver
+    })
+  );
 
   return (
     <Suspense fallback={<div className="flex items-center justify-center py-12 text-gray-300 text-sm">Memuat data...</div>}>
@@ -81,17 +72,22 @@ const Keuangan = ({ sppg_id }: Props) => {
                   <Truck className="w-5 h-5 text-blue-500" />
                 </div>
                 <div>
-                  <p className="font-bold text-gray-800">Pengiriman Hari Ini (Real Time)</p>
+                  <p className="font-bold text-gray-800">Pengiriman Hari Ini, {formatTanggalIndonesia(`${today}T00:00:00Z`)}</p>
                 </div>
               </div>
+              {data.pengiriman.length === 0 && (
+                <Alert variant="warning" className="bg-red-50 border-red-200 mt-2 w-fit">
+                  <AlertCircleIcon className="w-4 h-4" />
+                  <AlertTitle>Harap tambahkan pengiriman hari ini!</AlertTitle>
+                </Alert>
+              )}
             </div>
-
             <div className="grid grid-cols-3 gap-0 divide-x divide-gray-100">
               <div className="p-6 flex flex-col gap-4">
                 <div className="flex items-start gap-3">
                   <Group className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
                   <div>
-                    <p className="text-xs text-gray-400 tracking-widest">ALOKASI</p>
+                    <p className="text-xs text-gray-400 tracking-widest">ALOKASI TUJUAN PENGIRIMAN</p>
                     <p className="text-sm text-gray-700 mt-0.5">{sekolah.metadata.total_records + posyandu.metadata.total_records}</p>
                   </div>
                 </div>
@@ -143,10 +139,25 @@ const Keuangan = ({ sppg_id }: Props) => {
                   <p className="font-bold text-gray-800">Akun Driver</p>
                 </div>
               </div>
+              {dataDriver.drivers.length === 0 && (
+                <Alert variant="warning" className="bg-red-50 border-red-200 mt-2 w-fit">
+                  <AlertCircleIcon className="w-4 h-4" />
+                  <AlertTitle>Harap tambahkan akun driver!</AlertTitle>
+                </Alert>
+              )}
             </div>
 
             <div className="p-5">
-              <DriversTable sppg_id={sppg_id} />
+              <DriversTable
+                data={dataDriver}
+                setPageDriver={setPageDriver}
+                searchDrivers={searchDrivers}
+                sortingDriver={sortingDriver}
+                setSortingDriver={setSortingDriver}
+                setSearchDrivers={setSearchDrivers}
+                refetchDriver={refetchDriver}
+                pageDriver={pageDriver}
+              />
             </div>
           </div>
         </div>

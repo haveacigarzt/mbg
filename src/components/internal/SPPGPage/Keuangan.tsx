@@ -3,7 +3,7 @@ import Navbar from '../Navbar';
 import { createAlokasiMutationOptions, getAlokasiHarianQueryOptions, getPengeluaranHarianQueryOptions, getSPPGByIDQueryOptions } from '../../../queryOptions/sppg';
 import { useState } from 'react';
 import type { AuthResponse } from '@/types/auth';
-import { HandCoins, ShoppingCart, Wallet, Plus, History, CalendarClock, SquarePen, Save, X, LoaderCircle } from 'lucide-react';
+import { HandCoins, ShoppingCart, Wallet, Plus, History, CalendarClock, SquarePen, Save, X, LoaderCircle, CircleDollarSign, AlertCircleIcon } from 'lucide-react';
 import { WebSocketProvider } from '@/provider/websocket-provider';
 import { formatRupiah, formatTanggalIndonesia, getTodaysDate } from '@/lib/utils';
 import PengeluaranTable from './PengeluaranTable';
@@ -16,6 +16,7 @@ import { errorToast, successToast } from '@/lib/constants';
 import { alokasiSchema } from '@/schema/formValidation';
 import type { SortingState } from '@tanstack/react-table';
 import { getPedagangLokalQueryOptions } from '@/queryOptions/pedaganglokal';
+import { Alert, AlertTitle } from '@/components/ui/alert';
 
 interface Props {
   user: AuthResponse;
@@ -83,21 +84,26 @@ const Keuangan = ({ user }: Props) => {
       tanggal: today,
       jumlah: alokasiHarianJumlah
     };
-    const result = alokasiSchema.safeParse(payload);
+    try {
+      const result = alokasiSchema.safeParse(payload);
 
-    if (!result.success) {
-      const firstError = Object.values(result.error.flatten().fieldErrors).flat()[0];
+      if (!result.success) {
+        const firstError = Object.values(result.error.flatten().fieldErrors).flat()[0];
 
-      if (firstError) {
-        toast.error(firstError, {
-          style: errorToast as React.CSSProperties
-        });
+        if (firstError) {
+          toast.error(firstError, {
+            style: errorToast as React.CSSProperties
+          });
+        }
+        return;
       }
-      return;
+      await mutation.mutateAsync({ sppg_id: sppg.id, input: payload });
+      setIsInput(false);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
     }
-    await mutation.mutateAsync({ sppg_id: sppg.id, input: payload });
-    setIsLoading(false);
-    setIsInput(false);
   };
   return (
     <WebSocketProvider room_id={`sppg/${String(sppg.id)}`}>
@@ -116,16 +122,22 @@ const Keuangan = ({ user }: Props) => {
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <div className="flex items-center gap-3">
                 <div className="bg-blue-50 rounded-xl p-2">
-                  <CalendarClock className="w-5 h-5 text-blue-500" />
+                  <CircleDollarSign className="w-5 h-5 text-blue-500" />
                 </div>
                 <div>
                   <p className="font-bold text-gray-800">Keuangan Hari Ini, {formatTanggalIndonesia(`${today}T00:00:00Z`)}</p>
                 </div>
               </div>
+              {alokasiHarian.jumlah === 0 && (
+                <Alert variant="warning" className="bg-red-50 border-red-200 mt-2 w-fit">
+                  <AlertCircleIcon className="w-4 h-4" />
+                  <AlertTitle>Harap atur nilai alokasi hari ini!</AlertTitle>
+                </Alert>
+              )}
             </div>
 
             <div className="grid grid-cols-3 gap-0 divide-x divide-gray-100">
-              <div className="p-6 flex justify-between">
+              <div className="p-6 ">
                 {isInput ? (
                   <div className="flex items-start gap-3">
                     <Input
@@ -151,22 +163,25 @@ const Keuangan = ({ user }: Props) => {
                     </div>
                   </div>
                 ) : (
-                  <>
+                  <div className="flex justify-between">
                     <div className="flex items-start gap-3">
                       <HandCoins className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
                       <div>
-                        <p className="text-xs text-gray-400 tracking-widest">ALOKASI</p>
+                        <p className="text-xs text-gray-400 tracking-widest">ALOKASI PENDANAAN</p>
                         <p className="text-sm text-gray-700 mt-0.5">{formatRupiah(alokasiHarian.jumlah)}</p>
                       </div>
                     </div>
-                    <Button
-                      className="bg-blue-600 hover:bg-blue-700
+                    <div className="relative inline-block">
+                      <Button
+                        className="bg-blue-600 hover:bg-blue-700
                              text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
-                      onClick={() => setIsInput(!isInput)}
-                    >
-                      <SquarePen />
-                    </Button>
-                  </>
+                        onClick={() => setIsInput(!isInput)}
+                      >
+                        <SquarePen />
+                      </Button>
+                      {alokasiHarian.jumlah === 0 && <span className="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full bg-red-500 border-2 border-background" />}
+                    </div>
+                  </div>
                 )}
               </div>
               <div className="p-6 flex flex-col gap-4">
@@ -197,14 +212,14 @@ const Keuangan = ({ user }: Props) => {
                 </div>
               </div>
               <DialogTambahPengeluaran sppg_id={sppg.id} alokasi_harian_id={alokasiHarian.id} onPengeluaranUpdate={refetchPengeluaran} pedagangLokal={pedagangLokal}>
-                <button
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300
+                <Button
+                  className="flex items-center gap-2 
                              text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
                   disabled={alokasiHarian.id === 0}
                 >
                   <Plus className="w-4 h-4" />
                   Tambah
-                </button>
+                </Button>
               </DialogTambahPengeluaran>
             </div>
             <div className="px-4 pb-4">

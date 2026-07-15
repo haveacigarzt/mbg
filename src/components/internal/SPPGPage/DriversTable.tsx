@@ -1,15 +1,22 @@
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable, type SortingState } from '@tanstack/react-table';
-import type { Drivers } from '../../../types/drivers';
-import { useEffect, useState } from 'react';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { getDriversQueryOptions } from '../../../queryOptions/drivers';
+import type { Drivers, FetchDriversResponse } from '../../../types/drivers';
+import { useEffect } from 'react';
+import { type QueryObserverResult, type RefetchOptions } from '@tanstack/react-query';
 import DialogTambahDriver from './Dialog/DialogTambahDriver';
 import DialogEditDriver from './Dialog/DialogEditDriver';
 import DialogHapusDriver from './Dialog/DialogHapusDriver';
 import { Plus, ChevronRight, ChevronLeft, Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface Props {
-  sppg_id: number;
+  data: FetchDriversResponse;
+  setPageDriver: React.Dispatch<React.SetStateAction<number>>;
+  searchDrivers: string;
+  sortingDriver: SortingState;
+  setSortingDriver: React.Dispatch<React.SetStateAction<SortingState>>;
+  setSearchDrivers: React.Dispatch<React.SetStateAction<string>>;
+  refetchDriver: (options?: RefetchOptions | undefined) => Promise<QueryObserverResult<FetchDriversResponse, Error>>;
+  pageDriver: number;
 }
 const columnHelper = createColumnHelper<Drivers>();
 
@@ -32,34 +39,20 @@ const columns = [
     }
   })
 ];
-const DriversTable = ({ sppg_id }: Props) => {
-  const [searchDrivers, setSearchDrivers] = useState('');
-  const [page, setPage] = useState(1);
-  const page_size = 10;
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const sort = sorting[0] ? `${sorting[0].desc ? '-' : ''}${sorting[0].id}` : '';
 
-  const { data, refetch } = useSuspenseQuery(
-    getDriversQueryOptions({
-      sppg_id,
-      page,
-      page_size,
-      nama: searchDrivers,
-      sort
-    })
-  );
+const DriversTable = ({ data, setPageDriver, searchDrivers, sortingDriver, setSortingDriver, setSearchDrivers, refetchDriver, pageDriver }: Props) => {
   const drivers = data.drivers;
   const metadata = data.metadata;
   useEffect(() => {
-    setPage(1);
+    setPageDriver(1);
   }, [searchDrivers]);
   const table = useReactTable({
     data: drivers,
     columns,
     state: {
-      sorting
+      sorting: sortingDriver
     },
-    onSortingChange: setSorting,
+    onSortingChange: setSortingDriver,
     manualSorting: true,
     getCoreRowModel: getCoreRowModel()
   });
@@ -77,14 +70,17 @@ const DriversTable = ({ sppg_id }: Props) => {
             placeholder={`Cari driver...`}
           />
         </div>
-        <DialogTambahDriver onDriverUpdate={refetch}>
-          <button
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700
+        <DialogTambahDriver onDriverUpdate={refetchDriver}>
+          <div className="relative inline-block">
+            <Button
+              className="flex items-center gap-2 
                              text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Tambah
-          </button>
+            >
+              <Plus className="w-4 h-4" />
+              Tambah
+            </Button>
+            {drivers.length === 0 && <span className="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full bg-red-500 border-2 border-background" />}
+          </div>
         </DialogTambahDriver>
       </div>
 
@@ -125,7 +121,7 @@ const DriversTable = ({ sppg_id }: Props) => {
                   </td>
                 ))}
                 <td className="flex gap-2">
-                  <DialogEditDriver onDriverUpdate={refetch} driver={row.original}>
+                  <DialogEditDriver onDriverUpdate={refetchDriver} driver={row.original}>
                     <button
                       className="text-xs font-semibold text-gray-600 bg-gray-100
                                          hover:bg-blue-300 px-3 py-1.5 rounded-lg transition-colors"
@@ -133,7 +129,7 @@ const DriversTable = ({ sppg_id }: Props) => {
                       Edit
                     </button>
                   </DialogEditDriver>
-                  <DialogHapusDriver onSuccess={refetch} id={row.original.id} nama={row.original.nama}>
+                  <DialogHapusDriver onSuccess={refetchDriver} id={row.original.id} nama={row.original.nama}>
                     <button
                       className="text-xs font-semibold text-red-500 bg-red-50
                                          hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors"
@@ -150,12 +146,12 @@ const DriversTable = ({ sppg_id }: Props) => {
       {/* Paginasi */}
       <div className="flex items-center justify-between mt-5">
         <p className="text-xs text-gray-400">
-          Halaman {page} dari {metadata.last_page} — <span className="font-bold text-gray-600">TOTAL {metadata.total_records} DATA</span>
+          Halaman {pageDriver} dari {metadata.last_page} — <span className="font-bold text-gray-600">TOTAL {metadata.total_records} DATA</span>
         </p>
         <div className="flex items-center gap-1">
           <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page === 1}
+            onClick={() => setPageDriver((p) => Math.max(1, p - 1))}
+            disabled={pageDriver === 1}
             className="p-1.5 rounded-lg border border-gray-200 text-gray-500
                        hover:border-blue-300 hover:text-blue-500
                        disabled:opacity-30 disabled:cursor-not-allowed transition-all"
@@ -165,17 +161,17 @@ const DriversTable = ({ sppg_id }: Props) => {
           {Array.from({ length: metadata.last_page }, (_, i) => i + 1).map((p) => (
             <button
               key={p}
-              onClick={() => setPage(p)}
-              disabled={p === page}
+              onClick={() => setPageDriver(p)}
+              disabled={p === pageDriver}
               className={`w-8 h-8 rounded-lg text-xs font-semibold transition-all
-                ${p === page ? 'bg-blue-600 text-white' : 'border border-gray-200 text-gray-500 hover:border-blue-300 hover:text-blue-500'}`}
+                ${p === pageDriver ? 'bg-blue-600 text-white' : 'border border-gray-200 text-gray-500 hover:border-blue-300 hover:text-blue-500'}`}
             >
               {p}
             </button>
           ))}
           <button
-            onClick={() => setPage((p) => Math.min(metadata.last_page, p + 1))}
-            disabled={page === metadata.last_page}
+            onClick={() => setPageDriver((p) => Math.min(metadata.last_page, p + 1))}
+            disabled={pageDriver === metadata.last_page}
             className="p-1.5 rounded-lg border border-gray-200 text-gray-500
                        hover:border-blue-300 hover:text-blue-500
                        disabled:opacity-30 disabled:cursor-not-allowed transition-all"

@@ -153,13 +153,16 @@ const PengirimanTable = ({ sppg_id, tanggal, onTanggalChange, date, onDateChange
           </Popover>
         </div>
         <DialogTambahPengiriman onPengirimanUpdate={refetch} sekolah={sekolah.sekolah} posyandu={posyandu.posyandu}>
-          <button
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700
+          <div className="relative inline-block">
+            <Button
+              className="flex items-center gap-2 
                              text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Tambah
-          </button>
+            >
+              <Plus className="w-4 h-4" />
+              Tambah
+            </Button>
+            {pengiriman.length === 0 && <span className="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full bg-red-500 border-2 border-background" />}
+          </div>
         </DialogTambahPengiriman>
       </div>
       {/* Tabel */}

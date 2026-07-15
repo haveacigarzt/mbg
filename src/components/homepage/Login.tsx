@@ -10,6 +10,7 @@ import { postLoginMutationOptions } from '@/queryOptions/auth';
 import { Link, useRouter } from '@tanstack/react-router';
 import type { ApiError } from '@/api/client';
 import { toast } from 'sonner';
+import { successToast } from '@/lib/constants';
 
 const quickLogins = [
   {
@@ -62,11 +63,7 @@ const Login = () => {
     ...postLoginMutationOptions(),
     onSuccess: () => {
       toast.success('Berhasil login. Selamat datang', {
-        style: {
-          '--normal-bg': 'color-mix(in oklab, light-dark(var(--color-green-600), var(--color-green-400)) 10%, var(--background))',
-          '--normal-text': 'light-dark(var(--color-green-600), var(--color-green-400))',
-          '--normal-border': 'light-dark(var(--color-green-600), var(--color-green-400))'
-        } as React.CSSProperties
+        style: successToast as React.CSSProperties
       });
       router.navigate({ to: '/dashboard' });
     },

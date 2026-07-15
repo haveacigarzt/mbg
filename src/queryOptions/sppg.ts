@@ -4,6 +4,7 @@ import {
   deletePengeluaran,
   getAlokasiHarian,
   getKecamatan,
+  getKelengkapan,
   getKelurahan,
   getKeuanganHarian,
   getPengeluaranHarian,
@@ -159,5 +160,11 @@ export function updatePedagangLokalMutationOptions() {
 export function deletePedagangLokalMutationOptions() {
   return mutationOptions({
     mutationFn: (id: number) => deletePedagangLokal(id)
+  });
+}
+export function getKelengkapanQueryOptions(tanggal: string) {
+  return queryOptions({
+    queryKey: ['kelengkapan_data', tanggal],
+    queryFn: () => getKelengkapan(tanggal)
   });
 }

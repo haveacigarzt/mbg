@@ -76,7 +76,7 @@ const Keuangan = ({ sppg_id }: Props) => {
                 </div>
               </div>
               {data.pengiriman.length === 0 && (
-                <Alert variant="warning" className="bg-red-50 border-red-200 mt-2 w-fit">
+                <Alert variant="warning" className="mt-2 w-fit">
                   <AlertCircleIcon className="w-4 h-4" />
                   <AlertTitle>Harap tambahkan pengiriman hari ini!</AlertTitle>
                 </Alert>
@@ -140,7 +140,7 @@ const Keuangan = ({ sppg_id }: Props) => {
                 </div>
               </div>
               {dataDriver.drivers.length === 0 && (
-                <Alert variant="warning" className="bg-red-50 border-red-200 mt-2 w-fit">
+                <Alert variant="warning" className="mt-2 w-fit">
                   <AlertCircleIcon className="w-4 h-4" />
                   <AlertTitle>Harap tambahkan akun driver!</AlertTitle>
                 </Alert>

@@ -151,12 +151,14 @@ const Dashboard = ({ role_id }: Props) => {
         {/* Stat Cards */}
         <div className="grid grid-cols-4 gap-4">
           {stats.map((item, i) => (
-            <div key={i} className={`bg-white rounded-2xl p-5 border ${item.border} flex flex-col gap-3 shadow-sm`}>
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${item.iconBg}`}>{item.icon}</div>
-              <div>
-                <p className="text-xs text-gray-400 tracking-widest uppercase">{item.label}</p>
-                <p className="text-2xl font-black text-gray-800 mt-1">{item.value}</p>
-                <p className="text-xs text-gray-400 mt-1">{item.sub}</p>
+            <div key={i} className={`bg-white rounded-2xl p-5 border ${item.border}  shadow-sm`}>
+              <div className="flex gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${item.iconBg}`}>{item.icon}</div>
+                <div>
+                  <p className="text-xs text-gray-400 tracking-widest uppercase">{item.label}</p>
+                  <p className="text-2xl font-black text-gray-800 mt-1">{item.value}</p>
+                  <p className="text-xs text-gray-400 mt-1">{item.sub}</p>
+                </div>
               </div>
             </div>
           ))}
@@ -165,7 +167,7 @@ const Dashboard = ({ role_id }: Props) => {
         {/* Map + Pengiriman Aktif */}
         <div className="flex gap-4 flex-1">
           {/* Map */}
-          <div className="flex-[3] bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-h-[500px]">
+          <div className="flex-3 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-h-125">
             <DashboardMap tracking={tracking?.tracking} pengeluaranBaru={pengeluaranBaru} />
           </div>
 

@@ -92,10 +92,12 @@ const Login = () => {
   return (
     <main className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
       {/* Logo */}
-      <div className="text-center mb-8">
-        <p className="text-blue-600 font-black text-3xl tracking-tight">SIAP-MBG</p>
-        <p className="text-gray-400 text-xs tracking-widest mt-1">BGN SANGGAU</p>
-      </div>
+      <Link to="/">
+        <div className="text-center mb-8">
+          <p className="text-blue-600 font-black text-3xl tracking-tight">SIAP-MBG</p>
+          <p className="text-gray-400 text-xs tracking-widest mt-1">BGN SANGGAU</p>
+        </div>
+      </Link>
 
       {/* Card */}
       <div className="w-full max-w-sm bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">

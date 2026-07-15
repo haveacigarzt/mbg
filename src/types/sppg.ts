@@ -176,3 +176,11 @@ export type FetchKeuanganHarianResponse = {
     }
   ];
 };
+export type FetchKelengkapanResponse = {
+  kelengkapan_data: {
+    penerima_manfaat: boolean;
+    alokasi_hari_ini: boolean;
+    pengiriman_hari_ini: boolean;
+    produksi_hari_ini: boolean;
+  };
+};

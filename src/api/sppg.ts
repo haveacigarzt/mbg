@@ -5,6 +5,7 @@ import type {
   CreateProduksiHarianInput,
   FetchAlokasiHarianResponse,
   FetchKecamatanResponse,
+  FetchKelengkapanResponse,
   FetchKelurahanResponse,
   FetchKeuanganHarianResponse,
   FetchPengeluaranHarianResponse,
@@ -245,4 +246,12 @@ export async function deletePedagangLokal(id: number) {
   }
   const data: { message: string } = await response.json();
   return data.message;
+}
+export async function getKelengkapan(tanggal: string) {
+  const response = await apiFetch(`/v1/sppg2/kelengkapandata?tanggal=${tanggal}`);
+  if (!response.ok) {
+    throw new Error('gagal mengambil kelengkapan data');
+  }
+  const data: FetchKelengkapanResponse = await response.json();
+  return data.kelengkapan_data;
 }

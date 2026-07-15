@@ -1,11 +1,14 @@
 import type { ApiError } from '@/api/client';
 import { deleteAuthTokenMutationOptions } from '@/queryOptions/auth';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useRouter } from '@tanstack/react-router';
 import { toast } from 'sonner';
 import { LayoutDashboard, Building2, Truck, LogOut, UserStar, Store } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { errorToast, successToast } from '@/lib/constants';
+import { getTodaysDate } from '@/lib/utils';
+import { getKelengkapanQueryOptions } from '@/queryOptions/sppg';
+import { useState } from 'react';
 
 interface Props {
   role_id: number;
@@ -35,6 +38,14 @@ const Navbar = ({ role_id }: Props) => {
     e.stopPropagation();
     await mutation.mutateAsync();
   };
+
+  const today = getTodaysDate();
+  const { data: kelengkapanSPPG } = useQuery({
+    ...getKelengkapanQueryOptions(today),
+    enabled: role_id === 3
+  });
+
+  const [openItem, setOpenItem] = useState<boolean>(false);
 
   return (
     <div className="fixed top-0 left-0 h-screen w-[15%] bg-white border-r border-gray-100 flex flex-col p-4 gap-2 z-40">
@@ -80,7 +91,7 @@ const Navbar = ({ role_id }: Props) => {
           </Link>
         )}
 
-        {role_id === 3 && (
+        {role_id === 3 && kelengkapanSPPG && (
           <>
             <Accordion type="single" collapsible defaultValue="item-1">
               <AccordionItem value="item-1" className="max-h-125">
@@ -88,9 +99,15 @@ const Navbar = ({ role_id }: Props) => {
                   className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500
                        hover:bg-blue-50 hover:text-blue-600 transition-all
                        [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
+                  onClick={() => setOpenItem(!openItem)}
                 >
                   <Building2 className="w-4 h-4" />
-                  SPPG
+                  <div className="relative inline-block">
+                    SPPG
+                    {openItem && (!kelengkapanSPPG?.penerima_manfaat || !kelengkapanSPPG?.alokasi_hari_ini || !kelengkapanSPPG?.pengiriman_hari_ini || !kelengkapanSPPG?.produksi_hari_ini) && (
+                      <span className="absolute -top-0.5 h-3 w-3 rounded-full bg-red-500 border-2 border-background" />
+                    )}
+                  </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <Link
@@ -99,7 +116,10 @@ const Navbar = ({ role_id }: Props) => {
                        hover:bg-blue-50 hover:text-blue-600 transition-all
                        [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
                   >
-                    Profil
+                    <div className="relative inline-block">
+                      Profil
+                      {!kelengkapanSPPG?.penerima_manfaat && <span className="absolute -top-0.5 h-3 w-3 rounded-full bg-red-500 border-2 border-background" />}
+                    </div>
                   </Link>
                   <Link
                     to="/sppg/keuangan"
@@ -107,7 +127,10 @@ const Navbar = ({ role_id }: Props) => {
                        hover:bg-blue-50 hover:text-blue-600 transition-all
                        [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
                   >
-                    Keuangan
+                    <div className="relative inline-block">
+                      Keuangan
+                      {!kelengkapanSPPG?.alokasi_hari_ini && <span className="absolute -top-0.5 h-3 w-3 rounded-full bg-red-500 border-2 border-background" />}
+                    </div>
                   </Link>
                   <Link
                     to="/sppg/pengiriman"
@@ -115,7 +138,10 @@ const Navbar = ({ role_id }: Props) => {
                        hover:bg-blue-50 hover:text-blue-600 transition-all
                        [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
                   >
-                    Pengiriman
+                    <div className="relative inline-block">
+                      Pengiriman
+                      {!kelengkapanSPPG?.pengiriman_hari_ini && <span className="absolute -top-0.5 h-3 w-3 rounded-full bg-red-500 border-2 border-background" />}
+                    </div>
                   </Link>
                   <Link
                     to="/sppg/produksi"
@@ -123,7 +149,10 @@ const Navbar = ({ role_id }: Props) => {
                        hover:bg-blue-50 hover:text-blue-600 transition-all
                        [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
                   >
-                    Produksi
+                    <div className="relative inline-block">
+                      Produksi
+                      {!kelengkapanSPPG?.produksi_hari_ini && <span className="absolute -top-0.5 h-3 w-3 rounded-full bg-red-500 border-2 border-background" />}
+                    </div>
                   </Link>
                 </AccordionContent>
               </AccordionItem>

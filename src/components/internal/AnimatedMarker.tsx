@@ -6,9 +6,10 @@ import { ArrowRight } from 'lucide-react';
 interface Props {
   tracking: Tracking;
   color: string;
+  distance: number;
 }
 
-export default function AnimatedMarker({ tracking, color }: Props) {
+export default function AnimatedMarker({ tracking, color, distance }: Props) {
   const [position, setPosition] = useState({
     lat: tracking.latitude,
     lng: tracking.longitude
@@ -48,6 +49,14 @@ export default function AnimatedMarker({ tracking, color }: Props) {
     };
   }, [tracking.latitude, tracking.longitude]);
 
+  const jarak = distance / 1000; // km
+
+  const etaJam = tracking.speed > 0 ? jarak / tracking.speed : 0;
+
+  const totalMenit = Math.round(etaJam * 60);
+
+  const jam = Math.floor(totalMenit / 60);
+  const menit = totalMenit % 60;
   return (
     <>
       <CircleMarker
@@ -79,6 +88,9 @@ export default function AnimatedMarker({ tracking, color }: Props) {
             <ArrowRight size={15} />
             {tracking.tujuan_nama}
           </div>
+          <div>Jarak: {jarak.toFixed(2)} km</div>
+          <div>Kecepatan: {tracking.speed} km/jam</div>
+          <div>ETA: {tracking.speed > 0 ? (jam > 0 ? `${jam} jam ${menit} menit` : `${menit} menit`) : '-'}</div>
         </Tooltip>
       </CircleMarker>
     </>

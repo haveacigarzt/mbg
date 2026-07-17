@@ -56,6 +56,8 @@ const DashboardMap = ({ tracking, pengeluaranBaru }: Props) => {
     };
   }, []);
 
+  const [distance, setDistance] = useState(0);
+
   return (
     <div style={{ height: '100%', width: '100%', position: 'relative' }}>
       {/* Overlay Alert */}
@@ -72,7 +74,7 @@ const DashboardMap = ({ tracking, pengeluaranBaru }: Props) => {
         {tracking?.map((el) => (
           /* 2. OPTIMASI: Fragment eksternal dihapus, key diletakkan di Fragment utama yang membungkus semua elemen anak. */
           <Fragment key={el.pengiriman_id}>
-            <AnimatedMarker color={colors[el.pengiriman_id % colors.length]} tracking={el} />
+            <AnimatedMarker color={colors[el.pengiriman_id % colors.length]} tracking={el} distance={distance} />
 
             <Marker position={[el.tujuan_lat, el.tujuan_lng]}>
               <Tooltip permanent direction="top" offset={[-15, -13]}>
@@ -80,7 +82,7 @@ const DashboardMap = ({ tracking, pengeluaranBaru }: Props) => {
               </Tooltip>
             </Marker>
 
-            <RoutingMachine currLat={el.latitude} currLng={el.longitude} tujuanLat={el.tujuan_lat} tujuanLng={el.tujuan_lng} />
+            <RoutingMachine currLat={el.latitude} currLng={el.longitude} tujuanLat={el.tujuan_lat} tujuanLng={el.tujuan_lng} onDistanceChange={setDistance} />
           </Fragment>
         ))}
         {pengeluaranBaru && <AutoPopupMarker pengeluaranBaru={pengeluaranBaru} />}

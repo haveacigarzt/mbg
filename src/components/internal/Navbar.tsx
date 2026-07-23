@@ -1,6 +1,6 @@
 import type { ApiError } from '@/api/client';
 import { deleteAuthTokenMutationOptions } from '@/queryOptions/auth';
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link, useRouter } from '@tanstack/react-router';
 import { toast } from 'sonner';
 import { LayoutDashboard, Building2, Truck, LogOut, UserStar, Store } from 'lucide-react';
@@ -89,6 +89,70 @@ const Navbar = ({ role_id }: Props) => {
             <UserStar className="w-4 h-4" />
             Admin
           </Link>
+        )}
+
+        {role_id === 6 && (
+          <>
+            <Link
+              to="/sekolah/pesertadidik"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500
+                       hover:bg-blue-50 hover:text-blue-600 transition-all
+                       [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
+            >
+              <UserStar className="w-4 h-4" />
+              Peserta Didik
+            </Link>
+            <Link
+              to="/sekolah/gizi"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500
+                       hover:bg-blue-50 hover:text-blue-600 transition-all
+                       [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
+            >
+              <UserStar className="w-4 h-4" />
+              Gizi
+            </Link>
+          </>
+        )}
+
+        {role_id === 5 && (
+          <>
+            <Link
+              to="/posyandu/bumil"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500
+                       hover:bg-blue-50 hover:text-blue-600 transition-all
+                       [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
+            >
+              <UserStar className="w-4 h-4" />
+              Bumil
+            </Link>
+            <Link
+              to="/posyandu/busui"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500
+                       hover:bg-blue-50 hover:text-blue-600 transition-all
+                       [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
+            >
+              <UserStar className="w-4 h-4" />
+              Busui
+            </Link>
+            <Link
+              to="/posyandu/balita"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500
+                       hover:bg-blue-50 hover:text-blue-600 transition-all
+                       [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
+            >
+              <UserStar className="w-4 h-4" />
+              Balita
+            </Link>
+            <Link
+              to="/posyandu/gizi"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500
+                       hover:bg-blue-50 hover:text-blue-600 transition-all
+                       [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
+            >
+              <UserStar className="w-4 h-4" />
+              Gizi
+            </Link>
+          </>
         )}
 
         {role_id === 3 && kelengkapanSPPG && (

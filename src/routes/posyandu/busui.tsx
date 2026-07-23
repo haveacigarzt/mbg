@@ -1,0 +1,309 @@
+import type { ApiError } from '@/api/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import { errorToast, successToast } from '@/lib/constants';
+import { requireAuth } from '@/main';
+import { createBusuiMutationOptions, getBusuiQueryOptions } from '@/queryOptions/posyandu';
+import { busuiSchema, pendudukSchema } from '@/schema/formValidation';
+import type { BusuiInput } from '@/types/posyandu';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { createFileRoute, redirect } from '@tanstack/react-router';
+import { useState } from 'react';
+import { toast } from 'sonner';
+
+export const Route = createFileRoute('/posyandu/busui')({
+  beforeLoad: async () => {
+    const { user } = await requireAuth();
+    if (user.role.role_id !== 5) {
+      toast.error('Access denied', {
+        style: errorToast as React.CSSProperties
+      });
+      throw redirect({ to: '/dashboard' });
+    }
+    return {
+      user
+    };
+  },
+  component: RouteComponent
+});
+
+function RouteComponent() {
+  const [form, setForm] = useState<BusuiInput>({
+    penduduk: {
+      nik: '6101014501980001',
+      nama: 'Dewi Lestari',
+      jenis_kelamin: 'P',
+      tanggal_lahir: '1998-01-05',
+      kelurahan_id: 1,
+      alamat: 'Jl. Ahmad Yani No. 15, Sanggau',
+      no_hp: '081234567890'
+    },
+    busui: {
+      tanggal_persalinan: '2026-05-18',
+      anak_ke: 2,
+      asi_eksklusif: true
+    }
+  });
+
+  const mutation = useMutation({
+    ...createBusuiMutationOptions(),
+    onSuccess: () => {
+      toast.success('Berhasil menambahkan busui.', {
+        style: successToast as React.CSSProperties
+      });
+      refetch();
+    },
+    onError: (error: ApiError) => {
+      toast.error(error.data.error.nik || error.data.error.nisn || 'Gagal menambahkan busui.', {
+        style: errorToast as React.CSSProperties
+      });
+    }
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const result0 = pendudukSchema.safeParse(form.penduduk);
+    if (!result0.success) {
+      const firstError = Object.values(result0.error.flatten().fieldErrors).flat()[0];
+
+      if (firstError) {
+        toast.error(firstError, {
+          style: errorToast as React.CSSProperties
+        });
+      }
+      return;
+    }
+
+    console.log('post: ', form.busui);
+
+    const result = busuiSchema.safeParse(form.busui);
+    if (!result.success) {
+      const firstError = Object.values(result.error.flatten().fieldErrors).flat()[0];
+
+      if (firstError) {
+        toast.error(firstError, {
+          style: errorToast as React.CSSProperties
+        });
+      }
+      return;
+    }
+    try {
+      form.penduduk = { ...form.penduduk, jenis_kelamin: 'P' };
+      await mutation.mutateAsync({ posyandu_id: user.role.id_in_role, input: form });
+    } catch (error: any) {
+      console.log(error.data.error);
+    }
+  };
+
+  const { user } = Route.useRouteContext();
+
+  const { data, refetch } = useQuery(getBusuiQueryOptions(user.role.id_in_role));
+  console.log(data);
+
+  return (
+    <div>
+      <div className="w-100 mx-auto p-5 bg-amber-100">
+        <h1 className="text-xl">Form Busui</h1>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <h2 className="font-semibold text-lg">Data Penduduk</h2>
+          </div>
+
+          <div className="space-y-2">
+            <Label>NIK</Label>
+            <Input
+              value={form.penduduk.nik}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  penduduk: {
+                    ...form.penduduk,
+                    nik: e.target.value
+                  }
+                })
+              }
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Nama</Label>
+            <Input
+              value={form.penduduk.nama}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  penduduk: {
+                    ...form.penduduk,
+                    nama: e.target.value
+                  }
+                })
+              }
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Tanggal Lahir</Label>
+            <Input
+              type="date"
+              value={form.penduduk.tanggal_lahir}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  penduduk: {
+                    ...form.penduduk,
+                    tanggal_lahir: e.target.value
+                  }
+                })
+              }
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Kelurahan ID</Label>
+            <Input
+              type="number"
+              value={form.penduduk.kelurahan_id}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  penduduk: {
+                    ...form.penduduk,
+                    kelurahan_id: Number(e.target.value)
+                  }
+                })
+              }
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Alamat</Label>
+            <Textarea
+              value={form.penduduk.alamat}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  penduduk: {
+                    ...form.penduduk,
+                    alamat: e.target.value
+                  }
+                })
+              }
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>No HP</Label>
+            <Input
+              value={form.penduduk.no_hp}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  penduduk: {
+                    ...form.penduduk,
+                    no_hp: e.target.value
+                  }
+                })
+              }
+            />
+          </div>
+
+          <div>
+            <h2 className="font-semibold text-lg">Data Ibu Menyusui</h2>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Tanggal Persalinan</Label>
+            <Input
+              value={form.busui.tanggal_persalinan}
+              type="date"
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  busui: {
+                    ...form.busui,
+                    tanggal_persalinan: e.target.value
+                  }
+                })
+              }
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Anak Ke</Label>
+            <Input
+              value={form.busui.anak_ke}
+              type="number"
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  busui: {
+                    ...form.busui,
+                    anak_ke: Number(e.target.value)
+                  }
+                })
+              }
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Switch
+              id="asi-eksklusif"
+              checked={form.busui.asi_eksklusif}
+              onCheckedChange={(checked) =>
+                setForm({
+                  ...form,
+                  busui: {
+                    ...form.busui,
+                    asi_eksklusif: checked
+                  }
+                })
+              }
+            />
+            <Label htmlFor="asi-eksklusif">ASI Eksklusif</Label>
+          </div>
+          <Button type="submit">Tambah</Button>
+        </form>
+      </div>
+      <div>
+        <h1>Tabel Busui</h1>
+        <table border={1}>
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>NIK</th>
+              <th>Nama</th>
+              <th>Tanggal Lahir</th>
+              <th>Kelurahan</th>
+              <th>Alamat</th>
+              <th>No HP</th>
+              <th>Tanggal Persalinan</th>
+              <th>Anak Ke</th>
+              <th>ASI Eksklusif</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {data?.busui.map((item, index) => (
+              <tr key={item.penduduk.id}>
+                <td>{index + 1}</td>
+                <td>{item.penduduk.nik}</td>
+                <td>{item.penduduk.nama}</td>
+                <td>{item.penduduk.tanggal_lahir.slice(0, 10)}</td>
+                <td>{item.penduduk.kelurahan_nama}</td>
+                <td>{item.penduduk.alamat}</td>
+                <td>{item.penduduk.no_hp}</td>
+                <td>{item.busui.tanggal_persalinan}</td>
+                <td>{item.busui.anak_ke}</td>
+                <td>{item.busui.asi_eksklusif ? 'Ya' : 'Tidak'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}

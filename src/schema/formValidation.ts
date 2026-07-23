@@ -207,3 +207,68 @@ export const produksiSchema = z
     path: ['estimasi_waktu_selesai'],
     message: 'Estimasi waktu selesai harus setelah waktu mulai'
   });
+
+export const pendudukSchema = z.object({
+  nik: z.string().length(16, 'NIK harus terdiri dari 16 digit').regex(/^\d+$/, 'NIK hanya boleh berisi angka'),
+
+  nama: z.string().min(1, 'Nama wajib diisi').max(255, 'Nama maksimal 255 karakter'),
+
+  jenis_kelamin: z.enum(['L', 'P'], {
+    message: 'Jenis kelamin tidak valid'
+  }),
+
+  tanggal_lahir: z.string().min(1, 'Tanggal lahir wajib diisi'),
+
+  kelurahan_id: z.number().min(1, 'Kelurahan wajib dipilih'),
+
+  alamat: z.string().min(1, 'Alamat wajib diisi'),
+
+  no_hp: z.string().min(10, 'Nomor HP tidak valid').max(20, 'Nomor HP maksimal 20 karakter').regex(/^\d+$/, 'Nomor HP hanya boleh berisi angka')
+});
+
+export const pesertaDidikSchema = z.object({
+  nisn: z.string().length(10, 'NISN harus terdiri dari 10 digit').regex(/^\d+$/, 'NISN hanya boleh berisi angka'),
+
+  kelas: z.string().min(1, 'Kelas wajib diisi').max(20, 'Kelas maksimal 20 karakter'),
+
+  rombel: z.string().min(1, 'Rombel wajib diisi').max(20, 'Rombel maksimal 20 karakter')
+});
+
+export const balitaSchema = z.object({
+  ibu_id: z.number().min(1, 'Ibu wajib dipilih'),
+
+  anak_ke: z.number().int('Anak ke harus berupa bilangan bulat').min(1, 'Anak ke minimal 1'),
+
+  berat_lahir: z.number().int('Berat lahir harus berupa bilangan bulat').min(300, 'Berat lahir tidak valid').max(7000, 'Berat lahir tidak valid'),
+
+  panjang_lahir: z.number().min(20, 'Panjang lahir tidak valid').max(70, 'Panjang lahir tidak valid')
+});
+
+export const bumilSchema = z
+  .object({
+    hpht: z.string().min(1, 'HPHT wajib diisi'),
+
+    hpl: z.string().min(1, 'HPL wajib diisi'),
+
+    gravida: z.number().int('Gravida harus berupa bilangan bulat').min(1, 'Gravida minimal 1'),
+
+    para: z.number().int('Para harus berupa bilangan bulat').min(0, 'Para tidak boleh kurang dari 0'),
+
+    abortus: z.number().int('Abortus harus berupa bilangan bulat').min(0, 'Abortus tidak boleh kurang dari 0')
+  })
+  .refine((data) => data.gravida >= data.para + data.abortus, {
+    path: ['gravida'],
+    message: 'Gravida harus lebih besar atau sama dengan jumlah Para dan Abortus'
+  })
+  .refine((data) => new Date(data.hpht) < new Date(data.hpl), {
+    path: ['hpl'],
+    message: 'HPL harus setelah HPHT'
+  });
+
+export const busuiSchema = z.object({
+  tanggal_persalinan: z.string().min(1, 'Tanggal persalinan wajib diisi'),
+
+  anak_ke: z.number().int('Anak ke harus berupa bilangan bulat').min(1, 'Anak ke minimal 1'),
+
+  asi_eksklusif: z.boolean()
+});

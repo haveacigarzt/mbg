@@ -48,6 +48,18 @@ const quickLogins = [
     email: 'driver.bunut2@gmail.com',
     password: 'password123',
     color: 'bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100'
+  },
+  {
+    label: 'Sekolah A',
+    email: 'admin.sd001@example.com',
+    password: 'Password123!',
+    color: 'bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100'
+  },
+  {
+    label: 'Posyandu A',
+    email: 'admin.posyandu.melati@example.com',
+    password: 'Password123!',
+    color: 'bg-teal-50 text-teal-600 border-teal-200 hover:bg-teal-100'
   }
 ];
 

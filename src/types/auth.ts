@@ -10,7 +10,7 @@ export type LoginResponse = {
   };
 };
 
-export type RoleId = 1 | 2 | 3 | 4;
+export type RoleId = 1 | 2 | 3 | 4 | 5 | 6;
 
 export interface AuthResponse {
   user: {

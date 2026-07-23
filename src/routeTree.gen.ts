@@ -18,11 +18,18 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SppgIndexRouteImport } from './routes/sppg/index'
+import { Route as SekolahIndexRouteImport } from './routes/sekolah/index'
 import { Route as SppgProfilRouteImport } from './routes/sppg/profil'
 import { Route as SppgProduksiRouteImport } from './routes/sppg/produksi'
 import { Route as SppgPengirimanRouteImport } from './routes/sppg/pengiriman'
 import { Route as SppgKeuanganRouteImport } from './routes/sppg/keuangan'
+import { Route as SekolahPesertadidikRouteImport } from './routes/sekolah/pesertadidik'
+import { Route as SekolahGiziRouteImport } from './routes/sekolah/gizi'
 import { Route as RegisterTokenRouteImport } from './routes/register/$token'
+import { Route as PosyanduGiziRouteImport } from './routes/posyandu/gizi'
+import { Route as PosyanduBusuiRouteImport } from './routes/posyandu/busui'
+import { Route as PosyanduBumilRouteImport } from './routes/posyandu/bumil'
+import { Route as PosyanduBalitaRouteImport } from './routes/posyandu/balita'
 
 const PedaganglokalRoute = PedaganglokalRouteImport.update({
   id: '/pedaganglokal',
@@ -69,6 +76,11 @@ const SppgIndexRoute = SppgIndexRouteImport.update({
   path: '/sppg/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SekolahIndexRoute = SekolahIndexRouteImport.update({
+  id: '/sekolah/',
+  path: '/sekolah/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SppgProfilRoute = SppgProfilRouteImport.update({
   id: '/sppg/profil',
   path: '/sppg/profil',
@@ -89,9 +101,39 @@ const SppgKeuanganRoute = SppgKeuanganRouteImport.update({
   path: '/sppg/keuangan',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SekolahPesertadidikRoute = SekolahPesertadidikRouteImport.update({
+  id: '/sekolah/pesertadidik',
+  path: '/sekolah/pesertadidik',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SekolahGiziRoute = SekolahGiziRouteImport.update({
+  id: '/sekolah/gizi',
+  path: '/sekolah/gizi',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterTokenRoute = RegisterTokenRouteImport.update({
   id: '/register/$token',
   path: '/register/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PosyanduGiziRoute = PosyanduGiziRouteImport.update({
+  id: '/posyandu/gizi',
+  path: '/posyandu/gizi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PosyanduBusuiRoute = PosyanduBusuiRouteImport.update({
+  id: '/posyandu/busui',
+  path: '/posyandu/busui',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PosyanduBumilRoute = PosyanduBumilRouteImport.update({
+  id: '/posyandu/bumil',
+  path: '/posyandu/bumil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PosyanduBalitaRoute = PosyanduBalitaRouteImport.update({
+  id: '/posyandu/balita',
+  path: '/posyandu/balita',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -104,11 +146,18 @@ export interface FileRoutesByFullPath {
   '/driver': typeof DriverRoute
   '/login': typeof LoginRoute
   '/pedaganglokal': typeof PedaganglokalRoute
+  '/posyandu/balita': typeof PosyanduBalitaRoute
+  '/posyandu/bumil': typeof PosyanduBumilRoute
+  '/posyandu/busui': typeof PosyanduBusuiRoute
+  '/posyandu/gizi': typeof PosyanduGiziRoute
   '/register/$token': typeof RegisterTokenRoute
+  '/sekolah/gizi': typeof SekolahGiziRoute
+  '/sekolah/pesertadidik': typeof SekolahPesertadidikRoute
   '/sppg/keuangan': typeof SppgKeuanganRoute
   '/sppg/pengiriman': typeof SppgPengirimanRoute
   '/sppg/produksi': typeof SppgProduksiRoute
   '/sppg/profil': typeof SppgProfilRoute
+  '/sekolah/': typeof SekolahIndexRoute
   '/sppg/': typeof SppgIndexRoute
 }
 export interface FileRoutesByTo {
@@ -120,11 +169,18 @@ export interface FileRoutesByTo {
   '/driver': typeof DriverRoute
   '/login': typeof LoginRoute
   '/pedaganglokal': typeof PedaganglokalRoute
+  '/posyandu/balita': typeof PosyanduBalitaRoute
+  '/posyandu/bumil': typeof PosyanduBumilRoute
+  '/posyandu/busui': typeof PosyanduBusuiRoute
+  '/posyandu/gizi': typeof PosyanduGiziRoute
   '/register/$token': typeof RegisterTokenRoute
+  '/sekolah/gizi': typeof SekolahGiziRoute
+  '/sekolah/pesertadidik': typeof SekolahPesertadidikRoute
   '/sppg/keuangan': typeof SppgKeuanganRoute
   '/sppg/pengiriman': typeof SppgPengirimanRoute
   '/sppg/produksi': typeof SppgProduksiRoute
   '/sppg/profil': typeof SppgProfilRoute
+  '/sekolah': typeof SekolahIndexRoute
   '/sppg': typeof SppgIndexRoute
 }
 export interface FileRoutesById {
@@ -137,11 +193,18 @@ export interface FileRoutesById {
   '/driver': typeof DriverRoute
   '/login': typeof LoginRoute
   '/pedaganglokal': typeof PedaganglokalRoute
+  '/posyandu/balita': typeof PosyanduBalitaRoute
+  '/posyandu/bumil': typeof PosyanduBumilRoute
+  '/posyandu/busui': typeof PosyanduBusuiRoute
+  '/posyandu/gizi': typeof PosyanduGiziRoute
   '/register/$token': typeof RegisterTokenRoute
+  '/sekolah/gizi': typeof SekolahGiziRoute
+  '/sekolah/pesertadidik': typeof SekolahPesertadidikRoute
   '/sppg/keuangan': typeof SppgKeuanganRoute
   '/sppg/pengiriman': typeof SppgPengirimanRoute
   '/sppg/produksi': typeof SppgProduksiRoute
   '/sppg/profil': typeof SppgProfilRoute
+  '/sekolah/': typeof SekolahIndexRoute
   '/sppg/': typeof SppgIndexRoute
 }
 export interface FileRouteTypes {
@@ -155,11 +218,18 @@ export interface FileRouteTypes {
     | '/driver'
     | '/login'
     | '/pedaganglokal'
+    | '/posyandu/balita'
+    | '/posyandu/bumil'
+    | '/posyandu/busui'
+    | '/posyandu/gizi'
     | '/register/$token'
+    | '/sekolah/gizi'
+    | '/sekolah/pesertadidik'
     | '/sppg/keuangan'
     | '/sppg/pengiriman'
     | '/sppg/produksi'
     | '/sppg/profil'
+    | '/sekolah/'
     | '/sppg/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -171,11 +241,18 @@ export interface FileRouteTypes {
     | '/driver'
     | '/login'
     | '/pedaganglokal'
+    | '/posyandu/balita'
+    | '/posyandu/bumil'
+    | '/posyandu/busui'
+    | '/posyandu/gizi'
     | '/register/$token'
+    | '/sekolah/gizi'
+    | '/sekolah/pesertadidik'
     | '/sppg/keuangan'
     | '/sppg/pengiriman'
     | '/sppg/produksi'
     | '/sppg/profil'
+    | '/sekolah'
     | '/sppg'
   id:
     | '__root__'
@@ -187,11 +264,18 @@ export interface FileRouteTypes {
     | '/driver'
     | '/login'
     | '/pedaganglokal'
+    | '/posyandu/balita'
+    | '/posyandu/bumil'
+    | '/posyandu/busui'
+    | '/posyandu/gizi'
     | '/register/$token'
+    | '/sekolah/gizi'
+    | '/sekolah/pesertadidik'
     | '/sppg/keuangan'
     | '/sppg/pengiriman'
     | '/sppg/produksi'
     | '/sppg/profil'
+    | '/sekolah/'
     | '/sppg/'
   fileRoutesById: FileRoutesById
 }
@@ -204,11 +288,18 @@ export interface RootRouteChildren {
   DriverRoute: typeof DriverRoute
   LoginRoute: typeof LoginRoute
   PedaganglokalRoute: typeof PedaganglokalRoute
+  PosyanduBalitaRoute: typeof PosyanduBalitaRoute
+  PosyanduBumilRoute: typeof PosyanduBumilRoute
+  PosyanduBusuiRoute: typeof PosyanduBusuiRoute
+  PosyanduGiziRoute: typeof PosyanduGiziRoute
   RegisterTokenRoute: typeof RegisterTokenRoute
+  SekolahGiziRoute: typeof SekolahGiziRoute
+  SekolahPesertadidikRoute: typeof SekolahPesertadidikRoute
   SppgKeuanganRoute: typeof SppgKeuanganRoute
   SppgPengirimanRoute: typeof SppgPengirimanRoute
   SppgProduksiRoute: typeof SppgProduksiRoute
   SppgProfilRoute: typeof SppgProfilRoute
+  SekolahIndexRoute: typeof SekolahIndexRoute
   SppgIndexRoute: typeof SppgIndexRoute
 }
 
@@ -277,6 +368,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SppgIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sekolah/': {
+      id: '/sekolah/'
+      path: '/sekolah'
+      fullPath: '/sekolah/'
+      preLoaderRoute: typeof SekolahIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sppg/profil': {
       id: '/sppg/profil'
       path: '/sppg/profil'
@@ -305,11 +403,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SppgKeuanganRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sekolah/pesertadidik': {
+      id: '/sekolah/pesertadidik'
+      path: '/sekolah/pesertadidik'
+      fullPath: '/sekolah/pesertadidik'
+      preLoaderRoute: typeof SekolahPesertadidikRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sekolah/gizi': {
+      id: '/sekolah/gizi'
+      path: '/sekolah/gizi'
+      fullPath: '/sekolah/gizi'
+      preLoaderRoute: typeof SekolahGiziRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register/$token': {
       id: '/register/$token'
       path: '/register/$token'
       fullPath: '/register/$token'
       preLoaderRoute: typeof RegisterTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/posyandu/gizi': {
+      id: '/posyandu/gizi'
+      path: '/posyandu/gizi'
+      fullPath: '/posyandu/gizi'
+      preLoaderRoute: typeof PosyanduGiziRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/posyandu/busui': {
+      id: '/posyandu/busui'
+      path: '/posyandu/busui'
+      fullPath: '/posyandu/busui'
+      preLoaderRoute: typeof PosyanduBusuiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/posyandu/bumil': {
+      id: '/posyandu/bumil'
+      path: '/posyandu/bumil'
+      fullPath: '/posyandu/bumil'
+      preLoaderRoute: typeof PosyanduBumilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/posyandu/balita': {
+      id: '/posyandu/balita'
+      path: '/posyandu/balita'
+      fullPath: '/posyandu/balita'
+      preLoaderRoute: typeof PosyanduBalitaRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -324,11 +464,18 @@ const rootRouteChildren: RootRouteChildren = {
   DriverRoute: DriverRoute,
   LoginRoute: LoginRoute,
   PedaganglokalRoute: PedaganglokalRoute,
+  PosyanduBalitaRoute: PosyanduBalitaRoute,
+  PosyanduBumilRoute: PosyanduBumilRoute,
+  PosyanduBusuiRoute: PosyanduBusuiRoute,
+  PosyanduGiziRoute: PosyanduGiziRoute,
   RegisterTokenRoute: RegisterTokenRoute,
+  SekolahGiziRoute: SekolahGiziRoute,
+  SekolahPesertadidikRoute: SekolahPesertadidikRoute,
   SppgKeuanganRoute: SppgKeuanganRoute,
   SppgPengirimanRoute: SppgPengirimanRoute,
   SppgProduksiRoute: SppgProduksiRoute,
   SppgProfilRoute: SppgProfilRoute,
+  SekolahIndexRoute: SekolahIndexRoute,
   SppgIndexRoute: SppgIndexRoute,
 }
 export const routeTree = rootRouteImport

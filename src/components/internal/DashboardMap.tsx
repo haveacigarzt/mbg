@@ -5,6 +5,7 @@ import AnimatedMarker from './AnimatedMarker';
 import RoutingMachine from './RoutingMachine';
 import AutoPopupMarker from './AutoPopupMarker';
 import type { PengeluaranHarianWithCoords } from '@/types/sppg';
+import { getPengirimanColor } from '@/lib/pengirimancolors';
 
 const CtrlScrollZoom = ({ onRequireCtrl }: { onRequireCtrl: () => void }) => {
   const map = useMap();
@@ -32,14 +33,22 @@ const CtrlScrollZoom = ({ onRequireCtrl }: { onRequireCtrl: () => void }) => {
   return null;
 };
 
+// Otomatis geser map ke posisi truk yang lagi dipilih tiap kali ganti pengiriman
+const FlyToSelected = ({ lat, lng }: { lat: number; lng: number }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.flyTo([lat, lng], map.getZoom(), { duration: 1 });
+  }, [lat, lng, map]);
+  return null;
+};
+
 interface Props {
   tracking: Tracking[] | undefined;
   pengeluaranBaru: PengeluaranHarianWithCoords | null;
+  selectedPengirimanId: number | null;
 }
 
-const DashboardMap = ({ tracking, pengeluaranBaru }: Props) => {
-  const colors = ['red', 'blue', 'green', 'orange', 'purple'];
-
+const DashboardMap = ({ tracking, pengeluaranBaru, selectedPengirimanId }: Props) => {
   // State dan ref overlay
   const [showOverlay, setShowOverlay] = useState(false);
   const overlayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -58,6 +67,13 @@ const DashboardMap = ({ tracking, pengeluaranBaru }: Props) => {
 
   const [distance, setDistance] = useState(0);
 
+  // Cuma ambil 1 tracking yang lagi dipilih dari panel kanan.
+  // Fallback ke tracking pertama HANYA kalau belum ada seleksi sama sekali (selectedPengirimanId null).
+  // Kalau selectedPengirimanId sudah ada tapi datanya belum ketemu di `tracking`
+  // (misal truk itu belum pernah kirim posisi lewat WebSocket), JANGAN fallback ke tracking lain —
+  // biar keliatan jelas kalau memang datanya belum ada, bukan diam-diam nampilin data truk yang salah.
+  const selectedTracking = selectedPengirimanId ? tracking?.find((el) => el.pengiriman_id === selectedPengirimanId) : tracking?.[0];
+
   return (
     <div style={{ height: '100%', width: '100%', position: 'relative' }}>
       {/* Overlay Alert */}
@@ -71,22 +87,37 @@ const DashboardMap = ({ tracking, pengeluaranBaru }: Props) => {
 
         <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-        {tracking?.map((el) => (
-          /* 2. OPTIMASI: Fragment eksternal dihapus, key diletakkan di Fragment utama yang membungkus semua elemen anak. */
-          <Fragment key={el.pengiriman_id}>
-            <AnimatedMarker color={colors[el.pengiriman_id % colors.length]} tracking={el} distance={distance} />
+        {selectedTracking && (
+          <Fragment key={selectedTracking.pengiriman_id}>
+            <FlyToSelected lat={selectedTracking.latitude} lng={selectedTracking.longitude} />
 
-            <Marker position={[el.tujuan_lat, el.tujuan_lng]}>
+            <AnimatedMarker color={getPengirimanColor(selectedTracking.pengiriman_id).name} tracking={selectedTracking} distance={distance} />
+
+            <Marker position={[selectedTracking.tujuan_lat, selectedTracking.tujuan_lng]}>
               <Tooltip permanent direction="top" offset={[-15, -13]}>
-                {el.tujuan_nama}
+                {selectedTracking.tujuan_nama}
               </Tooltip>
             </Marker>
 
-            <RoutingMachine currLat={el.latitude} currLng={el.longitude} tujuanLat={el.tujuan_lat} tujuanLng={el.tujuan_lng} onDistanceChange={setDistance} />
+            <RoutingMachine
+              currLat={selectedTracking.latitude}
+              currLng={selectedTracking.longitude}
+              tujuanLat={selectedTracking.tujuan_lat}
+              tujuanLng={selectedTracking.tujuan_lng}
+              onDistanceChange={setDistance}
+            />
           </Fragment>
-        ))}
+        )}
         {pengeluaranBaru && <AutoPopupMarker pengeluaranBaru={pengeluaranBaru} />}
       </MapContainer>
+
+      {/* Muncul kalau pengiriman sudah dipilih tapi datanya belum ada di `tracking`
+          (misal truk itu belum pernah kirim posisi lewat WebSocket) */}
+      {selectedPengirimanId && !selectedTracking && (
+        <div className="absolute inset-x-0 top-4 z-[999] flex justify-center pointer-events-none">
+          <div className="bg-white/90 rounded-full px-4 py-1.5 text-xs font-medium text-gray-500 shadow">Menunggu data lokasi truk...</div>
+        </div>
+      )}
     </div>
   );
 };

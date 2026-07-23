@@ -10,6 +10,7 @@ import { getTrackingQueryOptions } from '@/queryOptions/tracking';
 import Navbar from './Navbar';
 import { Truck, Wallet, CheckCircle2, ChefHat, Users, ArrowRight } from 'lucide-react';
 import { getTodaysDate } from '@/lib/utils';
+import { getPengirimanColor } from '@/lib/pengirimancolors';
 import type { FetchSinglePengeluaranHarianResponse, PengeluaranHarianWithCoords } from '@/types/sppg';
 
 interface Props {
@@ -30,6 +31,19 @@ const Dashboard = ({ role_id }: Props) => {
   const { data: tracking } = useQuery(getTrackingQueryOptions(pengirimanIds));
 
   const [pengeluaranBaru, setPengeluaranBaru] = useState<PengeluaranHarianWithCoords | null>(null);
+
+  const [selectedPengirimanId, setSelectedPengirimanId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (pengiriman.pengiriman.length === 0) {
+      setSelectedPengirimanId(null);
+      return;
+    }
+    const stillExist = pengiriman.pengiriman.some((el) => el.id === selectedPengirimanId);
+    if (!stillExist) {
+      setSelectedPengirimanId(pengiriman.pengiriman[0].id);
+    }
+  }, [pengiriman.pengiriman, selectedPengirimanId]);
 
   const { lastMessage } = useWebSocket();
   const queryClient = useQueryClient(); // ← pakai useQueryClient dari repo, bukan import langsung
@@ -168,7 +182,7 @@ const Dashboard = ({ role_id }: Props) => {
         <div className="flex gap-4 flex-1">
           {/* Map */}
           <div className="flex-3 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-h-125">
-            <DashboardMap tracking={tracking?.tracking} pengeluaranBaru={pengeluaranBaru} />
+            <DashboardMap tracking={tracking?.tracking} pengeluaranBaru={pengeluaranBaru} selectedPengirimanId={selectedPengirimanId} />
           </div>
 
           {/* Pengiriman Aktif */}
@@ -185,19 +199,29 @@ const Dashboard = ({ role_id }: Props) => {
               {pengiriman.pengiriman.length === 0 ? (
                 <div className="flex items-center justify-center h-full text-gray-300 text-sm">Tidak ada pengiriman aktif</div>
               ) : (
-                pengiriman.pengiriman.map((el) => (
-                  <div key={el.id} className="bg-gray-50 rounded-xl p-3 flex flex-col gap-1">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                      <p className="text-xs font-bold text-gray-700">{el.sppg_nama}</p>
+                pengiriman.pengiriman.map((el) => {
+                  const color = getPengirimanColor(el.id);
+                  const isSelected = selectedPengirimanId === el.id;
+                  return (
+                    <div
+                      key={el.id}
+                      onClick={() => setSelectedPengirimanId(el.id)}
+                      className={`rounded-xl p-3 flex flex-col gap-1 cursor-pointer border transition-colors ${
+                        isSelected ? 'bg-blue-50 border-blue-200 shadow-sm' : 'bg-gray-50 border-transparent hover:bg-gray-100'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: color.hex }} />
+                        <p className="text-xs font-bold text-gray-700">{el.sppg_nama}</p>
+                      </div>
+                      <p className="text-xs text-gray-400 pl-4">Driver: {el.driver_nama}</p>
+                      <div className="flex items-center gap-1 text-xs text-gray-400 pl-4 ">
+                        <ArrowRight size={15} />
+                        {el.tujuan_nama}
+                      </div>
                     </div>
-                    <p className="text-xs text-gray-400 pl-4">Driver: {el.driver_nama}</p>
-                    <div className="flex items-center gap-1 text-xs text-gray-400 pl-4 ">
-                      <ArrowRight size={15} />
-                      {el.tujuan_nama}
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>

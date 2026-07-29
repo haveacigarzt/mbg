@@ -70,6 +70,7 @@ const Dashboard = ({ role_id }: Props) => {
       }
       case 'keuangan:updated': {
         queryClient.setQueriesData({ queryKey: ['keuangan_harian'] }, () => message.data);
+        console.log('keuangan updated');
         break;
       }
       case 'produksi:updated': {

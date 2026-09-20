@@ -72,7 +72,7 @@ const InvitationsTable = ({ data, page, setPage }: Props) => {
       enableSorting: false,
       cell: (info) => {
         const { token, nama_sppg: namaSPPG, expires_at, id } = info.row.original;
-        const linkPendaftaran = `https://192.168.1.10:5173/register/${token}`;
+        const linkPendaftaran = `https://192.168.1.13:5173/register/${token}`;
         const pesan = `🏢 *UNDANGAN PENGELOLA SPPG - MBG*
 
         Halo,

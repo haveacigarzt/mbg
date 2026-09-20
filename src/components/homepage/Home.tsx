@@ -387,7 +387,7 @@ const home = () => {
         </footer>
 
         {/* Debug section - hapus/comment kalau sudah nggak dipakai */}
-        <div className="bg-red-200 px-4 py-4">
+        {/* <div className="bg-red-200 px-4 py-4">
           Routes khusus user:
           <div className="flex flex-wrap gap-5 mb-2">
             <Link to="/dashboard" className="font-medium text-blue-700 hover:underline">
@@ -418,7 +418,7 @@ const home = () => {
               ))}
             </ul>
           </div>
-        </div>
+        </div> */}
       </main>
     </div>
   );

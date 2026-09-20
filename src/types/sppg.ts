@@ -35,12 +35,18 @@ export type Distrik = {
   name: string;
 };
 
+export type Kelurahan = {
+  id: number;
+  name: string;
+  kecamatan_id: number;
+};
+
 export type FetchKecamatanResponse = {
   kecamatan: Distrik[];
 };
 
 export type FetchKelurahanResponse = {
-  kelurahan: Distrik[];
+  kelurahan: Kelurahan[];
 };
 
 export type GetSPPGParams = {

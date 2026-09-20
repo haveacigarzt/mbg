@@ -23,6 +23,7 @@ import { Route as SppgProfilRouteImport } from './routes/sppg/profil'
 import { Route as SppgProduksiRouteImport } from './routes/sppg/produksi'
 import { Route as SppgPengirimanRouteImport } from './routes/sppg/pengiriman'
 import { Route as SppgKeuanganRouteImport } from './routes/sppg/keuangan'
+import { Route as SekolahProfilRouteImport } from './routes/sekolah/profil'
 import { Route as SekolahPesertadidikRouteImport } from './routes/sekolah/pesertadidik'
 import { Route as SekolahGiziRouteImport } from './routes/sekolah/gizi'
 import { Route as RegisterTokenRouteImport } from './routes/register/$token'
@@ -101,6 +102,11 @@ const SppgKeuanganRoute = SppgKeuanganRouteImport.update({
   path: '/sppg/keuangan',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SekolahProfilRoute = SekolahProfilRouteImport.update({
+  id: '/sekolah/profil',
+  path: '/sekolah/profil',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SekolahPesertadidikRoute = SekolahPesertadidikRouteImport.update({
   id: '/sekolah/pesertadidik',
   path: '/sekolah/pesertadidik',
@@ -153,6 +159,7 @@ export interface FileRoutesByFullPath {
   '/register/$token': typeof RegisterTokenRoute
   '/sekolah/gizi': typeof SekolahGiziRoute
   '/sekolah/pesertadidik': typeof SekolahPesertadidikRoute
+  '/sekolah/profil': typeof SekolahProfilRoute
   '/sppg/keuangan': typeof SppgKeuanganRoute
   '/sppg/pengiriman': typeof SppgPengirimanRoute
   '/sppg/produksi': typeof SppgProduksiRoute
@@ -176,6 +183,7 @@ export interface FileRoutesByTo {
   '/register/$token': typeof RegisterTokenRoute
   '/sekolah/gizi': typeof SekolahGiziRoute
   '/sekolah/pesertadidik': typeof SekolahPesertadidikRoute
+  '/sekolah/profil': typeof SekolahProfilRoute
   '/sppg/keuangan': typeof SppgKeuanganRoute
   '/sppg/pengiriman': typeof SppgPengirimanRoute
   '/sppg/produksi': typeof SppgProduksiRoute
@@ -200,6 +208,7 @@ export interface FileRoutesById {
   '/register/$token': typeof RegisterTokenRoute
   '/sekolah/gizi': typeof SekolahGiziRoute
   '/sekolah/pesertadidik': typeof SekolahPesertadidikRoute
+  '/sekolah/profil': typeof SekolahProfilRoute
   '/sppg/keuangan': typeof SppgKeuanganRoute
   '/sppg/pengiriman': typeof SppgPengirimanRoute
   '/sppg/produksi': typeof SppgProduksiRoute
@@ -225,6 +234,7 @@ export interface FileRouteTypes {
     | '/register/$token'
     | '/sekolah/gizi'
     | '/sekolah/pesertadidik'
+    | '/sekolah/profil'
     | '/sppg/keuangan'
     | '/sppg/pengiriman'
     | '/sppg/produksi'
@@ -248,6 +258,7 @@ export interface FileRouteTypes {
     | '/register/$token'
     | '/sekolah/gizi'
     | '/sekolah/pesertadidik'
+    | '/sekolah/profil'
     | '/sppg/keuangan'
     | '/sppg/pengiriman'
     | '/sppg/produksi'
@@ -271,6 +282,7 @@ export interface FileRouteTypes {
     | '/register/$token'
     | '/sekolah/gizi'
     | '/sekolah/pesertadidik'
+    | '/sekolah/profil'
     | '/sppg/keuangan'
     | '/sppg/pengiriman'
     | '/sppg/produksi'
@@ -295,6 +307,7 @@ export interface RootRouteChildren {
   RegisterTokenRoute: typeof RegisterTokenRoute
   SekolahGiziRoute: typeof SekolahGiziRoute
   SekolahPesertadidikRoute: typeof SekolahPesertadidikRoute
+  SekolahProfilRoute: typeof SekolahProfilRoute
   SppgKeuanganRoute: typeof SppgKeuanganRoute
   SppgPengirimanRoute: typeof SppgPengirimanRoute
   SppgProduksiRoute: typeof SppgProduksiRoute
@@ -403,6 +416,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SppgKeuanganRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sekolah/profil': {
+      id: '/sekolah/profil'
+      path: '/sekolah/profil'
+      fullPath: '/sekolah/profil'
+      preLoaderRoute: typeof SekolahProfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sekolah/pesertadidik': {
       id: '/sekolah/pesertadidik'
       path: '/sekolah/pesertadidik'
@@ -471,6 +491,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterTokenRoute: RegisterTokenRoute,
   SekolahGiziRoute: SekolahGiziRoute,
   SekolahPesertadidikRoute: SekolahPesertadidikRoute,
+  SekolahProfilRoute: SekolahProfilRoute,
   SppgKeuanganRoute: SppgKeuanganRoute,
   SppgPengirimanRoute: SppgPengirimanRoute,
   SppgProduksiRoute: SppgProduksiRoute,

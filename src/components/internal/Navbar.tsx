@@ -93,24 +93,45 @@ const Navbar = ({ role_id }: Props) => {
 
         {role_id === 6 && (
           <>
-            <Link
-              to="/sekolah/pesertadidik"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500
+            <Accordion type="single" collapsible defaultValue="item-1">
+              <AccordionItem value="item-1" className="max-h-125">
+                <AccordionTrigger
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500
                        hover:bg-blue-50 hover:text-blue-600 transition-all
                        [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
-            >
-              <UserStar className="w-4 h-4" />
-              Peserta Didik
-            </Link>
-            <Link
-              to="/sekolah/gizi"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500
+                  onClick={() => setOpenItem(!openItem)}
+                >
+                  <Building2 className="w-4 h-4" />
+                  <div className="relative inline-block">Sekolah</div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <Link
+                    to="/sekolah/profil"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500 ms-7
                        hover:bg-blue-50 hover:text-blue-600 transition-all
                        [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
-            >
-              <UserStar className="w-4 h-4" />
-              Gizi
-            </Link>
+                  >
+                    Profil
+                  </Link>
+                  <Link
+                    to="/sekolah/pesertadidik"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500 ms-7
+                       hover:bg-blue-50 hover:text-blue-600 transition-all
+                       [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
+                  >
+                    Peserta Didik
+                  </Link>
+                  <Link
+                    to="/sekolah/gizi"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500 ms-7
+                       hover:bg-blue-50 hover:text-blue-600 transition-all
+                       [&.active]:bg-blue-50 [&.active]:text-blue-600 [&.active]:font-semibold"
+                  >
+                    Gizi
+                  </Link>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </>
         )}
 

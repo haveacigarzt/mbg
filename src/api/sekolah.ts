@@ -1,5 +1,14 @@
 import { ApiError, apiFetch } from './client';
-import type { FetchPesertaDidikResponse, FetchSekolahResponse, GetPesertaDidikParams, GetSekolahParams, PesertaDidikInput, PostPesertaDidikResponse, PostSekolah } from '../types/sekolah';
+import type {
+  FetchPesertaDidikResponse,
+  FetchSekolahResponse,
+  FetchSingleSekolahResponse,
+  GetPesertaDidikParams,
+  GetSekolahParams,
+  PesertaDidikInput,
+  PostPesertaDidikResponse,
+  PostSekolah
+} from '../types/sekolah';
 
 export async function getSekolah(params?: GetSekolahParams) {
   const searchParams = new URLSearchParams();
@@ -21,6 +30,22 @@ export async function getSekolah(params?: GetSekolahParams) {
   }
 
   const data: FetchSekolahResponse = await response.json();
+
+  return data;
+}
+
+export async function getSekolahByID(id: number) {
+  const response = await apiFetch(`/v1/sekolah/${id}`);
+  if (response.status === 401) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('token_expiry');
+  }
+
+  if (!response.ok) {
+    throw new Error('gagal mengambil sekolah user');
+  }
+
+  const data: FetchSingleSekolahResponse = await response.json();
 
   return data;
 }

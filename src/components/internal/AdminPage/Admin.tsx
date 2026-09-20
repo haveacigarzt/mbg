@@ -119,7 +119,7 @@ const Admin = () => {
     document.body.removeChild(textarea);
   };
 
-  const linkPendaftaran = `https://192.168.1.10:5173/register/${token}`;
+  const linkPendaftaran = `https://192.168.1.13:5173/register/${token}`;
   const pesan = `🏢 *UNDANGAN PENGELOLA SPPG - MBG*
 
         Halo,

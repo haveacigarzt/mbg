@@ -1,65 +1,60 @@
 import { PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { ChartContainer } from '@/components/ui/chart';
-interface SekolahItem {
-  tingkat: string;
-  jumlah_siswa: number;
-}
-
-interface PosyanduItem {
-  jumlah_balita: number;
-  jumlah_ibu_hamil: number;
-}
+import type { SummaryPenerimaManfaatInner } from '@/types/summary';
 
 interface Props {
   selected: string;
-  sekolah: SekolahItem[];
-  posyandu: PosyanduItem[];
+  summaryPenerimaManfaat: SummaryPenerimaManfaatInner;
+  chartColors: string[][];
 }
 
 const chartConfig = { data: { label: 'Data' } };
 
-export default function DonutPenerima({ selected, sekolah, posyandu }: Props) {
+export default function DonutPenerima({ selected, summaryPenerimaManfaat, chartColors }: Props) {
   // Hitung data 3B dari posyandu
-  const totalBumil = posyandu.reduce((sum, el) => sum + el.jumlah_ibu_hamil, 0);
-  const totalBalita = posyandu.reduce((sum, el) => sum + el.jumlah_balita, 0);
+  const totalBumil = summaryPenerimaManfaat.bumil;
+  const totalBalita = summaryPenerimaManfaat.balita;
+  const totalBusui = summaryPenerimaManfaat.busui;
 
-  // Hitung data Ps.D — group per tingkat
-  const groupByTingkat = sekolah.reduce(
-    (acc, el) => {
-      acc[el.tingkat] = (acc[el.tingkat] || 0) + el.jumlah_siswa;
-      return acc;
-    },
-    {} as Record<string, number>
-  );
+  const totalTKPaud = summaryPenerimaManfaat.tk_paud;
+  const totalSDMI = summaryPenerimaManfaat.sd_mi;
+  const totalSMPMTS = summaryPenerimaManfaat.smp_mts;
+  const totalSMASMKMA = summaryPenerimaManfaat.sma_smk_ma;
 
-  const dataMap: Record<string, { label: string; items: { name: string; value: number; color: string }[] }> = {
+  const dataMap: Record<string, { label: string; items: { name: string; value: number; color: string }[]; subtitle: string }> = {
     '3B': {
       label: '3B (BUMIL, BUSUI, BALITA)',
       items: [
-        { name: 'Ibu Hamil (Bumil)', value: totalBumil, color: '#ec4899' },
-        { name: 'Ibu Menyusui (Busui)', value: 0, color: '#a855f7' },
-        { name: 'Balita', value: totalBalita, color: '#3b82f6' }
-      ]
+        { name: 'Ibu Hamil (BUMIL)', value: totalBumil, color: chartColors[0][0] },
+        { name: 'Ibu Menyusui (BUSUI)', value: totalBusui, color: chartColors[1][0] },
+        { name: 'Bawah Lima Tahun (BALITA)', value: totalBalita, color: chartColors[2][0] }
+      ],
+      subtitle: 'KATEGORI PELAYANAN GIZI ESENSIAL UNTUK 1000 HARI PERTAMA KEHIDUPAN (HPK).'
     },
     'Ps.D': {
       label: 'PESERTA DIDIK (Ps.D)',
-      items: Object.entries(groupByTingkat).map(([tingkat, jumlah], i) => ({
-        name: tingkat,
-        value: jumlah,
-        color: ['#3b82f6', '#6366f1', '#8b5cf6', '#a855f7'][i] ?? '#94a3b8'
-      }))
+      items: [
+        { name: 'TK/PAUD', value: totalTKPaud, color: chartColors[0][0] },
+        { name: 'SD/MI', value: totalSDMI, color: chartColors[1][0] },
+        { name: 'SMP/MTs', value: totalSMPMTS, color: chartColors[2][0] },
+        { name: 'SMA/SMK/MA', value: totalSMASMKMA, color: chartColors[3][0] }
+      ],
+      subtitle: 'KATEGORI PELAYANAN GIZI ESENSIAL UNTUK MENDUKUNG TUMBUH KEMBANG DAN PRESTASI BELAJAR.'
     },
     Guru: {
       label: 'GURU & TENAGA PENDIDIK',
-      items: [{ name: 'Data belum tersedia', value: 1, color: '#e5e7eb' }]
+      items: [{ name: 'Data belum tersedia', value: 1, color: '#e5e7eb' }],
+      subtitle: 'KATEGORI PELAYANAN GIZI ESENSIAL UNTUK MENDUKUNG KESEHATAN DAN PRODUKTIVITAS PENDIDIK.'
     },
     ATS: {
       label: 'ANAK TIDAK SEKOLAH (ATS)',
-      items: [{ name: 'Data belum tersedia', value: 1, color: '#e5e7eb' }]
+      items: [{ name: 'Data belum tersedia', value: 1, color: '#e5e7eb' }],
+      subtitle: 'KATEGORI PELAYANAN GIZI ESENSIAL UNTUK MENDUKUNG TUMBUH KEMBANG ANAK USIA SEKOLAH.'
     },
     APS: {
       label: 'ANAK PUTUS SEKOLAH (APS)',
-      items: [{ name: 'Data belum tersedia', value: 1, color: '#e5e7eb' }]
+      items: [{ name: 'Data belum tersedia', value: 1, color: '#e5e7eb' }],
+      subtitle: 'KATEGORI PELAYANAN GIZI ESENSIAL UNTUK MENDUKUNG PEMULIHAN DAN TUMBUH KEMBANG ANAK USIA SEKOLAH.'
     }
   };
 
@@ -67,12 +62,12 @@ export default function DonutPenerima({ selected, sekolah, posyandu }: Props) {
   if (!data) return null;
 
   const total = data.items.reduce((sum, i) => sum + i.value, 0);
-  const isDataTersedia = data.items[0]?.name !== 'Data belum tersedia';
+  // const isDataTersedia = data.items[0]?.name !== 'Data belum tersedia';
 
   return (
     <div className="bg-white rounded-2xl p-4 md:p-6 border border-gray-100">
       <p className="font-bold text-gray-700 text-sm mb-1">{data.label}</p>
-      <p className="text-xs text-gray-400 tracking-widest mb-6">KATEGORI PELAYANAN GIZI ESENSIAL UNTUK 1000 HARI PERTAMA KEHIDUPAN (HPK).</p>
+      <p className="text-xs text-gray-400 tracking-widest mb-6">{data.subtitle}</p>
 
       {/* Stack ke bawah di mobile, sejajar mulai md */}
       <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10">

@@ -1,15 +1,18 @@
-import Gizi from '@/components/internal/SekolahPage/Gizi';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { toast } from 'sonner';
 import { requireAuth } from '@/main';
-import { errorToast } from '@/lib/constants';
+import Sekolah from '@/components/internal/SekolahPage/Sekolah';
 
-export const Route = createFileRoute('/sekolah/gizi')({
+export const Route = createFileRoute('/sekolah/profil')({
   beforeLoad: async () => {
     const { user } = await requireAuth();
     if (user.role.role_id !== 6) {
       toast.error('Access denied', {
-        style: errorToast as React.CSSProperties
+        style: {
+          '--normal-bg': 'color-mix(in oklab, var(--destructive) 10%, var(--background))',
+          '--normal-text': 'var(--destructive)',
+          '--normal-border': 'var(--destructive)'
+        } as React.CSSProperties
       });
       throw redirect({ to: '/dashboard' });
     }
@@ -22,5 +25,5 @@ export const Route = createFileRoute('/sekolah/gizi')({
 
 function RouteComponent() {
   const { user } = Route.useRouteContext();
-  return <Gizi user={{ user }} />;
+  return <Sekolah user={{ user }} />;
 }

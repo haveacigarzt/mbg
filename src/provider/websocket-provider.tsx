@@ -8,7 +8,8 @@ export function WebSocketProvider({ children, room_id }: { children: React.React
   useEffect(() => {
     if (!room_id) return;
 
-    const ws = new WebSocket(`ws://192.168.1.12:4040/ws/${room_id}`);
+    // const ws = new WebSocket(`ws://192.168.1.13:4040/ws/${room_id}`);
+    const ws = new WebSocket(`ws://localhost:4040/ws/${room_id}`);
 
     ws.onopen = () => {
       console.log('WS connected');

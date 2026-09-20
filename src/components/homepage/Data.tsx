@@ -1,17 +1,24 @@
-import { useSuspenseQueries } from '@tanstack/react-query';
+import { useSuspenseQueries, useSuspenseQuery } from '@tanstack/react-query';
 import { getSekolahQueryOptions } from '../../queryOptions/sekolah';
 import { getPosyanduQueryOptions } from '../../queryOptions/posyandu';
-import { getSPPGQueryOptions } from '../../queryOptions/sppg';
 import { Link } from '@tanstack/react-router';
 import { Users, Utensils, School, Heart } from 'lucide-react';
 import KatalogTabs from '@/components/homepage/data/KalatogTabs';
+import { getSummaryDapurQueryOptions, getSummaryPenerimaManfaatQueryOptions } from '@/queryOptions/summary';
 export default function DataPage() {
-  const [{ data: sekolah }, { data: posyandu }, { data: sppg }] = useSuspenseQueries({
-    queries: [getSekolahQueryOptions(), getPosyanduQueryOptions(), getSPPGQueryOptions()]
+  const [{ data: sekolah }, { data: posyandu }] = useSuspenseQueries({
+    queries: [getSekolahQueryOptions(), getPosyanduQueryOptions()]
   });
 
-  const totalSasaran = sekolah.sekolah.reduce((sum, el) => sum + el.jumlah_siswa, 0);
-  const totalBumilBalita = posyandu.posyandu.reduce((sum, el) => sum + el.jumlah_balita + el.jumlah_ibu_hamil, 0);
+  const { data: summaryPenerimaManfaat } = useSuspenseQuery(getSummaryPenerimaManfaatQueryOptions());
+  const { data: summaryDapur } = useSuspenseQuery(getSummaryDapurQueryOptions());
+
+  // console.log(summaryPenerimaManfaat);
+  // console.log(summaryDapur);
+
+  const totalSasaran = summaryPenerimaManfaat.total_penerima_manfaat;
+  const total3B = summaryPenerimaManfaat.bumil + summaryPenerimaManfaat.busui + summaryPenerimaManfaat.balita;
+  const totalPesertaDidik = summaryPenerimaManfaat.tk_paud + summaryPenerimaManfaat.sd_mi + summaryPenerimaManfaat.smp_mts + summaryPenerimaManfaat.sma_smk_ma;
   return (
     <main className="min-h-screen bg-gray-50 pt-16">
       {/* NAVBAR */}
@@ -40,7 +47,7 @@ export default function DataPage() {
       {/* HERO SECTION */}
       <section className="relative bg-[#0f1f3d] px-4 sm:px-6 md:px-8 pt-12 md:pt-16 pb-28 sm:pb-32 md:pb-36">
         {/* Floating card KIRI - disembunyikan di layar kecil biar nggak numpuk sama headline */}
-        <div className="hidden lg:block absolute left-8 top-1/2 -translate-y-1/2 bg-[#1a2f52] rounded-2xl p-5 max-w-[220px]">
+        <div className="hidden lg:block absolute left-8 top-1/2 -translate-y-1/2 bg-[#1a2f52] rounded-2xl p-5 max-w-55">
           <div className="flex items-center gap-2 mb-3">
             <div className="bg-blue-500/20 rounded-lg p-1.5">
               <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -54,7 +61,7 @@ export default function DataPage() {
         </div>
 
         {/* Floating card KANAN - disembunyikan di layar kecil biar nggak numpuk sama headline */}
-        <div className="hidden lg:block absolute right-8 top-1/2 -translate-y-1/2 bg-[#1a2f52] rounded-2xl p-5 max-w-[220px]">
+        <div className="hidden lg:block absolute right-8 top-1/2 -translate-y-1/2 bg-[#1a2f52] rounded-2xl p-5 max-w-55">
           <div className="flex items-center gap-2 mb-3">
             <div className="bg-green-500/20 rounded-lg p-1.5">
               <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -119,8 +126,8 @@ export default function DataPage() {
               iconBg: 'bg-orange-500',
               cardBg: 'bg-orange-200/30 backdrop-blur-md border border-orange-200/40',
               label: 'UNIT PRODUKSI',
-              value: sppg.metadata.total_records.toString(),
-              sub: 'UNIT AKTIF',
+              value: summaryDapur.operasional.dapur_aktif,
+              sub: 'DAPUR AKTIF',
               valueColor: 'text-orange-900'
             },
             {
@@ -129,7 +136,7 @@ export default function DataPage() {
               cardBg: 'bg-green-200/30 backdrop-blur-md border border-green-200/40',
               label: 'SEKOLAH',
               value: sekolah.metadata.total_records.toString(),
-              sub: 'TITIK PENERIMA',
+              sub: `TITIK PENERIMA (${totalPesertaDidik.toLocaleString('id-ID')} PESERTA DIDIK)`,
               valueColor: 'text-green-900'
             },
             {
@@ -137,8 +144,8 @@ export default function DataPage() {
               iconBg: 'bg-red-500',
               cardBg: 'bg-red-200/30 backdrop-blur-md border border-red-200/40',
               label: 'POSYANDU (3B)',
-              value: totalBumilBalita.toLocaleString('id-ID'),
-              sub: 'IBU & BALITA',
+              value: posyandu.metadata.total_records.toString(),
+              sub: `TITIK PENERIMA (${total3B.toLocaleString('id-ID')} IBU & BALITA)`,
               valueColor: 'text-red-900'
             }
           ].map((item, i) => (
@@ -160,7 +167,7 @@ export default function DataPage() {
       </section>
 
       {/* KATALOG SECTION */}
-      <KatalogTabs />
+      <KatalogTabs summaryPenerimaManfaat={summaryPenerimaManfaat} sekolah={sekolah} posyandu={posyandu} />
     </main>
   );
 }

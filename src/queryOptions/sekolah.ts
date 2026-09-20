@@ -1,7 +1,6 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
-import { createSekolah, deleteSekolah, getPesertaDidik, getSekolah, postPesertaDidik, updateSekolah } from '../api/sekolah';
+import { createSekolah, deleteSekolah, getPesertaDidik, getSekolah, getSekolahByID, postPesertaDidik, updateSekolah } from '../api/sekolah';
 import type { GetPesertaDidikParams, GetSekolahParams, PesertaDidikInput, PostSekolah } from '../types/sekolah';
-import mockDataSekolah from '../mocks/sekolah.json';
 
 export function getSekolahQueryOptions(params?: GetSekolahParams) {
   return queryOptions({
@@ -13,6 +12,19 @@ export function getSekolahQueryOptions(params?: GetSekolahParams) {
 
     // QUERY FN KALAU SERVER HIDUP PLEASE UNCOMMENT KLO DIRUMAH
     queryFn: () => getSekolah(params)
+  });
+}
+
+export function getSekolahByIDQueryOptions(id: number) {
+  return queryOptions({
+    queryKey: ['sekolah_user', id],
+    // queryFn: async () => {
+    //   await new Promise((resolve) => setTimeout(resolve, 800));
+    //   return mockDataSekolah;
+    // },
+
+    // QUERY FN KALAU SERVER HIDUP PLEASE UNCOMMENT KLO DIRUMAH
+    queryFn: () => getSekolahByID(id)
   });
 }
 

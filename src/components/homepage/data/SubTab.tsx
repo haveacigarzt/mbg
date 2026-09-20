@@ -3,7 +3,7 @@
 import { GraduationCap, Briefcase, UserX, Clock, Baby } from 'lucide-react';
 const allTabs = [
   { id: '3B', icon: Baby, label: '3B', color: 'text-pink-500' },
-  { id: 'Ps.D', icon: GraduationCap, label: 'PS. D.', color: 'text-blue-500' },
+  { id: 'Ps.D', icon: GraduationCap, label: 'Ps.D', color: 'text-blue-500' },
   { id: 'Guru', icon: Briefcase, label: 'GURU', color: 'text-green-500' },
   { id: 'ATS', icon: UserX, label: 'ATS', color: 'text-orange-500' },
   { id: 'APS', icon: Clock, label: 'APS', color: 'text-gray-500' }

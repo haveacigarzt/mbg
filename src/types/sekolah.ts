@@ -4,7 +4,7 @@ export type Sekolah = {
   id: number;
   nama: string;
   alamat: string;
-  tingkat: 'SD' | 'SMP' | 'SMA';
+  kategori: 'TK/PAUD' | 'SD/MI' | 'SMP/MTs' | 'SMA/SMK/MA';
   jumlah_siswa: number;
   kecamatan: string;
   kelurahan: string;
@@ -19,6 +19,10 @@ export type Sekolah = {
 export type FetchSekolahResponse = {
   metadata: Metadata;
   sekolah: Sekolah[];
+};
+
+export type FetchSingleSekolahResponse = {
+  sekolah: Sekolah;
 };
 
 export type GetSekolahParams = {
@@ -47,6 +51,15 @@ export type GetPesertaDidikParams = {
   nama?: string;
 };
 
+export type PD = {
+  kelas: string;
+  nisn: string;
+  rombel: string;
+  sekolah_id: number;
+  sekolah_nama: string;
+  status_aktif: boolean;
+};
+
 export type PesertaDidik = {
   penduduk: {
     alamat: string;
@@ -59,14 +72,7 @@ export type PesertaDidik = {
     no_hp: string;
     tanggal_lahir: string; // YYYY-MM-DD
   };
-  peserta_didik: {
-    kelas: string;
-    nisn: string;
-    rombel: string;
-    sekolah_id: number;
-    sekolah_nama: string;
-    status_aktif: boolean;
-  };
+  peserta_didik: PD;
 };
 
 export type FetchPesertaDidikResponse = {

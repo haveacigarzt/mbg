@@ -10,6 +10,7 @@ export interface Posyandu {
   kelurahan_id: number;
   jumlah_balita: number;
   jumlah_ibu_hamil: number;
+  jumlah_ibu_menyusui: number;
   sppg_id: number;
   latitude: number;
   longitude: number;
@@ -102,6 +103,7 @@ export type Balita = {
   panjang_lahir: number;
   posyandu_id: number;
   posyandu_nama: string;
+  status_aktif: boolean;
 };
 
 export type Bumil = {
@@ -112,6 +114,7 @@ export type Bumil = {
   abortus: number;
   posyandu_id: number;
   posyandu_nama: string;
+  status_aktif: boolean;
 };
 
 export type Busui = {
@@ -120,6 +123,7 @@ export type Busui = {
   asi_eksklusif: boolean;
   posyandu_id: number;
   posyandu_nama: string;
+  status_aktif: boolean;
 };
 
 //

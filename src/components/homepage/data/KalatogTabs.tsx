@@ -3,6 +3,15 @@
 import { useState } from 'react';
 import { Users, Heart, Briefcase, Wheat } from 'lucide-react';
 import Penerima from './Penerima';
+import type { SummaryPenerimaManfaatInner } from '@/types/summary';
+import type { FetchSekolahResponse } from '@/types/sekolah';
+import type { FetchPosyanduResponse } from '@/types/posyandu';
+
+interface Props {
+  summaryPenerimaManfaat: SummaryPenerimaManfaatInner;
+  sekolah: FetchSekolahResponse;
+  posyandu: FetchPosyanduResponse;
+}
 
 const tabs = [
   { id: 'penerima', icon: <Users className="w-5 h-5 md:w-7 md:h-7" />, label: 'PENERIMA MANFAAT', color: 'text-blue-500' },
@@ -11,7 +20,7 @@ const tabs = [
   { id: 'pangan', icon: <Wheat className="w-5 h-5 md:w-7 md:h-7" />, label: 'SERAPAN PANGAN LOKAL', color: 'text-orange-400' }
 ];
 
-export default function KatalogTabs() {
+const KatalogTabs = ({ summaryPenerimaManfaat, sekolah, posyandu }: Props) => {
   const [activeTab, setActiveTab] = useState('penerima');
 
   return (
@@ -33,11 +42,13 @@ export default function KatalogTabs() {
 
       {/* Konten berdasarkan tab aktif */}
       <div>
-        {activeTab === 'penerima' && <Penerima />}
+        {activeTab === 'penerima' && <Penerima summaryPenerimaManfaat={summaryPenerimaManfaat} sekolah={sekolah} posyandu={posyandu} />}
         {activeTab === 'stunting' && <p className="text-gray-400 text-sm">Konten Potensi Stunting — coming soon</p>}
         {activeTab === 'pekerjaan' && <p className="text-gray-400 text-sm">Konten Lapangan Pekerjaan — coming soon</p>}
         {activeTab === 'pangan' && <p className="text-gray-400 text-sm">Konten Serapan Pangan Lokal — coming soon</p>}
       </div>
     </section>
   );
-}
+};
+
+export default KatalogTabs;

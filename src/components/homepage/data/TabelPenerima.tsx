@@ -2,33 +2,21 @@
 
 import { useState } from 'react';
 import { Heart, School, ChevronLeft, ChevronRight, Ban } from 'lucide-react';
-
-interface PosyanduItem {
-  nama: string;
-  alamat: string;
-  jumlah_balita: number;
-  jumlah_ibu_hamil: number;
-}
-
-interface SekolahItem {
-  nama: string;
-  alamat: string;
-  tingkat: string;
-  jumlah_siswa: number;
-  kecamatan: string;
-}
+import type { Sekolah } from '@/types/sekolah';
+import type { Posyandu } from '@/types/posyandu';
 
 interface Props {
   selected: string;
-  posyandu: PosyanduItem[];
-  sekolah: SekolahItem[];
+  posyandu: Posyandu[];
+  sekolah: Sekolah[];
+  chartColors: string[][];
 }
 
 const PER_PAGE = 10;
 
-export default function TabelPenerima({ selected, posyandu, sekolah }: Props) {
+export default function TabelPenerima({ selected, posyandu, sekolah, chartColors }: Props) {
   const [page, setPage] = useState(1);
-  const handlePageReset = () => setPage(1);
+  // const handlePageReset = () => setPage(1);
   // Config per kategori
   const config: Record<
     string,
@@ -45,15 +33,18 @@ export default function TabelPenerima({ selected, posyandu, sekolah }: Props) {
       icon: <Heart className="w-4 h-4 text-pink-500" />,
       iconBg: 'bg-pink-50',
       title: 'DAFTAR POSYANDU PENERIMA MANFAAT (3B)',
-      columns: ['NAMA POSYANDU', 'ALAMAT', 'BALITA', 'IBU HAMIL'],
+      columns: ['NAMA POSYANDU', 'ALAMAT', 'BUMIL', 'BUSUI', 'BALITA'],
       rows: posyandu.map((el) => [
         <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">{el.nama}</span>,
         <span className="text-xs text-gray-400 whitespace-nowrap">{el.alamat}</span>,
-        <span className="text-sm font-bold text-blue-500 whitespace-nowrap">
-          {el.jumlah_balita} <span className="text-gray-400 font-normal text-xs">jiwa</span>
-        </span>,
-        <span className="text-sm font-bold text-pink-500 whitespace-nowrap">
+        <span className="text-sm font-bold whitespace-nowrap" style={{ color: chartColors[0][0] }}>
           {el.jumlah_ibu_hamil} <span className="text-gray-400 font-normal text-xs">jiwa</span>
+        </span>,
+        <span className="text-sm font-bold whitespace-nowrap" style={{ color: chartColors[1][0] }}>
+          {el.jumlah_ibu_menyusui} <span className="text-gray-400 font-normal text-xs">jiwa</span>
+        </span>,
+        <span className="text-sm font-bold whitespace-nowrap" style={{ color: chartColors[2][0] }}>
+          {el.jumlah_balita} <span className="text-gray-400 font-normal text-xs">jiwa</span>
         </span>
       ]),
       total: posyandu.length
@@ -66,7 +57,15 @@ export default function TabelPenerima({ selected, posyandu, sekolah }: Props) {
       rows: sekolah.map((el) => [
         <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">{el.nama}</span>,
         <span className="text-xs text-gray-400 whitespace-nowrap">{el.alamat}</span>,
-        <span className="bg-blue-50 text-blue-600 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap">{el.tingkat}</span>,
+        <span
+          className="text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap"
+          style={{
+            backgroundColor: el.kategori === 'TK/PAUD' ? chartColors[0][1] : el.kategori === 'SD/MI' ? chartColors[1][1] : el.kategori === 'SMP/MTs' ? chartColors[2][1] : chartColors[3][1],
+            color: el.kategori === 'TK/PAUD' ? chartColors[0][0] : el.kategori === 'SD/MI' ? chartColors[1][0] : el.kategori === 'SMP/MTs' ? chartColors[2][0] : chartColors[3][0]
+          }}
+        >
+          {el.kategori}
+        </span>,
         <span className="text-sm font-bold text-blue-500 whitespace-nowrap">
           {el.jumlah_siswa.toLocaleString('id-ID')} <span className="text-gray-400 font-normal text-xs">siswa</span>
         </span>
@@ -102,7 +101,7 @@ export default function TabelPenerima({ selected, posyandu, sekolah }: Props) {
 
       {/* Tabel - dibungkus scroll horizontal biar kolom nggak kegencet di mobile */}
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[600px]">
+        <table className="w-full min-w-150">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
               {current.columns.map((col, i) => (

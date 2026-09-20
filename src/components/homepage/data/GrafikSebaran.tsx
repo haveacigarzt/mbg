@@ -2,37 +2,27 @@
 
 import { Bar, BarChart, XAxis, YAxis, CartesianGrid, Cell } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-
-interface SekolahItem {
-  tingkat: string;
-  jumlah_siswa: number;
-}
-
-interface PosyanduItem {
-  jumlah_balita: number;
-  jumlah_ibu_hamil: number;
-}
+import type { SummaryPenerimaManfaatInner } from '@/types/summary';
 
 interface Props {
   onSelect: (kategori: string) => void;
   selected: string;
-  sekolah: SekolahItem[];
-  posyandu: PosyanduItem[];
+  summaryPenerimaManfaat: SummaryPenerimaManfaatInner;
 }
 
 const chartConfig = {
   jumlah: {
-    label: 'Jumlah Jiwa',
+    label: 'Jumlah Jiwa: ',
     color: '#3b82f6'
   }
 };
 
-export default function GrafikSebaran({ onSelect, selected, sekolah, posyandu }: Props) {
-  const totalBalita = posyandu.reduce((sum, el) => sum + el.jumlah_balita + el.jumlah_ibu_hamil, 0);
-  const totalPesertaDidik = sekolah.reduce((sum, el) => sum + el.jumlah_siswa, 0);
+export default function GrafikSebaran({ onSelect, selected, summaryPenerimaManfaat }: Props) {
+  const total3B = summaryPenerimaManfaat.balita + summaryPenerimaManfaat.bumil + summaryPenerimaManfaat.busui;
+  const totalPesertaDidik = summaryPenerimaManfaat.tk_paud + summaryPenerimaManfaat.sd_mi + summaryPenerimaManfaat.smp_mts + summaryPenerimaManfaat.sma_smk_ma;
 
   const data = [
-    { kategori: '3B', jumlah: totalBalita },
+    { kategori: '3B', jumlah: total3B },
     { kategori: 'Ps.D', jumlah: totalPesertaDidik },
     { kategori: 'Guru', jumlah: 0 },
     { kategori: 'ATS', jumlah: 0 },

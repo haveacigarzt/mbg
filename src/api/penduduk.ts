@@ -1,6 +1,6 @@
 import type { FetchPendudukResponse } from '@/types/penduduk';
 import { apiFetch } from './client';
-import type { PD } from '@/types/sekolah';
+import type { PesertaDidik } from '@/types/sekolah';
 
 export async function getPendudukByNIK(nik: string) {
   const response = await apiFetch(`/v1/penduduk/${nik}`);
@@ -29,7 +29,7 @@ export async function getPesertaDidikByNISN(nisn: string) {
     throw new Error('gagal mengambil peserta didik by NISN');
   }
 
-  const data: { peserta_didik: PD } = await response.json();
+  const data: { peserta_didik: PesertaDidik } = await response.json();
 
   return data;
 }

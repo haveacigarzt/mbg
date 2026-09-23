@@ -66,6 +66,7 @@ export type PesertaDidik = {
     id: number;
     jenis_kelamin: 'L' | 'P';
     kelurahan_id: number;
+    umur: number;
     kelurahan_nama: string;
     nama: string;
     nik: number;

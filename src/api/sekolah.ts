@@ -148,3 +148,22 @@ export async function postPesertaDidik(sekolah_id: number, input: PesertaDidikIn
 
   return data as PostPesertaDidikResponse;
 }
+
+export async function nonaktifPSD(nisn: string) {
+  const response = await apiFetch(`/v1/pesertadidik/${nisn}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status_aktif: false })
+  });
+  if (response.status === 401) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('token_expiry');
+  }
+
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    throw new ApiError(data?.message || data?.error || 'Patch peserta didik gagal', response.status, data);
+  }
+
+  return data as PostPesertaDidikResponse;
+}

@@ -1,0 +1,79 @@
+import type { ApiError } from '@/api/client';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { nonaktifPSDMutationOptions } from '@/queryOptions/sekolah';
+import { Loader2 } from 'lucide-react';
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { errorToast, successToast } from '@/lib/constants';
+
+interface Props {
+  children: React.ReactNode;
+  onSuccess: () => void;
+  nisn: string;
+  nama: string;
+}
+
+const DialogNonaktifkanPD = ({ children, onSuccess, nisn, nama }: Props) => {
+  const [open, setOpen] = useState(false);
+  const mutation = useMutation({
+    ...nonaktifPSDMutationOptions(),
+    onSuccess: () => {
+      toast.success(`Berhasil menonaktifkan peserta didik ${nama}`, {
+        style: successToast as React.CSSProperties
+      });
+      onSuccess();
+      setOpen(false);
+    },
+    onError: (error: ApiError) => {
+      toast.error('Terjadi kesalahan server. Harap menunggu beberapa saat', {
+        position: 'top-center',
+        style: errorToast as React.CSSProperties
+      });
+      console.log(error);
+    }
+  });
+
+  const handleDelete = async (nisn: string) => {
+    await mutation.mutateAsync(nisn);
+  };
+  return (
+    <Dialog open={open} onOpenChange={(val) => setOpen(val)}>
+      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogContent
+        className="
+            data-[state=open]:animate-in
+            data-[state=closed]:animate-out
+            data-[state=closed]:fade-out-0
+            data-[state=open]:fade-in-0
+            data-[state=closed]:zoom-out-95
+            data-[state=open]:zoom-in-95
+            duration-300
+          "
+      >
+        <DialogHeader>
+          <DialogTitle className="text-lg me-7">Apakah Anda yakin ingin menonaktifkan peserta didik ini?</DialogTitle>
+          <DialogDescription>Tindakan ini akan menonaktifkan peserta didik {nama} dari sekolah anda.</DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline" className="text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
+              Batal
+            </Button>
+          </DialogClose>
+          <Button
+            onClick={() => handleDelete(nisn)}
+            disabled={mutation.isPending}
+            className="bg-blue-600 hover:bg-blue-700
+                             text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
+          >
+            {mutation.isPending ? <Loader2 className="animate-spin" /> : 'Lanjutkan'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default DialogNonaktifkanPD;

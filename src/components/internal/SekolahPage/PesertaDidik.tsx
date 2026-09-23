@@ -4,19 +4,21 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import { Textarea } from '@/components/ui/textarea';
-import { createPesertaDidikMutationOptions, getPesertaDidikQueryOptions, getSekolahByIDQueryOptions } from '@/queryOptions/sekolah';
+import { createPesertaDidikMutationOptions, getPesertaDidikQueryOptions } from '@/queryOptions/sekolah';
 import { pendudukSchema, pesertaDidikSchema } from '@/schema/formValidation';
 import type { PesertaDidikInput } from '@/types/sekolah';
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
-import { Suspense, useEffect, useState } from 'react';
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 import { errorToast, successToast } from '@/lib/constants';
 import { toast } from 'sonner';
 import type { AuthResponse } from '@/types/auth';
 import Navbar from '../Navbar';
-import { HandHeart, Loader2 } from 'lucide-react';
+import { HandHeart, Loader2, Plus } from 'lucide-react';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { getKecamatanQueryOptions, getKelurahanQueryOptions } from '@/queryOptions/sppg';
 import { getPendudukByNIKQueryOptions, getPesertaDidikByNISNQueryOptions } from '@/queryOptions/penduduk';
+import PesertaDidikTable from './PesertaDidikTable';
+import type { SortingState } from '@tanstack/react-table';
 
 interface Props {
   user: AuthResponse;
@@ -41,9 +43,7 @@ const PesertaDidik = ({ user }: Props) => {
     }
   });
   const [hideForm, setHideForm] = useState(false);
-  const [pesan, setPesan] = useState(
-    'Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio numquam doloremque ratione aspernatur! Cumque quam voluptate exercitationem quo tempore eum quos incidunt, excepturi maiores officia blanditiis labore dolor nisi in!'
-  );
+  const [pesan, setPesan] = useState('');
 
   const [selectedNIK, setSelectedNIK] = useState('0');
   const [selectedNISN, setSelectedNISN] = useState('0');
@@ -135,8 +135,14 @@ const PesertaDidik = ({ user }: Props) => {
     }
   };
 
-  const { data, refetch } = useQuery(getPesertaDidikQueryOptions(user.user.role.id_in_role));
-  const { data: sekolah } = useSuspenseQuery(getSekolahByIDQueryOptions(user.user.role.id_in_role));
+  const [page, setPage] = useState(1);
+  const page_size = 10;
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const sort = sorting[0] ? `${sorting[0].desc ? '-' : ''}${sorting[0].id}` : '';
+
+  const { data, refetch } = useSuspenseQuery(getPesertaDidikQueryOptions(user.user.role.id_in_role, { page, page_size, sort }));
+  // console.log(data);
+  // const { data: sekolah } = useSuspenseQuery(getSekolahByIDQueryOptions(user.user.role.id_in_role));
   // console.log('sekolah', sekolah);
   const { data: kecamatan } = useSuspenseQuery(getKecamatanQueryOptions());
   const { data: kelurahan } = useSuspenseQuery(getKelurahanQueryOptions(kecamatanID));
@@ -145,8 +151,6 @@ const PesertaDidik = ({ user }: Props) => {
   const { data: penduduk } = useSuspenseQuery(getPendudukByNIKQueryOptions(selectedNIK));
 
   const { data: peserta_didik } = useSuspenseQuery(getPesertaDidikByNISNQueryOptions(selectedNISN));
-
-  console.log(peserta_didik);
 
   useEffect(() => {
     if (penduduk.penduduk) {
@@ -179,7 +183,7 @@ const PesertaDidik = ({ user }: Props) => {
         return;
       }
       if (penduduk.penduduk.balita?.status_aktif === false || penduduk.penduduk.bumil?.status_aktif === false || penduduk.penduduk.busui?.status_aktif === false) {
-        console.log(penduduk.penduduk.balita?.status_aktif);
+        // console.log(penduduk.penduduk.balita?.status_aktif);
         setKecamatanID(penduduk.penduduk.penduduk.kecamatan_id);
         setForm({
           ...form,
@@ -247,7 +251,10 @@ const PesertaDidik = ({ user }: Props) => {
             </div>
             <Dialog open={open} onOpenChange={(val) => setOpen(val)}>
               <DialogTrigger asChild>
-                <Button className="rounded-sm">Tambah</Button>
+                <Button className="gap-2">
+                  <Plus />
+                  Tambah
+                </Button>
               </DialogTrigger>
               <DialogContent
                 className="sm:max-w-4xl
@@ -263,7 +270,7 @@ const PesertaDidik = ({ user }: Props) => {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <DialogHeader className="gap-0">
                     <DialogTitle className="text-lg font-semibold">Tambah data Peserta Didik Baru</DialogTitle>
-                    <DialogDescription>Tambah data Peserta Didik baru di sekolah anda. Klik simpan saat selesai.</DialogDescription>
+                    <DialogDescription>Tambah data Peserta Didik (Ps.D) baru di sekolah anda. Klik simpan saat selesai.</DialogDescription>
                   </DialogHeader>
                   <div>
                     <div className="flex justify-around py-5">
@@ -435,9 +442,9 @@ const PesertaDidik = ({ user }: Props) => {
                           </div>
                         </div>
                       </div>
-                      <div className={hideForm ? 'hidden' : ''}>
+                      <div className={hideForm ? 'hidden' : 'w-2/9'}>
                         <div className="mb-3">
-                          <h2 className="font-semibold text-lg">Data Peserta Didik</h2>
+                          <h2 className="font-semibold text-lg">Data Ps.D</h2>
                         </div>
                         <div className="space-y-4">
                           <div className="space-y-2">
@@ -458,6 +465,7 @@ const PesertaDidik = ({ user }: Props) => {
                                 searchNISN(e.target.value);
                               }}
                             />
+                            <span className="text-red-600">{peserta_didik.peserta_didik ? `Ps.D dengan NISN ${peserta_didik.peserta_didik.peserta_didik.nisn} sudah terdaftar` : ''}</span>
                           </div>
 
                           <div className="space-y-2">
@@ -510,7 +518,7 @@ const PesertaDidik = ({ user }: Props) => {
                     </DialogClose>
                     <Button
                       type="submit"
-                      disabled={mutation.isPending || hideForm}
+                      disabled={mutation.isPending || hideForm || peserta_didik.peserta_didik}
                       className="bg-blue-600 hover:bg-blue-700
                              text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
                     >
@@ -521,51 +529,7 @@ const PesertaDidik = ({ user }: Props) => {
               </DialogContent>
             </Dialog>
           </div>
-
-          <div className="p-4">
-            <Suspense fallback={<div className="flex items-center justify-center py-12 text-gray-300 text-sm">Memuat data...</div>}>
-              <div>
-                <h1>Tabel Peserta Didik</h1>
-                <table border={1}>
-                  <thead>
-                    <tr>
-                      <th>No</th>
-                      <th>NIK</th>
-                      <th>Nama</th>
-                      <th>JK</th>
-                      <th>Tanggal Lahir</th>
-                      <th>Kelurahan</th>
-                      <th>Alamat</th>
-                      <th>No HP</th>
-                      <th>NISN</th>
-                      <th>Kelas</th>
-                      <th>Rombel</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {data?.peserta_didik.map((item, index) => (
-                      <tr key={item.penduduk.id}>
-                        <td>{index + 1}</td>
-                        <td>{item.penduduk.nik}</td>
-                        <td>{item.penduduk.nama}</td>
-                        <td>{item.penduduk.jenis_kelamin}</td>
-                        <td>{item.penduduk.tanggal_lahir.slice(0, 10)}</td>
-                        <td>{item.penduduk.kelurahan_nama}</td>
-                        <td>{item.penduduk.alamat}</td>
-                        <td>{item.penduduk.no_hp}</td>
-                        <td>{item.peserta_didik.nisn}</td>
-                        <td>{item.peserta_didik.kelas}</td>
-                        <td>{item.peserta_didik.rombel}</td>
-                        {/* <td>{item.peserta_didik.sekolah_nama}</td>
-                        <td>{item.peserta_didik.status_aktif ? 'Aktif' : 'Tidak Aktif'}</td> */}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Suspense>
-          </div>
+          <PesertaDidikTable pesertaDidik={data.peserta_didik} setPage={setPage} page={page} sorting={sorting} setSorting={setSorting} metadata={data.metadata} refetch={refetch} />
         </div>
       </div>
     </div>

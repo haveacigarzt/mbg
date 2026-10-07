@@ -94,6 +94,7 @@ const PesertaDidik = ({ user }: Props) => {
       return;
     }
     try {
+      console.log({ sekolah_id: user.user.role.id_in_role, input: form });
       await mutation.mutateAsync({ sekolah_id: user.user.role.id_in_role, input: form });
     } catch (error: any) {
       console.log(error.data.error);
@@ -155,55 +156,62 @@ const PesertaDidik = ({ user }: Props) => {
   useEffect(() => {
     if (penduduk.penduduk) {
       console.log(penduduk.penduduk);
-      if (!penduduk.penduduk.peserta_didik?.status_aktif) {
-        setKecamatanID(penduduk.penduduk.penduduk.kecamatan_id);
-        setForm({
-          ...form,
-          penduduk: {
-            ...form.penduduk,
-            nama: penduduk.penduduk.penduduk.nama,
-            jenis_kelamin: penduduk.penduduk.penduduk.jenis_kelamin,
-            tanggal_lahir: penduduk.penduduk.penduduk.tanggal_lahir.split('T')[0],
-            kelurahan_id: penduduk.penduduk.penduduk.kelurahan_id,
-            alamat: penduduk.penduduk.penduduk.alamat,
-            no_hp: penduduk.penduduk.penduduk.no_hp
-          },
-          peserta_didik: {
-            nisn: penduduk.penduduk.peserta_didik?.nisn || '',
-            kelas: penduduk.penduduk.peserta_didik?.kelas || '',
-            rombel: penduduk.penduduk.peserta_didik?.rombel || ''
-          }
-        });
+      if (penduduk.penduduk.penduduk.kategori == 'PESERTA_DIDIK') {
+        if (!penduduk.penduduk.peserta_didik?.status_aktif) {
+          console.log('here');
+          setKecamatanID(penduduk.penduduk.penduduk.kecamatan_id);
+          setForm({
+            ...form,
+            penduduk: {
+              ...form.penduduk,
+              nama: penduduk.penduduk.penduduk.nama,
+              jenis_kelamin: penduduk.penduduk.penduduk.jenis_kelamin,
+              tanggal_lahir: penduduk.penduduk.penduduk.tanggal_lahir.split('T')[0],
+              kelurahan_id: Number(penduduk.penduduk.penduduk.kelurahan_id),
+              alamat: penduduk.penduduk.penduduk.alamat,
+              no_hp: penduduk.penduduk.penduduk.no_hp
+            },
+            peserta_didik: {
+              nisn: penduduk.penduduk.peserta_didik?.nisn || '',
+              kelas: penduduk.penduduk.peserta_didik?.kelas || '',
+              rombel: penduduk.penduduk.peserta_didik?.rombel || ''
+            }
+          });
+        } else {
+          console.log('here 2');
+          setHideForm(true);
+          const nama = penduduk.penduduk.penduduk.nama;
+          const nik = penduduk.penduduk.penduduk.nik;
+          const sekolah = penduduk.penduduk.peserta_didik.sekolah_nama;
+          setPesan(`${nama} (${nik}) saat ini terdaftar sebagai PESERTA DIDIK penerima manfaat aktif di ${sekolah}`);
+          return;
+        }
       } else {
-        setHideForm(true);
-        const nama = penduduk.penduduk.penduduk.nama;
-        const nik = penduduk.penduduk.penduduk.nik;
-        const sekolah = penduduk.penduduk.peserta_didik.sekolah_nama;
-        setPesan(`${nama} (${nik}) saat ini terdaftar sebagai PESERTA DIDIK penerima manfaat aktif di ${sekolah}`);
-        return;
-      }
-      if (penduduk.penduduk.balita?.status_aktif === false || penduduk.penduduk.bumil?.status_aktif === false || penduduk.penduduk.busui?.status_aktif === false) {
-        // console.log(penduduk.penduduk.balita?.status_aktif);
-        setKecamatanID(penduduk.penduduk.penduduk.kecamatan_id);
-        setForm({
-          ...form,
-          penduduk: {
-            ...form.penduduk,
-            nama: penduduk.penduduk.penduduk.nama,
-            jenis_kelamin: penduduk.penduduk.penduduk.jenis_kelamin,
-            tanggal_lahir: penduduk.penduduk.penduduk.tanggal_lahir.split('T')[0],
-            kelurahan_id: penduduk.penduduk.penduduk.kelurahan_id,
-            alamat: penduduk.penduduk.penduduk.alamat,
-            no_hp: penduduk.penduduk.penduduk.no_hp
-          }
-        });
-      } else {
-        setHideForm(true);
-        const nama = penduduk.penduduk.penduduk.nama;
-        const nik = penduduk.penduduk.penduduk.nik;
-        const kategori = penduduk.penduduk.penduduk.kategori;
-        const posyandu = penduduk.penduduk.balita?.posyandu_nama || penduduk.penduduk.bumil?.posyandu_nama || penduduk.penduduk.busui?.posyandu_nama;
-        setPesan(`${nama} (${nik}) saat ini terdaftar sebagai ${kategori} penerima manfaat aktif di ${posyandu}`);
+        if (penduduk.penduduk.balita?.status_aktif === false || penduduk.penduduk.bumil?.status_aktif === false || penduduk.penduduk.busui?.status_aktif === false) {
+          console.log('here 3');
+          // console.log(penduduk.penduduk.balita?.status_aktif);
+          setKecamatanID(penduduk.penduduk.penduduk.kecamatan_id);
+          setForm({
+            ...form,
+            penduduk: {
+              ...form.penduduk,
+              nama: penduduk.penduduk.penduduk.nama,
+              jenis_kelamin: penduduk.penduduk.penduduk.jenis_kelamin,
+              tanggal_lahir: penduduk.penduduk.penduduk.tanggal_lahir.split('T')[0],
+              kelurahan_id: Number(penduduk.penduduk.penduduk.kelurahan_id),
+              alamat: penduduk.penduduk.penduduk.alamat,
+              no_hp: penduduk.penduduk.penduduk.no_hp
+            }
+          });
+        } else {
+          console.log('here 4');
+          setHideForm(true);
+          const nama = penduduk.penduduk.penduduk.nama;
+          const nik = penduduk.penduduk.penduduk.nik;
+          const kategori = penduduk.penduduk.penduduk.kategori;
+          const posyandu = penduduk.penduduk.balita?.posyandu_nama || penduduk.penduduk.bumil?.posyandu_nama || penduduk.penduduk.busui?.posyandu_nama;
+          setPesan(`${nama} (${nik}) saat ini terdaftar sebagai ${kategori} penerima manfaat aktif di ${posyandu}`);
+        }
       }
     } else {
       setHideForm(false);
@@ -318,6 +326,7 @@ const PesertaDidik = ({ user }: Props) => {
                                     }
                                   })
                                 }
+                                disabled={penduduk.penduduk ? true : false}
                               />
                             </div>
                           </div>
@@ -340,6 +349,7 @@ const PesertaDidik = ({ user }: Props) => {
                                     }
                                   })
                                 }
+                                disabled={penduduk.penduduk ? true : false}
                               />
                             </div>
                             <div className="space-y-2">
@@ -355,6 +365,7 @@ const PesertaDidik = ({ user }: Props) => {
                                     }
                                   })
                                 }
+                                disabled={penduduk.penduduk ? true : false}
                               >
                                 <NativeSelectOption value="L">Laki-laki</NativeSelectOption>
                                 <NativeSelectOption value="P">Perempuan</NativeSelectOption>
@@ -375,6 +386,7 @@ const PesertaDidik = ({ user }: Props) => {
                                     }
                                   })
                                 }
+                                disabled={penduduk.penduduk ? true : false}
                               />
                             </div>
                           </div>
@@ -397,11 +409,19 @@ const PesertaDidik = ({ user }: Props) => {
                                     }
                                   })
                                 }
+                                disabled={penduduk.penduduk ? true : false}
                               />
                             </div>
                             <div className="space-y-2">
                               <Label htmlFor="kecamatan">Kecamatan Domisili</Label>
-                              <NativeSelect id="kecamatan" onChange={(e) => setKecamatanID(Number(e.target.value))} value={kecamatanID || 0} className="w-full" required>
+                              <NativeSelect
+                                id="kecamatan"
+                                onChange={(e) => setKecamatanID(Number(e.target.value))}
+                                value={kecamatanID || 0}
+                                className="w-full"
+                                required
+                                disabled={penduduk.penduduk ? true : false}
+                              >
                                 <NativeSelectOption disabled value={0} className="text-center">
                                   --- Pilih Kecamatan ---
                                 </NativeSelectOption>
@@ -428,6 +448,7 @@ const PesertaDidik = ({ user }: Props) => {
                                 }
                                 value={form.penduduk.kelurahan_id || 0}
                                 className="w-full"
+                                disabled={penduduk.penduduk ? true : false}
                               >
                                 <NativeSelectOption disabled value="0" className="text-center">
                                   --- Pilih Kelurahan ---
@@ -464,6 +485,7 @@ const PesertaDidik = ({ user }: Props) => {
                                 });
                                 searchNISN(e.target.value);
                               }}
+                              disabled={penduduk.penduduk?.penduduk.kategori == 'PESERTA_DIDIK' ? true : false}
                             />
                             <span className="text-red-600">{peserta_didik.peserta_didik ? `Ps.D dengan NISN ${peserta_didik.peserta_didik.peserta_didik.nisn} sudah terdaftar` : ''}</span>
                           </div>

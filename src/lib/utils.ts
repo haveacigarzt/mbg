@@ -97,3 +97,24 @@ export function timeToDateTime(date: string, time: string) {
 export function formatNumber(value: number): string {
   return new Intl.NumberFormat('id-ID').format(value);
 }
+
+export function getChangedFields(oldData: any, newData: any) {
+  const result = {};
+
+  for (const key of Object.keys(oldData)) {
+    const oldValue = oldData[key];
+    const newValue = newData[key];
+
+    if (oldValue !== null && newValue !== null && typeof oldValue === 'object' && typeof newValue === 'object' && !Array.isArray(oldValue) && !Array.isArray(newValue)) {
+      const nestedChanges = getChangedFields(oldValue, newValue);
+
+      if (nestedChanges !== false) {
+        result[key] = nestedChanges;
+      }
+    } else if (oldValue !== newValue) {
+      result[key] = newValue;
+    }
+  }
+
+  return Object.keys(result).length > 0 ? result : false;
+}

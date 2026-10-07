@@ -11,11 +11,11 @@ import { errorToast, successToast } from '@/lib/constants';
 interface Props {
   children: React.ReactNode;
   onSuccess: () => void;
-  nisn: string;
+  pid: string;
   nama: string;
 }
 
-const DialogNonaktifkanPD = ({ children, onSuccess, nisn, nama }: Props) => {
+const DialogNonaktifkanPD = ({ children, onSuccess, pid, nama }: Props) => {
   const [open, setOpen] = useState(false);
   const mutation = useMutation({
     ...nonaktifPSDMutationOptions(),
@@ -23,8 +23,9 @@ const DialogNonaktifkanPD = ({ children, onSuccess, nisn, nama }: Props) => {
       toast.success(`Berhasil menonaktifkan peserta didik ${nama}`, {
         style: successToast as React.CSSProperties
       });
-      onSuccess();
+      //redirect dari http://localhost:5173/sekolah/pesertadidik/10 ke http://localhost:5173/sekolah/pesertadidik
       setOpen(false);
+      onSuccess();
     },
     onError: (error: ApiError) => {
       toast.error('Terjadi kesalahan server. Harap menunggu beberapa saat', {
@@ -35,8 +36,8 @@ const DialogNonaktifkanPD = ({ children, onSuccess, nisn, nama }: Props) => {
     }
   });
 
-  const handleDelete = async (nisn: string) => {
-    await mutation.mutateAsync(nisn);
+  const handleDelete = async (pid: string) => {
+    await mutation.mutateAsync(pid);
   };
   return (
     <Dialog open={open} onOpenChange={(val) => setOpen(val)}>
@@ -63,7 +64,7 @@ const DialogNonaktifkanPD = ({ children, onSuccess, nisn, nama }: Props) => {
             </Button>
           </DialogClose>
           <Button
-            onClick={() => handleDelete(nisn)}
+            onClick={() => handleDelete(pid)}
             disabled={mutation.isPending}
             className="bg-blue-600 hover:bg-blue-700
                              text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"

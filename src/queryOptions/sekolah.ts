@@ -1,6 +1,6 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
-import { createSekolah, deleteSekolah, getPesertaDidik, getSekolah, getSekolahByID, nonaktifPSD, postPesertaDidik, updateSekolah } from '../api/sekolah';
-import type { GetPesertaDidikParams, GetSekolahParams, PesertaDidikInput, PostSekolah } from '../types/sekolah';
+import { createSekolah, deleteSekolah, getPesertaDidik, getSekolah, getSekolahByID, nonaktifPSD, patchPesertaDidik, postPesertaDidik, updateSekolah } from '../api/sekolah';
+import type { GetPesertaDidikParams, GetSekolahParams, PesertaDidikInput, PesertaDidikPatch, PostSekolah } from '../types/sekolah';
 
 export function getSekolahQueryOptions(params?: GetSekolahParams) {
   return queryOptions({
@@ -74,7 +74,7 @@ export function nonaktifPSDMutationOptions() {
     //   return { status: "success", message: `Data sekolah berhasil dihapus!` };
     // },
     // MUTATE FN UNCOMMENT KLO LAGI DI RUMAH
-    mutationFn: (nisn: string) => nonaktifPSD(nisn)
+    mutationFn: (pid: string) => nonaktifPSD(pid)
   });
 }
 
@@ -88,5 +88,11 @@ export function getPesertaDidikQueryOptions(id: number, params?: GetPesertaDidik
 export function createPesertaDidikMutationOptions() {
   return mutationOptions({
     mutationFn: ({ sekolah_id, input }: { sekolah_id: number; input: PesertaDidikInput }) => postPesertaDidik(sekolah_id, input)
+  });
+}
+
+export function updatePesertaDidikMutationOptions() {
+  return mutationOptions({
+    mutationFn: ({ id, input }: { id: string; input: PesertaDidikPatch }) => patchPesertaDidik(id, input)
   });
 }

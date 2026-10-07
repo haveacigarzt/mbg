@@ -6,9 +6,11 @@ import type {
   GetPesertaDidikParams,
   GetSekolahParams,
   PesertaDidikInput,
+  PesertaDidikPatch,
   PostPesertaDidikResponse,
   PostSekolah
 } from '../types/sekolah';
+import { queryClient } from '@/main';
 
 export async function getSekolah(params?: GetSekolahParams) {
   const searchParams = new URLSearchParams();
@@ -149,10 +151,31 @@ export async function postPesertaDidik(sekolah_id: number, input: PesertaDidikIn
   return data as PostPesertaDidikResponse;
 }
 
-export async function nonaktifPSD(nisn: string) {
-  const response = await apiFetch(`/v1/pesertadidik/${nisn}`, {
+export async function patchPesertaDidik(id: string, input: PesertaDidikPatch) {
+  const response = await apiFetch(`/v1/pesertadidik/${id}`, {
     method: 'PATCH',
-    body: JSON.stringify({ status_aktif: false })
+    body: JSON.stringify(input)
+  });
+
+  if (response.status === 401) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('token_expiry');
+  }
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    throw new ApiError(data?.message || data?.error || 'Update peserta didik gagal', response.status, data);
+  }
+
+  queryClient.setQueryData(['peserta_didik_by_penduduk_id', id], data);
+
+  return data as PostPesertaDidikResponse;
+}
+
+export async function nonaktifPSD(pid: string) {
+  const response = await apiFetch(`/v1/pesertadidik/${pid}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ peserta_didik: { status_aktif: false, kelas: '', rombel: '' } })
   });
   if (response.status === 401) {
     localStorage.removeItem('token');

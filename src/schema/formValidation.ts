@@ -226,6 +226,8 @@ export const pendudukSchema = z.object({
   no_hp: z.string().min(10, 'Nomor HP tidak valid').max(20, 'Nomor HP maksimal 20 karakter').regex(/^\d+$/, 'Nomor HP hanya boleh berisi angka')
 });
 
+export const pendudukPatchSchema = pendudukSchema.partial();
+
 export const pesertaDidikSchema = z.object({
   nisn: z.string().length(10, 'NISN harus terdiri dari 10 digit').regex(/^\d+$/, 'NISN hanya boleh berisi angka'),
 
@@ -233,6 +235,8 @@ export const pesertaDidikSchema = z.object({
 
   rombel: z.string().min(1, 'Rombel wajib diisi').max(20, 'Rombel maksimal 20 karakter')
 });
+
+export const pesertaDidikPatchSchema = pesertaDidikSchema.partial();
 
 export const balitaSchema = z.object({
   ibu_id: z.number().min(1, 'Ibu wajib dipilih'),

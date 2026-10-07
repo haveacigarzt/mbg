@@ -1,4 +1,4 @@
-import { getPendudukByNIK, getPesertaDidikByNISN } from '@/api/penduduk';
+import { getPendudukByNIK, getPesertaDidikByNISN, getPesertaDidikByPID } from '@/api/penduduk';
 import { queryOptions } from '@tanstack/react-query';
 
 export function getPendudukByNIKQueryOptions(nik: string) {
@@ -16,7 +16,7 @@ export function getPendudukByNIKQueryOptions(nik: string) {
 
 export function getPesertaDidikByNISNQueryOptions(nisn: string) {
   return queryOptions({
-    queryKey: ['peserta_didik_by_nisn', nisn],
+    queryKey: ['peserta_didik_by_penduduk_nisn', nisn],
     // queryFn: async () => {
     //   await new Promise((resolve) => setTimeout(resolve, 800));
     //   return mockDataSekolah;
@@ -24,5 +24,18 @@ export function getPesertaDidikByNISNQueryOptions(nisn: string) {
 
     // QUERY FN KALAU SERVER HIDUP PLEASE UNCOMMENT KLO DIRUMAH
     queryFn: () => getPesertaDidikByNISN(nisn)
+  });
+}
+
+export function getPesertaDidikByPIDQueryOptions(id: string) {
+  return queryOptions({
+    queryKey: ['peserta_didik_by_penduduk_id', id],
+    // queryFn: async () => {
+    //   await new Promise((resolve) => setTimeout(resolve, 800));
+    //   return mockDataSekolah;
+    // },
+
+    // QUERY FN KALAU SERVER HIDUP PLEASE UNCOMMENT KLO DIRUMAH
+    queryFn: () => getPesertaDidikByPID(id)
   });
 }

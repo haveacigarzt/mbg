@@ -22,6 +22,7 @@ export const Route = createFileRoute('/sekolah/pesertadidik/$nisn')({
 
 function RouteComponent() {
   const { nisn } = Route.useParams();
+  const { user } = Route.useRouteContext();
 
-  return <DetailPesertaDidik nisn={nisn} />;
+  return <DetailPesertaDidik pid={nisn} user={{ user }} />;
 }

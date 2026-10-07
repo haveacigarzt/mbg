@@ -66,10 +66,12 @@ export type PesertaDidik = {
     id: number;
     jenis_kelamin: 'L' | 'P';
     kelurahan_id: number;
+    kecamatan_id: number;
+    kecamatan_nama: string;
     umur: number;
     kelurahan_nama: string;
     nama: string;
-    nik: number;
+    nik: string;
     no_hp: string;
     tanggal_lahir: string; // YYYY-MM-DD
   };
@@ -106,5 +108,22 @@ export type PesertaDidikInput = {
     nisn: string;
     kelas: string;
     rombel: string;
+  };
+};
+
+export type PesertaDidikPatch = {
+  penduduk?: {
+    nik?: string;
+    nama?: string;
+    jenis_kelamin?: 'L' | 'P';
+    tanggal_lahir?: string; // YYYY-MM-DD
+    kelurahan_id?: number;
+    alamat?: string;
+    no_hp?: string;
+  };
+  peserta_didik?: {
+    nisn?: string;
+    kelas?: string;
+    rombel?: string;
   };
 };

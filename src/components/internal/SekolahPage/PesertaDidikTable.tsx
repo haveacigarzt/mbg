@@ -95,7 +95,7 @@ const PesertaDidikTable = ({ pesertaDidik, sorting, setSorting, page, metadata, 
                   </td>
                 ))}
                 <td>
-                  <Link to="/sekolah/pesertadidik/$nisn" params={{ nisn: row.original.peserta_didik.nisn }} className="flex gap-2">
+                  <Link to="/sekolah/pesertadidik/$nisn" params={{ nisn: String(row.original.penduduk.id) }} className="flex gap-2">
                     <Button variant="outline">
                       <ExternalLink />
                       Lihat

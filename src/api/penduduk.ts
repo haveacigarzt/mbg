@@ -19,7 +19,7 @@ export async function getPendudukByNIK(nik: string) {
 }
 
 export async function getPesertaDidikByNISN(nisn: string) {
-  const response = await apiFetch(`/v1/pesertadidik/${nisn}`);
+  const response = await apiFetch(`/v1/pesertadidikbynisn/${nisn}`);
   if (response.status === 401) {
     localStorage.removeItem('token');
     localStorage.removeItem('token_expiry');
@@ -27,6 +27,22 @@ export async function getPesertaDidikByNISN(nisn: string) {
 
   if (!response.ok) {
     throw new Error('gagal mengambil peserta didik by NISN');
+  }
+
+  const data: { peserta_didik: PesertaDidik } = await response.json();
+
+  return data;
+}
+
+export async function getPesertaDidikByPID(id: string) {
+  const response = await apiFetch(`/v1/pesertadidik/${id}`);
+  if (response.status === 401) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('token_expiry');
+  }
+
+  if (!response.ok) {
+    throw new Error('gagal mengambil peserta didik by ID');
   }
 
   const data: { peserta_didik: PesertaDidik } = await response.json();
